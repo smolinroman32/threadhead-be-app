@@ -17,4 +17,33 @@ import * as Prisma from './internal/prismaNamespaceBrowser.js'
 export { Prisma }
 export * as $Enums from './enums.js'
 export * from './enums.js';
-
+/**
+ * Model OpportunityFeed
+ * 
+ */
+export type OpportunityFeed = Prisma.OpportunityFeedModel
+/**
+ * Model OpportunitySearchQuery
+ * 
+ */
+export type OpportunitySearchQuery = Prisma.OpportunitySearchQueryModel
+/**
+ * Model Opportunity
+ * 
+ */
+export type Opportunity = Prisma.OpportunityModel
+/**
+ * Model SearchQuery
+ * 
+ */
+export type SearchQuery = Prisma.SearchQueryModel
+/**
+ * Model ThreadsAccount
+ * 
+ */
+export type ThreadsAccount = Prisma.ThreadsAccountModel
+/**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel

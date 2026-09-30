@@ -1,0 +1,9 @@
+model OpportunitySearchQuery {
+  opportunityId String      @db.Uuid
+  searchQueryId String      @db.Uuid
+  createdAt     DateTime    @default(now())
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  searchQuery   SearchQuery @relation(fields: [searchQueryId], references: [id], onDelete: Cascade)
+
+  @@id([opportunityId, searchQueryId])
+}

@@ -51,7 +51,12 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-
+  OpportunityFeed: 'OpportunityFeed',
+  OpportunitySearchQuery: 'OpportunitySearchQuery',
+  Opportunity: 'Opportunity',
+  SearchQuery: 'SearchQuery',
+  ThreadsAccount: 'ThreadsAccount',
+  User: 'User'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -68,4 +73,109 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const OpportunityFeedScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  intent: 'intent',
+  includeTerms: 'includeTerms',
+  excludeTerms: 'excludeTerms',
+  languages: 'languages',
+  freshnessHours: 'freshnessHours',
+  minScore: 'minScore',
+  isActive: 'isActive',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OpportunityFeedScalarFieldEnum = (typeof OpportunityFeedScalarFieldEnum)[keyof typeof OpportunityFeedScalarFieldEnum]
+
+
+export const OpportunitySearchQueryScalarFieldEnum = {
+  opportunityId: 'opportunityId',
+  searchQueryId: 'searchQueryId',
+  createdAt: 'createdAt'
+} as const
+
+export type OpportunitySearchQueryScalarFieldEnum = (typeof OpportunitySearchQueryScalarFieldEnum)[keyof typeof OpportunitySearchQueryScalarFieldEnum]
+
+
+export const OpportunityScalarFieldEnum = {
+  id: 'id',
+  opportunityFeedId: 'opportunityFeedId',
+  externalPostId: 'externalPostId',
+  authorUsername: 'authorUsername',
+  text: 'text',
+  permalink: 'permalink',
+  publishedAt: 'publishedAt',
+  score: 'score',
+  reason: 'reason',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OpportunityScalarFieldEnum = (typeof OpportunityScalarFieldEnum)[keyof typeof OpportunityScalarFieldEnum]
+
+
+export const SearchQueryScalarFieldEnum = {
+  id: 'id',
+  opportunityFeedId: 'opportunityFeedId',
+  query: 'query',
+  type: 'type',
+  isActive: 'isActive',
+  matchedPosts: 'matchedPosts',
+  relevantPosts: 'relevantPosts',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SearchQueryScalarFieldEnum = (typeof SearchQueryScalarFieldEnum)[keyof typeof SearchQueryScalarFieldEnum]
+
+
+export const ThreadsAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  threadsUserId: 'threadsUserId',
+  username: 'username',
+  accessTokenEncrypted: 'accessTokenEncrypted',
+  tokenExpiresAt: 'tokenExpiresAt',
+  scopes: 'scopes',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ThreadsAccountScalarFieldEnum = (typeof ThreadsAccountScalarFieldEnum)[keyof typeof ThreadsAccountScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  age: 'age',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const SortOrder = {
+  asc: 'asc',
+  desc: 'desc'
+} as const
+
+export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
