@@ -1,0 +1,17 @@
+model OpportunityFeed {
+  id             String        @id @default(uuid()) @db.Uuid
+  name           String
+  intent         String
+  includeTerms   String[]
+  excludeTerms   String[]
+  languages      String[]
+  freshnessHours Int
+  minScore       Int
+  isActive       Boolean
+  userId         String        @db.Uuid
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  searchQueries  SearchQuery[]
+  opportunitites Opportunity[]
+}
