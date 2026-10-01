@@ -4,6 +4,7 @@ export type CreateUserDateBody = Omit<UserEntity, 'id' | 'createdAt' | 'updatedA
 export type UpdateUserDataBody = Partial<Omit<UserEntity, 'id' | 'createdAt' | 'updatedAt'>>;
 export interface IUserRepository {
     getUserById: (userId: string) => Promise<UserEntity>;
+    getUserByEmail: (email: string) => Promise<UserEntity | null>;
     deleteUserById: (userId: string) => Promise<UserEntity>;
     updateUserById: (userId: string, userData: UpdateUserDataBody) => Promise<UserEntity>;
     createUser: (userData: CreateUserDateBody) => Promise<UserEntity>;
