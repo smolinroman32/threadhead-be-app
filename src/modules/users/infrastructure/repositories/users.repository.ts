@@ -49,4 +49,14 @@ export class UserRepository implements IUserRepository {
 
         return UserMapper.toDomain(user);
     }
+
+    async getUserByEmail(email: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (!user) return null;
+
+        return UserMapper.toDomain(user);
+    }
 }

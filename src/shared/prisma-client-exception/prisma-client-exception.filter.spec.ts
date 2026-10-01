@@ -1,6 +1,6 @@
 import { HttpStatus, type ArgumentsHost } from '@nestjs/common';
 import type { Response } from 'express';
-import { Prisma } from '../../../prisma/generated/prisma/client.js';
+import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaClientExceptionFilter } from './prisma-client-exception.filter.js';
 
 describe('PrismaClientExceptionFilter', () => {
