@@ -1,15 +1,3 @@
-//   id string pk
-//   opportunityFeedId string
-//   authorUsername string
-//   text string
-//   permalink string
-//   publishedAt Date
-//   score number
-//   reason string
-//   status string
-//   createdAt Date
-//   updatedAt Date
-
 model Opportunity {
   id                       String                   @id @default(uuid()) @db.Uuid
   opportunityFeedId        String                   @db.Uuid
