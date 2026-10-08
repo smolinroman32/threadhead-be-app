@@ -4,7 +4,7 @@ import {Strategy} from "passport-jwt";
 import type { Request } from "express";
 import { ACCESS_TOKEN_COOKIE } from "../../auth.constants.js";
 import { getEnv } from "../../../../shared/env/get-env.js";
-type JwtPayload = { sub: string; email: string };
+import type { JwtPayload } from "../../domain/jwt-payload.js";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
