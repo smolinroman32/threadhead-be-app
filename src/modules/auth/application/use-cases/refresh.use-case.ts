@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../../../users/application/user.service.js';
+import { UserNotFoundError } from '../../../users/domain/errors/user-not-found.error.js';
 import { InvalidRefreshTokenError } from '../../domain/errors/invalid-refresh-token.error.js';
 import { JwtTokenService } from '../../infrastructure/jwt/jwt.service.js';
 
@@ -13,12 +14,10 @@ export class RefreshUseCase {
     async execute(refreshToken: string | undefined) {
         const payload = await this.jwtTokenService.verifyRefreshToken(refreshToken ?? '').catch(() => null);
 
-        // Looked up by email (the only lookup that returns null): a deleted user, or one who changed
-        // email since the token was issued, has to sign in again.
-        const user = payload && (await this.userService.getUserByEmail(payload.email));
+        if (!payload) throw new InvalidRefreshTokenError();
 
-        if (!user || user.id !== payload.sub) throw new InvalidRefreshTokenError();
-
-        return user;
+        return this.userService.getUserById(payload.sub).catch((error) => {
+            throw error instanceof UserNotFoundError ? new InvalidRefreshTokenError() : error;
+        });
     }
 }
