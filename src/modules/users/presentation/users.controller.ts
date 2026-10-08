@@ -1,5 +1,7 @@
-import { Body, Controller, Delete, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import type { JwtPayload } from '../../auth/domain/jwt-payload.js';
+import { clearAuthCookies } from '../../auth/presentation/auth-cookies.js';
 import { CurrentUser } from '../../auth/presentation/decorators/current-user.decorator.js';
 import { UserService } from '../application/user.service.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -26,8 +28,10 @@ export class UsersController {
     }
 
     @Delete('me')
-    async deleteMe(@CurrentUser() currentUser: JwtPayload) {
+    async deleteMe(@CurrentUser() currentUser: JwtPayload, @Res({ passthrough: true }) res: Response) {
         const user = await this.userService.deleteUserById(currentUser.sub);
+
+        clearAuthCookies(res);
 
         return UserResponseMapper.toDto(user);
     }

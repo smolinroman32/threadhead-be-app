@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { PATH_METADATA } from '@nestjs/common/constants.js';
+import type { Response } from 'express';
 import type { JwtPayload } from '../../auth/domain/jwt-payload.js';
 import type { UserService } from '../application/user.service.js';
 import { UserEntity } from '../domain/entities/user.entity.js';
@@ -21,6 +22,8 @@ describe('UsersController', () => {
         deleteUserById: vi.fn(),
     };
     const controller = new UsersController(userService as unknown as UserService);
+    const response = { clearCookie: vi.fn() };
+    const res = response as unknown as Response;
 
     beforeEach(() => {
         vi.resetAllMocks();
@@ -53,9 +56,16 @@ describe('UsersController', () => {
     });
 
     it('deletes only the token user', async () => {
-        await controller.deleteMe(currentUser);
+        await controller.deleteMe(currentUser, res);
 
         expect(userService.deleteUserById).toHaveBeenCalledWith(currentUser.sub);
+    });
+
+    it('clears the auth cookies when the account is deleted', async () => {
+        await controller.deleteMe(currentUser, res);
+
+        expect(response.clearCookie).toHaveBeenCalledWith('access_token', expect.objectContaining({ path: '/' }));
+        expect(response.clearCookie).toHaveBeenCalledWith('refresh_token', expect.objectContaining({ path: '/auth' }));
     });
 
     it('has no route that takes a user id from the request', () => {
