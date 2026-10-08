@@ -3,6 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { CredentialsService } from '../../shared/credential-service/credential.service.js';
 import { AuthService } from './application/auth.service.js';
+import { RefreshUseCase } from './application/use-cases/refresh.use-case.js';
 import { SignInUseCase } from './application/use-cases/sign-in.use-case.js';
 import { SignUpUseCase } from './application/use-cases/sign-up.use-case.js';
 import { AuthController } from './presentation/auth.controller.js';
@@ -20,6 +21,7 @@ import {JwtStrategy} from "./infrastructure/jwt/jwt.strategy.js";
         AuthService,
         SignUpUseCase,
         SignInUseCase,
+        RefreshUseCase,
         JwtTokenService,
         JwtStrategy,
         { provide: APP_GUARD, useClass: JwtAuthGuard },

@@ -1,7 +1,7 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
-import type { CookieOptions, Response } from 'express';
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import type { CookieOptions, Request, Response } from 'express';
 import { getEnv } from '../../../shared/env/get-env.js';
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from '../auth.constants.js';
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, REFRESH_TOKEN_PATH } from '../auth.constants.js';
 import { Public } from './decorators/public.decorator.js';
 import { AuthService } from '../application/auth.service.js';
 import { UserResponseMapper } from '../../users/presentation/mappers/user-response.mapper.js';
@@ -30,19 +30,43 @@ export class AuthController {
         const { email, password } = body;
         const { user, tokens } = await this.authService.signIn({ email, password });
 
-        res.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, this.cookieOptions(ACCESS_TOKEN_MAX_AGE_MS));
-        res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, this.cookieOptions(REFRESH_TOKEN_MAX_AGE_MS));
+        this.setAuthCookies(res, tokens);
 
         return UserResponseMapper.toDto(user);
     }
 
-    private cookieOptions(maxAge: number): CookieOptions {
+    @Post('/refresh')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+        const { tokens } = await this.authService.refresh(req.cookies?.[REFRESH_TOKEN_COOKIE]);
+
+        this.setAuthCookies(res, tokens);
+    }
+
+    @Post('/sign-out')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    signOut(@Res({ passthrough: true }) res: Response) {
+        res.clearCookie(ACCESS_TOKEN_COOKIE, this.cookieOptions('/'));
+        res.clearCookie(REFRESH_TOKEN_COOKIE, this.cookieOptions(REFRESH_TOKEN_PATH));
+    }
+
+    private setAuthCookies(res: Response, tokens: { accessToken: string; refreshToken: string }) {
+        res.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
+            ...this.cookieOptions('/'),
+            maxAge: ACCESS_TOKEN_MAX_AGE_MS,
+        });
+        res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
+            ...this.cookieOptions(REFRESH_TOKEN_PATH),
+            maxAge: REFRESH_TOKEN_MAX_AGE_MS,
+        });
+    }
+
+    private cookieOptions(path: string): CookieOptions {
         return {
             httpOnly: true,
             secure: getEnv('NODE_ENV', 'development') === 'production',
             sameSite: 'lax',
-            path: '/',
-            maxAge,
+            path,
         };
     }
 }

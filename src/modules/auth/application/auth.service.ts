@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SignInUseCase, type SignInInput } from './use-cases/sign-in.use-case.js';
+import { RefreshUseCase } from './use-cases/refresh.use-case.js';
 import { SignUpUseCase, type SignUpInput } from './use-cases/sign-up.use-case.js';
 import { JwtTokenService } from '../infrastructure/jwt/jwt.service.js';
 
@@ -8,6 +9,7 @@ export class AuthService {
     constructor(
         private readonly signUpUseCase: SignUpUseCase,
         private readonly signInUseCase: SignInUseCase,
+        private readonly refreshUseCase: RefreshUseCase,
         private readonly jwtTokenService: JwtTokenService,
     ) {}
 
@@ -17,6 +19,13 @@ export class AuthService {
 
     async signIn(signInData: SignInInput) {
         const user = await this.signInUseCase.execute(signInData);
+        const tokens = await this.jwtTokenService.generateTokens({ sub: user.id, email: user.email });
+
+        return { user, tokens };
+    }
+
+    async refresh(refreshToken: string | undefined) {
+        const user = await this.refreshUseCase.execute(refreshToken);
         const tokens = await this.jwtTokenService.generateTokens({ sub: user.id, email: user.email });
 
         return { user, tokens };
