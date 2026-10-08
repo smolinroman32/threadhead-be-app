@@ -3,7 +3,7 @@ import {PassportStrategy} from "@nestjs/passport";
 import {Strategy} from "passport-jwt";
 import type { Request } from "express";
 import { ACCESS_TOKEN_COOKIE } from "../../auth.constants.js";
-import { getEnv } from "../../../../shared/env/get-env.js";
+import { getSecret } from "../../../../shared/env/get-env.js";
 import type { JwtPayload } from "../../domain/jwt-payload.js";
 
 @Injectable()
@@ -11,7 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor() {
         super({
             jwtFromRequest: (req: Request) => req?.cookies?.[ACCESS_TOKEN_COOKIE],
-            secretOrKey: getEnv('JWT_ACCESS_SECRET'),
+            secretOrKey: getSecret('JWT_ACCESS_SECRET'),
         });
     }
 
