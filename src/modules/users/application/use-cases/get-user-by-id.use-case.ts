@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../../infrastructure/repositories/users.repository.js';
+import { UserRepositoryPort } from '../../domain/ports/user-repository.port.js';
 
 @Injectable()
 export class GetUserByIdUseCase {
-    constructor(private readonly userRepository: UserRepository) {}
+    constructor(private readonly userRepository: UserRepositoryPort) {}
 
     execute(userId: string) {
         return this.userRepository.getUserById(userId);

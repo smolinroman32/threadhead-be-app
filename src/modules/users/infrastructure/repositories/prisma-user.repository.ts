@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import type { CreateUserData, IUserRepository, UpdateUserData } from './user-repository.interface.js';
+import { UserRepositoryPort, type CreateUserData, type UpdateUserData } from '../../domain/ports/user-repository.port.js';
 import { PrismaService } from '../../../../shared/prisma.service.js';
 import { UserNotFoundError } from '../../domain/errors/user-not-found.error.js';
 import { UserMapper } from '../mappers/user.mapper.js';
 
 @Injectable()
-export class UserRepository implements IUserRepository {
+export class PrismaUserRepository implements UserRepositoryPort {
     constructor(private prisma: PrismaService) {}
 
     async getUserById(userId: string) {

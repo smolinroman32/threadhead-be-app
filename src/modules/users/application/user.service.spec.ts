@@ -1,4 +1,4 @@
-import type { UserRepository } from '../infrastructure/repositories/users.repository.js';
+import type { UserRepositoryPort } from '../domain/ports/user-repository.port.js';
 import { UserService } from './user.service.js';
 import { CreateUserUseCase } from './use-cases/create-user.use-case.js';
 import { DeleteUserByIdUseCase } from './use-cases/delete-user-by-id.use-case.js';
@@ -15,7 +15,7 @@ describe('UserService', () => {
         getUserByEmail: vi.fn(),
         updateUserById: vi.fn(),
         revokeSessions: vi.fn(),
-    } as unknown as UserRepository;
+    } as unknown as UserRepositoryPort;
     const service = new UserService(
         new CreateUserUseCase(repository),
         new DeleteUserByIdUseCase(repository),
