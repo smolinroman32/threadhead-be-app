@@ -31,7 +31,7 @@ describe('UserService', () => {
 
     it('delegates each operation to its use case and repository', () => {
         const userId = 'user-id';
-        
+
         const userData = {
             name: 'Jane Doe',
             age: 25,

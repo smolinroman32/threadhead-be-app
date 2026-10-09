@@ -1,10 +1,10 @@
-import {Injectable} from "@nestjs/common";
-import {PassportStrategy} from "@nestjs/passport";
-import {Strategy} from "passport-jwt";
-import type { Request } from "express";
-import { ACCESS_TOKEN_COOKIE } from "../../auth.constants.js";
-import { getSecret } from "../../../../shared/env/get-env.js";
-import type { JwtPayload } from "../../domain/jwt-payload.js";
+import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy } from 'passport-jwt';
+import type { Request } from 'express';
+import { ACCESS_TOKEN_COOKIE } from '../../auth.constants.js';
+import { getSecret } from '../../../../shared/env/get-env.js';
+import type { JwtPayload } from '../../domain/jwt-payload.js';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,5 +18,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     validate(payload: JwtPayload) {
         return payload;
     }
-
 }

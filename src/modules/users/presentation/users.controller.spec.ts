@@ -65,14 +65,22 @@ describe('UsersController', () => {
     it('clears the auth cookies when the account is deleted', async () => {
         await controller.deleteMe(currentUser, res);
 
-        expect(response.clearCookie).toHaveBeenCalledWith('access_token', expect.objectContaining({ path: '/' }));
-        expect(response.clearCookie).toHaveBeenCalledWith('refresh_token', expect.objectContaining({ path: '/auth' }));
+        expect(response.clearCookie).toHaveBeenCalledWith(
+            'access_token',
+            expect.objectContaining({ path: '/' }),
+        );
+        expect(response.clearCookie).toHaveBeenCalledWith(
+            'refresh_token',
+            expect.objectContaining({ path: '/auth' }),
+        );
     });
 
     it('has no route that takes a user id from the request', () => {
         const paths = Object.getOwnPropertyNames(UsersController.prototype)
             .filter((name) => name !== 'constructor')
-            .map((name) => Reflect.getMetadata(PATH_METADATA, UsersController.prototype[name as keyof UsersController]));
+            .map((name) =>
+                Reflect.getMetadata(PATH_METADATA, UsersController.prototype[name as keyof UsersController]),
+            );
 
         expect(paths.length).toBeGreaterThan(0);
         expect(paths.every((path) => !String(path).includes(':'))).toBe(true);

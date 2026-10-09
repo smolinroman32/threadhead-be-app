@@ -13,9 +13,9 @@ async function bootstrap() {
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-    const { httpAdapter } = app.get(HttpAdapterHost)
+    const { httpAdapter } = app.get(HttpAdapterHost);
 
-    app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter), new DomainExceptionFilter())
+    app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter), new DomainExceptionFilter());
 
     await app.listen(Number(getEnv('PORT', '3000')));
 }

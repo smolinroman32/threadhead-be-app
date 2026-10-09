@@ -9,9 +9,9 @@ import { SignOutUseCase } from './application/use-cases/sign-out.use-case.js';
 import { SignUpUseCase } from './application/use-cases/sign-up.use-case.js';
 import { AuthController } from './presentation/auth.controller.js';
 import { UsersModule } from '../users/user.module.js';
-import {JwtTokenService} from "./infrastructure/jwt/jwt.service.js";
-import {JwtAuthGuard} from "./infrastructure/jwt/jwt-auth.guard.js";
-import {JwtStrategy} from "./infrastructure/jwt/jwt.strategy.js";
+import { JwtTokenService } from './infrastructure/jwt/jwt.service.js';
+import { JwtAuthGuard } from './infrastructure/jwt/jwt-auth.guard.js';
+import { JwtStrategy } from './infrastructure/jwt/jwt.strategy.js';
 
 @Module({
     imports: [UsersModule, JwtModule.register({})],

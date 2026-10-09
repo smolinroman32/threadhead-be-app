@@ -9,7 +9,6 @@ export function getEnv(name: string, fallback?: string): string {
     throw new Error(`Missing required environment variable: ${name}`);
 }
 
-
 const MIN_SECRET_LENGTH = 32;
 
 export function getSecret(name: string) {

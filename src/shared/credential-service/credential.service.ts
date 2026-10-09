@@ -13,7 +13,14 @@ export class CredentialsService {
         const salt = randomBytes(SALT_LENGTH);
         const key = await this.derive(password, salt, SCRYPT_PARAMS);
 
-        return ['scrypt', SCRYPT_PARAMS.N, SCRYPT_PARAMS.r, SCRYPT_PARAMS.p, salt.toString('base64'), key.toString('base64')].join('$');
+        return [
+            'scrypt',
+            SCRYPT_PARAMS.N,
+            SCRYPT_PARAMS.r,
+            SCRYPT_PARAMS.p,
+            salt.toString('base64'),
+            key.toString('base64'),
+        ].join('$');
     }
 
     // Pass `undefined` for an unknown user: a dummy hash is checked instead,

@@ -15,7 +15,11 @@ describe('SignOutUseCase', () => {
     });
 
     it('revokes the sessions of the refresh token user', async () => {
-        jwtTokenService.verifyRefreshToken.mockResolvedValue({ sub: 'user-id', email: 'u@x.io', tokenVersion: 0 });
+        jwtTokenService.verifyRefreshToken.mockResolvedValue({
+            sub: 'user-id',
+            email: 'u@x.io',
+            tokenVersion: 0,
+        });
 
         await useCase.execute('refresh-token');
 

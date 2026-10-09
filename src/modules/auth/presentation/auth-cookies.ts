@@ -15,7 +15,10 @@ function cookieOptions(path: string): CookieOptions {
 }
 
 export function setAuthCookies(res: Response, tokens: { accessToken: string; refreshToken: string }) {
-    res.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, { ...cookieOptions('/'), maxAge: ACCESS_TOKEN_MAX_AGE_MS });
+    res.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
+        ...cookieOptions('/'),
+        maxAge: ACCESS_TOKEN_MAX_AGE_MS,
+    });
     res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
         ...cookieOptions(REFRESH_TOKEN_PATH),
         maxAge: REFRESH_TOKEN_MAX_AGE_MS,

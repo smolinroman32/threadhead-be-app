@@ -21,7 +21,11 @@ describe('AuthController', () => {
         await controller.refresh(req, res);
 
         expect(authService.refresh).toHaveBeenCalledWith('old-refresh');
-        expect(response.cookie).toHaveBeenCalledWith('access_token', 'new-access', expect.objectContaining({ path: '/' }));
+        expect(response.cookie).toHaveBeenCalledWith(
+            'access_token',
+            'new-access',
+            expect.objectContaining({ path: '/' }),
+        );
         expect(response.cookie).toHaveBeenCalledWith(
             'refresh_token',
             'new-refresh',
@@ -35,7 +39,13 @@ describe('AuthController', () => {
         await controller.signOut(req, res);
 
         expect(authService.signOut).toHaveBeenCalledWith('old-refresh');
-        expect(response.clearCookie).toHaveBeenCalledWith('access_token', expect.objectContaining({ path: '/' }));
-        expect(response.clearCookie).toHaveBeenCalledWith('refresh_token', expect.objectContaining({ path: '/auth' }));
+        expect(response.clearCookie).toHaveBeenCalledWith(
+            'access_token',
+            expect.objectContaining({ path: '/' }),
+        );
+        expect(response.clearCookie).toHaveBeenCalledWith(
+            'refresh_token',
+            expect.objectContaining({ path: '/auth' }),
+        );
     });
 });
