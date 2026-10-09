@@ -4,6 +4,7 @@ import { CreateUserUseCase } from './use-cases/create-user.use-case.js';
 import { DeleteUserByIdUseCase } from './use-cases/delete-user-by-id.use-case.js';
 import { GetUserByEmailUseCase } from './use-cases/get-user-by-email.use-case.js';
 import { GetUserByIdUseCase } from './use-cases/get-user-by-id.use-case.js';
+import { RevokeUserSessionsUseCase } from './use-cases/revoke-user-sessions.use-case.js';
 import { UpdateUserByIdUseCase } from './use-cases/update-user-by-id.use-case.js';
 
 describe('UserService', () => {
@@ -13,6 +14,7 @@ describe('UserService', () => {
         getUserById: vi.fn(),
         getUserByEmail: vi.fn(),
         updateUserById: vi.fn(),
+        revokeSessions: vi.fn(),
     } as unknown as UserRepository;
     const service = new UserService(
         new CreateUserUseCase(repository),
@@ -20,6 +22,7 @@ describe('UserService', () => {
         new GetUserByIdUseCase(repository),
         new GetUserByEmailUseCase(repository),
         new UpdateUserByIdUseCase(repository),
+        new RevokeUserSessionsUseCase(repository),
     );
 
     beforeEach(() => {
@@ -41,11 +44,13 @@ describe('UserService', () => {
         service.getUserById(userId);
         service.getUserByEmail(userData.email);
         service.updateUserById(userId, { name: userData.name });
+        service.revokeSessions(userId);
 
         expect(repository.createUser).toHaveBeenCalledWith(userData);
         expect(repository.deleteUserById).toHaveBeenCalledWith(userId);
         expect(repository.getUserById).toHaveBeenCalledWith(userId);
         expect(repository.getUserByEmail).toHaveBeenCalledWith(userData.email);
         expect(repository.updateUserById).toHaveBeenCalledWith(userId, { name: userData.name });
+        expect(repository.revokeSessions).toHaveBeenCalledWith(userId);
     });
 });

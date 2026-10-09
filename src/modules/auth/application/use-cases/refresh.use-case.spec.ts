@@ -6,8 +6,8 @@ import type { JwtTokenService } from '../../infrastructure/jwt/jwt.service.js';
 import { RefreshUseCase } from './refresh.use-case.js';
 
 describe('RefreshUseCase', () => {
-    const payload = { sub: 'user-id', email: 'user@example.com' };
-    const user = { id: 'user-id', email: 'user@example.com' } as UserEntity;
+    const payload = { sub: 'user-id', email: 'user@example.com', tokenVersion: 0 };
+    const user = { id: 'user-id', email: 'user@example.com', tokenVersion: 0 } as UserEntity;
     const jwtTokenService = { verifyRefreshToken: vi.fn() };
     const userService = { getUserById: vi.fn() };
     const useCase = new RefreshUseCase(
@@ -39,6 +39,12 @@ describe('RefreshUseCase', () => {
 
     it('rejects a token whose user no longer exists', async () => {
         userService.getUserById.mockRejectedValue(new UserNotFoundError('user-id'));
+
+        await expect(useCase.execute('refresh-token')).rejects.toBeInstanceOf(InvalidRefreshTokenError);
+    });
+
+    it('rejects a token issued before the sessions were revoked', async () => {
+        userService.getUserById.mockResolvedValue({ ...user, tokenVersion: 1 });
 
         await expect(useCase.execute('refresh-token')).rejects.toBeInstanceOf(InvalidRefreshTokenError);
     });

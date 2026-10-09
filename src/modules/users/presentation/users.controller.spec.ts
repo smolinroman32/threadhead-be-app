@@ -7,12 +7,13 @@ import { UserEntity } from '../domain/entities/user.entity.js';
 import { UsersController } from './users.controller.js';
 
 describe('UsersController', () => {
-    const currentUser: JwtPayload = { sub: 'token-user-id', email: 'me@example.com' };
+    const currentUser: JwtPayload = { sub: 'token-user-id', email: 'me@example.com', tokenVersion: 0 };
     const entity = new UserEntity(currentUser.sub, {
         name: 'Me',
         age: 30,
         email: currentUser.email,
         passwordHash: 'secret-hash',
+        tokenVersion: 0,
         createdAt: new Date('2026-01-01'),
         updatedAt: new Date('2026-01-02'),
     });

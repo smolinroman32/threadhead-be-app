@@ -42,7 +42,9 @@ export class AuthController {
 
     @Post('/sign-out')
     @HttpCode(HttpStatus.NO_CONTENT)
-    signOut(@Res({ passthrough: true }) res: Response) {
+    async signOut(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+        await this.authService.signOut(req.cookies?.[REFRESH_TOKEN_COOKIE]);
+
         clearAuthCookies(res);
     }
 }

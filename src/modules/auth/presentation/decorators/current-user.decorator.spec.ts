@@ -22,7 +22,7 @@ function resolveCurrentUser(request: object) {
 
 describe('CurrentUser', () => {
     it('returns the payload that the JWT strategy attached to request.user', () => {
-        const payload: JwtPayload = { sub: 'user-id', email: 'user@example.com' };
+        const payload: JwtPayload = { sub: 'user-id', email: 'user@example.com', tokenVersion: 0 };
 
         expect(resolveCurrentUser({ user: payload })).toBe(payload);
     });

@@ -16,8 +16,12 @@ export class RefreshUseCase {
 
         if (!payload) throw new InvalidRefreshTokenError();
 
-        return this.userService.getUserById(payload.sub).catch((error) => {
+        const user = await this.userService.getUserById(payload.sub).catch((error) => {
             throw error instanceof UserNotFoundError ? new InvalidRefreshTokenError() : error;
         });
+
+        if (user.tokenVersion !== payload.tokenVersion) throw new InvalidRefreshTokenError();
+
+        return user;
     }
 }

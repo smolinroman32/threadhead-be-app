@@ -12,3 +12,17 @@ describe('UserRepository.getUserById', () => {
         await expect(repository.getUserById('missing-id')).rejects.toBeInstanceOf(UserNotFoundError);
     });
 });
+
+describe('UserRepository.revokeSessions', () => {
+    const updateMany = vi.fn();
+    const repository = new UserRepository({ user: { updateMany } } as unknown as PrismaService);
+
+    it('bumps tokenVersion without failing for a deleted user', async () => {
+        await repository.revokeSessions('user-id');
+
+        expect(updateMany).toHaveBeenCalledWith({
+            where: { id: 'user-id' },
+            data: { tokenVersion: { increment: 1 } },
+        });
+    });
+});

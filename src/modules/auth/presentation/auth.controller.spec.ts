@@ -5,7 +5,7 @@ import { AuthController } from './auth.controller.js';
 describe('AuthController', () => {
     const user = { id: 'user-id', email: 'user@example.com' };
     const tokens = { accessToken: 'new-access', refreshToken: 'new-refresh' };
-    const authService = { refresh: vi.fn() };
+    const authService = { refresh: vi.fn(), signOut: vi.fn() };
     const controller = new AuthController(authService as unknown as AuthService);
     const response = { cookie: vi.fn(), clearCookie: vi.fn() };
     const res = response as unknown as Response;
@@ -29,9 +29,12 @@ describe('AuthController', () => {
         );
     });
 
-    it('sign-out clears both cookies on the paths they were set with', () => {
-        controller.signOut(res);
+    it('sign-out revokes the sessions of the refresh cookie user and clears both cookies', async () => {
+        const req = { cookies: { refresh_token: 'old-refresh' } } as unknown as Request;
 
+        await controller.signOut(req, res);
+
+        expect(authService.signOut).toHaveBeenCalledWith('old-refresh');
         expect(response.clearCookie).toHaveBeenCalledWith('access_token', expect.objectContaining({ path: '/' }));
         expect(response.clearCookie).toHaveBeenCalledWith('refresh_token', expect.objectContaining({ path: '/auth' }));
     });

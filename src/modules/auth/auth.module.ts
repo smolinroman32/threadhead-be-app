@@ -5,6 +5,7 @@ import { CredentialsService } from '../../shared/credential-service/credential.s
 import { AuthService } from './application/auth.service.js';
 import { RefreshUseCase } from './application/use-cases/refresh.use-case.js';
 import { SignInUseCase } from './application/use-cases/sign-in.use-case.js';
+import { SignOutUseCase } from './application/use-cases/sign-out.use-case.js';
 import { SignUpUseCase } from './application/use-cases/sign-up.use-case.js';
 import { AuthController } from './presentation/auth.controller.js';
 import { UsersModule } from '../users/user.module.js';
@@ -22,6 +23,7 @@ import {JwtStrategy} from "./infrastructure/jwt/jwt.strategy.js";
         SignUpUseCase,
         SignInUseCase,
         RefreshUseCase,
+        SignOutUseCase,
         JwtTokenService,
         JwtStrategy,
         { provide: APP_GUARD, useClass: JwtAuthGuard },

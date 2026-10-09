@@ -10,6 +10,7 @@ export class UserMapper {
             createdAt: raw.createdAt,
             updatedAt: raw.updatedAt,
             passwordHash: raw.passwordHash,
+            tokenVersion: raw.tokenVersion,
         });
     }
 }

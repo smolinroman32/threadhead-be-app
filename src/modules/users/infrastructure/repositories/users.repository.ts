@@ -53,6 +53,14 @@ export class UserRepository implements IUserRepository {
         return UserMapper.toDomain(user);
     }
 
+    // updateMany, not update: revoking sessions of an already deleted user must not throw.
+    async revokeSessions(userId: string) {
+        await this.prisma.user.updateMany({
+            where: { id: userId },
+            data: { tokenVersion: { increment: 1 } },
+        });
+    }
+
     async getUserByEmail(email: string) {
         const user = await this.prisma.user.findUnique({
             where: { email },
