@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import type {
-    CreateUserDateBody,
-    UpdateUserDataBody,
-} from '../infrastructure/repositories/user.repositroy.interface.js';
+    CreateUserData,
+    UpdateUserData,
+} from '../infrastructure/repositories/user-repository.types.js';
 import { CreateUserUseCase } from './use-cases/create-user.use-case.js';
 import { DeleteUserByIdUseCase } from './use-cases/delete-user-by-id.use-case.js';
 import { GetUserByEmailUseCase } from './use-cases/get-user-by-email.use-case.js';
@@ -21,7 +21,7 @@ export class UserService {
         private readonly revokeUserSessionsUseCase: RevokeUserSessionsUseCase,
     ) {}
 
-    createUser(userData: CreateUserDateBody) {
+    createUser(userData: CreateUserData) {
         return this.createUserUseCase.execute(userData);
     }
 
@@ -41,7 +41,7 @@ export class UserService {
         return this.revokeUserSessionsUseCase.execute(userId);
     }
 
-    updateUserById(userId: string, userData: UpdateUserDataBody) {
+    updateUserById(userId: string, userData: UpdateUserData) {
         return this.updateUserByIdUseCase.execute(userId, userData);
     }
 }
