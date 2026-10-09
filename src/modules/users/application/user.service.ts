@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type {
     CreateUserData,
     UpdateUserData,
-} from '../infrastructure/repositories/user-repository.types.js';
+} from '../infrastructure/repositories/user-repository.interface.js';
 import { CreateUserUseCase } from './use-cases/create-user.use-case.js';
 import { DeleteUserByIdUseCase } from './use-cases/delete-user-by-id.use-case.js';
 import { GetUserByEmailUseCase } from './use-cases/get-user-by-email.use-case.js';
