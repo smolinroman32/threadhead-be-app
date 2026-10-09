@@ -8,12 +8,10 @@ import { RevokeUserSessionsUseCase } from './application/use-cases/revoke-user-s
 import { UpdateUserByIdUseCase } from './application/use-cases/update-user-by-id.use-case.js';
 import { UserRepository } from './infrastructure/repositories/users.repository.js';
 import { UsersController } from './presentation/users.controller.js';
-import { PrismaService } from '../../shared/prisma.service.js';
 
 @Module({
     controllers: [UsersController],
     providers: [
-        PrismaService,
         UserRepository,
         CreateUserUseCase,
         DeleteUserByIdUseCase,
