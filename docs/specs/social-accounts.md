@@ -100,8 +100,14 @@ key is `ENCRYPTION_KEY`, 64 hex characters (32 bytes), checked at startup. The `
 algorithm and key, so a later rotation can write `v2` and still read `v1`.
 
 New environment variables (added to `.env.example` and the README; the user supplies real values):
-`THREADS_APP_ID`, `THREADS_APP_SECRET`, `THREADS_REDIRECT_URI`, `FRONTEND_URL`,
-`FRONTEND_SOCIAL_RESULT_PATH`, `ENCRYPTION_KEY`, `OAUTH_STATE_SECRET`.
+`NEST_URL`, `THREADS_APP_ID`, `THREADS_APP_SECRET`, `FRONTEND_URL`, `FRONTEND_SOCIAL_RESULT_PATH`,
+`ENCRYPTION_KEY`, `OAUTH_STATE_SECRET`.
+
+`NEST_URL` is the public base URL of this backend (for example `https://api.example.com`, no trailing
+slash; one is trimmed if present). The OAuth `redirect_uri` is derived from it as
+`${NEST_URL}/social-accounts/<provider>/callback`, so there is no separate redirect variable. That exact
+URL must be registered as a redirect URI in the Threads app, and changing `NEST_URL` means updating it
+there.
 
 ## Ports
 
@@ -113,6 +119,8 @@ New environment variables (added to `.env.example` and the README; the user supp
   a token, list scopes.
 - `SocialAccountApiPort`: `getProfile(accessToken)` returning `{ id, username, avatarUrl }`.
 - Adapters `ThreadsAccountOAuth` and `ThreadsAccountApi`, chosen by `provider` through a small registry.
+  `ThreadsAccountOAuth` builds `redirect_uri` from `NEST_URL` for both the authorization URL and the code
+  exchange (Threads requires the two to match).
 - Scopes requested: `threads_basic`, `threads_keyword_search`, `threads_read_replies`.
 
 Threads endpoints (from the previous implementation; verify against the Threads docs when building):
@@ -130,7 +138,8 @@ Unit (fakes for `HttpClientPort` and repositories):
 2. `EncryptionService`: round trip; two encryptions of one value differ; tampered ciphertext fails; unknown
    version prefix fails; a key that is not 32 bytes fails at startup.
 3. State: valid state verifies; expired, wrong secret, wrong `purpose` and an access token are rejected.
-4. Threads adapters build the right URL, scopes and requests, and map responses.
+4. Threads adapters build the right URL, scopes and requests, and map responses. The authorization URL and
+   the code exchange carry the same `redirect_uri`, `${NEST_URL}/social-accounts/threads/callback`.
 5. `getAccessToken`: not near expiry returns the stored token without a request; within 7 days refreshes and
    saves; 4xx deactivates and throws `reconnect_required`; 5xx or timeout changes nothing; two concurrent
    calls refresh once.
