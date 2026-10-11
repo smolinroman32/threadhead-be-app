@@ -57,7 +57,6 @@ export class PrismaUserRepository implements UserRepositoryPort {
         return UserMapper.toDomain(user);
     }
 
-    // updateMany, not update: revoking sessions of an already deleted user must not throw.
     async revokeSessions(userId: string) {
         await this.prisma.user.updateMany({
             where: { id: userId },

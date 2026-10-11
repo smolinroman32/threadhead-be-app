@@ -24,8 +24,11 @@ links the spec. When the feature is merged, delete the spec or fold what is last
 
 ## Language
 
-Code, comments, commit messages and documentation are in English. A comment explains *why*, in one line,
-and only when the code cannot show it. Do not narrate what the code does.
+Code, commit messages and documentation are in English.
+
+**No comments in code.** Names, types and tests carry the meaning. Anything that needs explaining goes in
+`docs/` (architecture, specs) or in the commit body, not in the source. Do not add comments, including
+`//` notes, JSDoc and `TODO`s.
 
 ## TypeScript and files
 

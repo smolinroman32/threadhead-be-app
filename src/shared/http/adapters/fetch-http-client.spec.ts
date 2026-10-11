@@ -13,7 +13,7 @@ describe('FetchHttpClient', () => {
             const chunks: Buffer[] = [];
             req.on('data', (chunk: Buffer) => chunks.push(chunk));
             req.on('end', () => {
-                if (req.url?.startsWith('/slow')) return; // never answers
+                if (req.url?.startsWith('/slow')) return;
                 const status = req.url?.startsWith('/status/') ? Number(req.url.split('/')[2]) : 200;
                 res.writeHead(status, { 'content-type': 'application/json' });
                 res.end(

@@ -1,4 +1,3 @@
-// The request did not complete (timeout, DNS, connection). Always transient.
 export class HttpTransportError extends Error {
     constructor(
         public readonly url: string,

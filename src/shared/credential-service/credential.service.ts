@@ -6,7 +6,6 @@ const KEY_LENGTH = 64;
 const SCRYPT_PARAMS = { N: 2 ** 15, r: 8, p: 1 } as const;
 const SCRYPT_MAX_MEMORY = 128 * SCRYPT_PARAMS.N * SCRYPT_PARAMS.r * 2;
 
-// Hash format: scrypt$<N>$<r>$<p>$<salt base64>$<key base64>, so parameters can be raised later.
 @Injectable()
 export class CredentialsService {
     async hashPassword(password: string) {
@@ -23,8 +22,6 @@ export class CredentialsService {
         ].join('$');
     }
 
-    // Pass `undefined` for an unknown user: a dummy hash is checked instead,
-    // so response time does not reveal which accounts exist.
     async checkPassword(password: string, storedHash: string | undefined) {
         const parsed = this.parse(storedHash);
 

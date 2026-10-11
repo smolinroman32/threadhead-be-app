@@ -85,7 +85,7 @@ a different class in the module). Use `extends` only when the port carries share
 - Global `JwtAuthGuard` (`APP_GUARD`) protects everything; `@Public()` opts a route out. `AuthController`
   is `@Public()` as a whole.
 - `JwtStrategy` reads the `access_token` cookie. `@CurrentUser()` returns the verified payload
-  `{ sub, email, tokenVersion }`.
+  `{ sub, email, tokenVersion }`; it is `undefined` on `@Public()` routes.
 - **The user id comes from the token (`currentUser.sub`), never from the URL or body.** Routes that act on
   the current user are `/users/me`.
 - Cookies: `access_token` (15 min, `Path=/`) and `refresh_token` (30 days, `Path=/auth`), both

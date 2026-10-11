@@ -7,8 +7,6 @@ const ALGORITHM = 'aes-256-gcm';
 const IV_BYTES = 12;
 const KEY_HEX_LENGTH = 64;
 
-// Stored as `v1.<iv>.<tag>.<ciphertext>` (base64 parts). The prefix selects the algorithm and key, so a
-// later rotation can write `v2` and still read `v1`.
 @Injectable()
 export class EncryptionService {
     private readonly key = this.loadKey();

@@ -14,8 +14,6 @@ export type HttpResponse = {
     body: unknown;
 };
 
-// 4xx and 5xx are returned, not thrown, so the caller decides whether a failure is final or transient.
-// A timeout or network failure throws HttpTransportError.
 export abstract class HttpClientPort {
     abstract get(url: string, options?: HttpOptions): Promise<HttpResponse>;
     abstract post(url: string, options?: HttpBodyOptions): Promise<HttpResponse>;

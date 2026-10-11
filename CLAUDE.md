@@ -10,6 +10,7 @@
   per [docs/conventions.md](docs/conventions.md#features-grill-first). Do not start code with an open decision.
 - Adding a shared class: answer "module or plain service?" first, per
   [docs/architecture.md](docs/architecture.md#module-or-plain-service).
+- Write no comments in code: not `//`, not JSDoc, not `TODO`. Put explanations in `docs/` or the commit body.
 - Run `npm run verify` before you call a change done, and say which checks you ran.
 - Do not read or edit `.env`. Do not apply migrations, push or open a PR unless asked.
 - For anything that touches DI, routing or cookies, check against the built app, not only unit tests.

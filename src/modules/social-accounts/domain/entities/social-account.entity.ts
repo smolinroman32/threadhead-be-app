@@ -7,7 +7,6 @@ export interface SocialAccountProps {
     providerAccountId: string;
     username: string;
     avatarUrl: string | null;
-    // Tokens are stored encrypted; decrypting is the job of the use case, never of the repository.
     accessTokenEncrypted: string;
     refreshTokenEncrypted: string | null;
     tokenExpiresAt: Date;
