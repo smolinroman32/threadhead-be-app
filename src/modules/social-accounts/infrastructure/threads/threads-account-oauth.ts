@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { getEnv } from '../../../../shared/env/get-env.js';
 import { HttpClientPort } from '../../../../shared/http/ports/http-client.port.js';
 import { SocialAccountOauthPort, type OAuthTokens } from '../../domain/ports/social-account-oauth.port.js';
-import { readThreadsBody } from './threads-response.js';
+import { readProviderBody } from '../providers/read-provider-body.js';
 
 const AUTHORIZE_URL = 'https://threads.net/oauth/authorize';
 const API_URL = 'https://graph.threads.net';
@@ -41,13 +41,13 @@ export class ThreadsAccountOAuth implements SocialAccountOauthPort {
                 code,
             },
         });
-        const { access_token } = readThreadsBody<TokenBody>(shortLived);
+        const { access_token } = readProviderBody<TokenBody>(shortLived);
 
         const longLived = await this.http.get(`${API_URL}/access_token`, {
             query: { grant_type: 'th_exchange_token', client_secret: this.appSecret, access_token },
         });
 
-        return this.toTokens(readThreadsBody<TokenBody>(longLived));
+        return this.toTokens(readProviderBody<TokenBody>(longLived));
     }
 
     async refreshToken(accessToken: string) {
@@ -55,7 +55,7 @@ export class ThreadsAccountOAuth implements SocialAccountOauthPort {
             query: { grant_type: 'th_refresh_token', access_token: accessToken },
         });
 
-        return this.toTokens(readThreadsBody<TokenBody>(response));
+        return this.toTokens(readProviderBody<TokenBody>(response));
     }
 
     private toTokens(body: TokenBody): OAuthTokens {
