@@ -89,7 +89,7 @@ start without them.
 
 ## Tests and limits
 
-- Unit specs sit beside the code. The row lock and the callback flow are not provable with fakes: check
+- Unit specs sit in a `__tests__/` folder next to the code. The row lock and the callback flow are not provable with fakes: check
   them against the built app on a scratch database with a fake provider server.
 - Not done: background token refresh, post import, publishing. A token is refreshed only when
   `getAccessToken` is called.
