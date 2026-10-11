@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { getSecret } from '../../../shared/env/get-env.js';
-import { SOCIAL_PROVIDERS, type SocialProvider } from '../domain/entities/social-account.entity.js';
-import { InvalidOAuthStateError } from '../domain/errors/invalid-oauth-state.error.js';
+import { getSecret } from '../../../../shared/env/get-env.js';
+import { SOCIAL_PROVIDERS, type SocialProvider } from '../../domain/entities/social-account.entity.js';
+import { InvalidOAuthStateError } from '../../domain/errors/invalid-oauth-state.error.js';
 
 const PURPOSE = 'oauth-state';
 const EXPIRES_IN = '10m';

@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { InvalidOAuthStateError } from '../domain/errors/invalid-oauth-state.error.js';
+import { InvalidOAuthStateError } from '../../domain/errors/invalid-oauth-state.error.js';
 import { OAuthStateService } from './oauth-state.service.js';
 
 const SECRET = 's'.repeat(40);
