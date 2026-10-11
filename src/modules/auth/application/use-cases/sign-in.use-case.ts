@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../../../users/application/user.service.js';
-import { CredentialsService } from '../../../../shared/credential-service/credential.service.js';
+import { CredentialsService } from '../../../../shared/services/credential-service/credential.service.js';
 import { InvalidCredentialsError } from '../../domain/errors/invalid-credentials.error.js';
 
 export type SignInInput = {

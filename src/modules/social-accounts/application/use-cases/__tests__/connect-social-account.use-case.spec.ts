@@ -1,11 +1,11 @@
-import type { EncryptionService } from '../../../../shared/encryption-service/encryption.service.js';
-import { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
-import { InvalidOAuthStateError } from '../../domain/errors/invalid-oauth-state.error.js';
-import { SocialAccountAlreadyConnectedError } from '../../domain/errors/social-account-already-connected.error.js';
-import type { OAuthStatePort } from '../../domain/ports/oauth-state.port.js';
-import type { SocialAccountRepositoryPort } from '../../domain/ports/social-account-repository.port.js';
-import type { SocialProviderRegistryPort } from '../../domain/ports/social-provider-registry.port.js';
-import { ConnectSocialAccountUseCase } from './connect-social-account.use-case.js';
+import type { EncryptionService } from '../../../../../shared/services/encryption-service/encryption.service.js';
+import { SocialAccountEntity } from '../../../domain/entities/social-account.entity.js';
+import { InvalidOAuthStateError } from '../../../domain/errors/invalid-oauth-state.error.js';
+import { SocialAccountAlreadyConnectedError } from '../../../domain/errors/social-account-already-connected.error.js';
+import type { OAuthStatePort } from '../../../domain/ports/oauth-state.port.js';
+import type { SocialAccountRepositoryPort } from '../../../domain/ports/social-account-repository.port.js';
+import type { SocialProviderRegistryPort } from '../../../domain/ports/social-provider-registry.port.js';
+import { ConnectSocialAccountUseCase } from '../connect-social-account.use-case.js';
 
 describe('ConnectSocialAccountUseCase', () => {
     const expiresAt = new Date('2026-12-08T12:00:00Z');

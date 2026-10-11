@@ -1,16 +1,16 @@
-import type { EncryptionService } from '../../../../shared/encryption-service/encryption.service.js';
-import { HttpTransportError } from '../../../../shared/http/errors/http-transport.error.js';
-import { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
-import { SocialAccountNotFoundError } from '../../domain/errors/social-account-not-found.error.js';
-import { SocialAccountReconnectRequiredError } from '../../domain/errors/social-account-reconnect-required.error.js';
-import { SocialProviderRejectedError } from '../../domain/errors/social-provider-rejected.error.js';
-import { SocialProviderUnavailableError } from '../../domain/errors/social-provider-unavailable.error.js';
+import type { EncryptionService } from '../../../../../shared/services/encryption-service/encryption.service.js';
+import { HttpTransportError } from '../../../../../shared/http/errors/http-transport.error.js';
+import { SocialAccountEntity } from '../../../domain/entities/social-account.entity.js';
+import { SocialAccountNotFoundError } from '../../../domain/errors/social-account-not-found.error.js';
+import { SocialAccountReconnectRequiredError } from '../../../domain/errors/social-account-reconnect-required.error.js';
+import { SocialProviderRejectedError } from '../../../domain/errors/social-provider-rejected.error.js';
+import { SocialProviderUnavailableError } from '../../../domain/errors/social-provider-unavailable.error.js';
 import type {
     SocialAccountChanges,
     SocialAccountRepositoryPort,
-} from '../../domain/ports/social-account-repository.port.js';
-import type { SocialProviderRegistryPort } from '../../domain/ports/social-provider-registry.port.js';
-import { GetAccessTokenUseCase } from './get-access-token.use-case.js';
+} from '../../../domain/ports/social-account-repository.port.js';
+import type { SocialProviderRegistryPort } from '../../../domain/ports/social-provider-registry.port.js';
+import { GetAccessTokenUseCase } from '../get-access-token.use-case.js';
 
 const NOW = new Date('2026-10-09T12:00:00Z');
 const DAY = 24 * 60 * 60 * 1000;

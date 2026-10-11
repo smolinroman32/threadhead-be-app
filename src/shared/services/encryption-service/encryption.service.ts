@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
-import { getEnv } from '../env/get-env.js';
+import { getEnv } from '../../env/get-env.js';
 
 const VERSION = 'v1';
 const ALGORITHM = 'aes-256-gcm';

@@ -1,6 +1,6 @@
-import { SocialAccountNotFoundError } from '../../domain/errors/social-account-not-found.error.js';
-import type { SocialAccountRepositoryPort } from '../../domain/ports/social-account-repository.port.js';
-import { DisconnectSocialAccountUseCase } from './disconnect-social-account.use-case.js';
+import { SocialAccountNotFoundError } from '../../../domain/errors/social-account-not-found.error.js';
+import type { SocialAccountRepositoryPort } from '../../../domain/ports/social-account-repository.port.js';
+import { DisconnectSocialAccountUseCase } from '../disconnect-social-account.use-case.js';
 
 describe('DisconnectSocialAccountUseCase', () => {
     const repository = { deleteByIdForUser: vi.fn() };

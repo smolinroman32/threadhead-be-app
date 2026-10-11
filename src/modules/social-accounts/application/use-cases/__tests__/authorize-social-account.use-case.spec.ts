@@ -1,6 +1,6 @@
-import type { OAuthStatePort } from '../../domain/ports/oauth-state.port.js';
-import type { SocialProviderRegistryPort } from '../../domain/ports/social-provider-registry.port.js';
-import { AuthorizeSocialAccountUseCase } from './authorize-social-account.use-case.js';
+import type { OAuthStatePort } from '../../../domain/ports/oauth-state.port.js';
+import type { SocialProviderRegistryPort } from '../../../domain/ports/social-provider-registry.port.js';
+import { AuthorizeSocialAccountUseCase } from '../authorize-social-account.use-case.js';
 
 describe('AuthorizeSocialAccountUseCase', () => {
     const oauthState = { sign: vi.fn() };

@@ -1,6 +1,6 @@
-import type { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
-import type { SocialAccountRepositoryPort } from '../../domain/ports/social-account-repository.port.js';
-import { ListSocialAccountsUseCase } from './list-social-accounts.use-case.js';
+import type { SocialAccountEntity } from '../../../domain/entities/social-account.entity.js';
+import type { SocialAccountRepositoryPort } from '../../../domain/ports/social-account-repository.port.js';
+import { ListSocialAccountsUseCase } from '../list-social-accounts.use-case.js';
 
 describe('ListSocialAccountsUseCase', () => {
     const repository = { listByUser: vi.fn() };
