@@ -173,7 +173,7 @@ Deviations to note: the callback is `@Public()` and checks the cookie itself (ne
 - [x] Schema rename and hand-written migration, checked with `migrate diff`
 - [x] Domain: `SocialAccountEntity`, errors, repository port; `SocialAccountRepository`, mapper
 - [x] OAuth state service and `AuthService.verifyAccessToken`
-- [ ] Threads adapters and provider registry with tests
+- [x] Threads adapters and provider registry with tests
 - [ ] Use cases: authorize, handle callback, list, disconnect, get access token (lazy refresh, row lock)
 - [ ] Controller, module wiring, env variables in `.env.example` and README
 - [ ] `npm run verify`, end-to-end run (checks 8 to 11), PR linking this spec
