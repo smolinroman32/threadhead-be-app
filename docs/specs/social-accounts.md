@@ -167,7 +167,7 @@ Deviations to note: the callback is `@Public()` and checks the cookie itself (ne
 
 ## Tasks
 
-- [ ] Restore the scaffold (`git revert 53d76a9`), merge `main`, delete `src/modules/social-account/`
+- [x] Restore the scaffold (`git revert 53d76a9`), merge `main`, delete `src/modules/social-account/`
 - [ ] `HttpClientPort` and `FetchHttpClient` with tests
 - [ ] `EncryptionService`, `ENCRYPTION_KEY` check, tests
 - [ ] Schema rename and hand-written migration, checked with `migrate diff`
