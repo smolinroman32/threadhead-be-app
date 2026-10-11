@@ -73,7 +73,9 @@ table; the user adds the real value.
 2. Generate the SQL: `npx prisma migrate diff --from-schema <previous schema> --to-schema prisma --script`.
 3. Save it as `prisma/migrations/<UTCtimestamp>_<name>/migration.sql` and run `npx prisma generate`.
 4. Applied migrations are immutable; fix forward with a new one.
-5. Say in the commit body anything that can fail on existing data (a new `UNIQUE`, a `NOT NULL`
+5. No indexes or other performance structures ahead of need. Add an index only after a measured slow
+   query; a `UNIQUE` constraint that enforces a rule is not an optimization and is fine.
+6. Say in the commit body anything that can fail on existing data (a new `UNIQUE`, a `NOT NULL`
    without default).
 
 ## Commits
