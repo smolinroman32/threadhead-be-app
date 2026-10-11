@@ -24,4 +24,8 @@ export abstract class SocialAccountRepositoryPort {
     abstract create(data: NewSocialAccount): Promise<SocialAccountEntity>;
     abstract update(id: string, changes: SocialAccountChanges): Promise<SocialAccountEntity>;
     abstract deleteByIdForUser(id: string, userId: string): Promise<boolean>;
+    abstract mutateLocked(
+        id: string,
+        mutate: (account: SocialAccountEntity) => Promise<SocialAccountChanges | null>,
+    ): Promise<SocialAccountEntity | null>;
 }

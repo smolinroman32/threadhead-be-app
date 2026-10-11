@@ -62,4 +62,43 @@ describe('SocialAccountRepository', () => {
             where: { id: 'account-id', userId: 'user-id' },
         });
     });
+
+    describe('mutateLocked', () => {
+        const queryRaw = vi.fn();
+        const tx = { $queryRaw: queryRaw, socialAccount: { findUniqueOrThrow: vi.fn(), update: vi.fn() } };
+        const $transaction = vi.fn(async (work: (client: typeof tx) => unknown) => work(tx));
+        const locking = new SocialAccountRepository({ $transaction } as unknown as PrismaService);
+
+        it('returns null without calling mutate when the row does not exist', async () => {
+            queryRaw.mockResolvedValue([]);
+            const mutate = vi.fn();
+
+            await expect(locking.mutateLocked('missing', mutate)).resolves.toBeNull();
+            expect(mutate).not.toHaveBeenCalled();
+        });
+
+        it('locks the row, applies the changes and returns the updated account', async () => {
+            queryRaw.mockResolvedValue([{ id: 'account-id' }]);
+            tx.socialAccount.findUniqueOrThrow.mockResolvedValue(row);
+            tx.socialAccount.update.mockResolvedValue({ ...row, isActive: false });
+
+            const result = await locking.mutateLocked('account-id', async () => ({ isActive: false }));
+
+            expect(tx.socialAccount.update).toHaveBeenCalledWith({
+                where: { id: 'account-id' },
+                data: { isActive: false },
+            });
+            expect(result?.isActive).toBe(false);
+        });
+
+        it('does not write when mutate returns null', async () => {
+            queryRaw.mockResolvedValue([{ id: 'account-id' }]);
+            tx.socialAccount.findUniqueOrThrow.mockResolvedValue(row);
+
+            const result = await locking.mutateLocked('account-id', async () => null);
+
+            expect(tx.socialAccount.update).not.toHaveBeenCalled();
+            expect(result?.id).toBe('account-id');
+        });
+    });
 });

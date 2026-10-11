@@ -43,8 +43,10 @@ Callback redirect target: `${FRONTEND_URL}${FRONTEND_SOCIAL_RESULT_PATH}` plus
 
 Internal API for other modules (`SocialAccountsService`, the module facade):
 
-- `getAccessToken(accountId): Promise<string>`: decrypts the token; if it expires within 7 days and is older
-  than 24 hours, refreshes it under a row lock and stores the new value. Throws `SocialAccountNotFoundError`
+- `getAccessToken(accountId): Promise<string>`: decrypts the token; if it expires within 7 days, refreshes it
+  under a row lock (`FOR UPDATE` in one transaction) and stores the new value. The 24 hour minimum token age
+  Threads requires is not checked: a freshly issued token is valid for about 60 days, so it never falls in
+  the 7 day window. Throws `SocialAccountNotFoundError`
   (404) or `SocialAccountReconnectRequiredError` (409, name `reconnect_required`).
 
 Errors:
@@ -174,6 +176,6 @@ Deviations to note: the callback is `@Public()` and checks the cookie itself (ne
 - [x] Domain: `SocialAccountEntity`, errors, repository port; `SocialAccountRepository`, mapper
 - [x] OAuth state service and `AuthService.verifyAccessToken`
 - [x] Threads adapters and provider registry with tests
-- [ ] Use cases: authorize, handle callback, list, disconnect, get access token (lazy refresh, row lock)
+- [x] Use cases: authorize, handle callback, list, disconnect, get access token (lazy refresh, row lock)
 - [ ] Controller, module wiring, env variables in `.env.example` and README
 - [ ] `npm run verify`, end-to-end run (checks 8 to 11), PR linking this spec

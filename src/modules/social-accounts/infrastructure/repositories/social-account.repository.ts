@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../shared/prisma.service.js';
-import type { SocialProvider } from '../../domain/entities/social-account.entity.js';
+import type { SocialAccountEntity, SocialProvider } from '../../domain/entities/social-account.entity.js';
 import {
     SocialAccountRepositoryPort,
     type NewSocialAccount,
     type SocialAccountChanges,
 } from '../../domain/ports/social-account-repository.port.js';
 import { SocialAccountMapper } from '../mappers/social-account.mapper.js';
+
+const TRANSACTION_TIMEOUT_MS = 15_000;
 
 @Injectable()
 export class SocialAccountRepository implements SocialAccountRepositoryPort {
@@ -45,6 +47,29 @@ export class SocialAccountRepository implements SocialAccountRepositoryPort {
         const account = await this.prisma.socialAccount.update({ where: { id }, data: changes });
 
         return SocialAccountMapper.toDomain(account);
+    }
+
+    mutateLocked(id: string, mutate: (account: SocialAccountEntity) => Promise<SocialAccountChanges | null>) {
+        return this.prisma.$transaction(
+            async (tx) => {
+                const locked = await tx.$queryRaw<{ id: string }[]>`
+                    SELECT "id" FROM "SocialAccount" WHERE "id" = ${id}::uuid FOR UPDATE
+                `;
+
+                if (locked.length === 0) return null;
+
+                const row = await tx.socialAccount.findUniqueOrThrow({ where: { id } });
+                const account = SocialAccountMapper.toDomain(row);
+                const changes = await mutate(account);
+
+                if (!changes) return account;
+
+                const updated = await tx.socialAccount.update({ where: { id }, data: changes });
+
+                return SocialAccountMapper.toDomain(updated);
+            },
+            { timeout: TRANSACTION_TIMEOUT_MS },
+        );
     }
 
     async deleteByIdForUser(id: string, userId: string) {
