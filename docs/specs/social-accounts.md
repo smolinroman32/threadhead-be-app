@@ -177,5 +177,5 @@ Deviations to note: the callback is `@Public()` and checks the cookie itself (ne
 - [x] OAuth state service and `AuthService.verifyAccessToken`
 - [x] Threads adapters and provider registry with tests
 - [x] Use cases: authorize, handle callback, list, disconnect, get access token (lazy refresh, row lock)
-- [ ] Controller, module wiring, env variables in `.env.example` and README
+- [x] Controller, module wiring, env variables in `.env.example` and README
 - [ ] `npm run verify`, end-to-end run (checks 8 to 11), PR linking this spec

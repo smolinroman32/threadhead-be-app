@@ -28,6 +28,13 @@ The server listens on `PORT` (default 3000). `.env` is loaded on startup.
 | `JWT_REFRESH_SECRET` | yes      | at least 32 characters, different from the access secret |
 | `PORT`               | no       | default `3000`                                           |
 | `NODE_ENV`           | no       | `production` makes the auth cookies `Secure`             |
+| `NEST_URL`           | yes      | public base URL of this backend, no trailing slash; the OAuth `redirect_uri` is derived from it |
+| `FRONTEND_URL`       | yes      | base URL the OAuth callback redirects to                 |
+| `FRONTEND_SOCIAL_RESULT_PATH` | yes | frontend path that receives `?social=connected` or `?social=error&reason=...` |
+| `THREADS_APP_ID`     | yes      | Threads app id                                           |
+| `THREADS_APP_SECRET` | yes      | Threads app secret                                       |
+| `ENCRYPTION_KEY`     | yes      | 64 hex characters (32 bytes), encrypts stored provider tokens |
+| `OAUTH_STATE_SECRET` | yes      | at least 32 characters, signs the OAuth `state`, distinct from the JWT secrets |
 
 ## Scripts
 
@@ -42,7 +49,7 @@ The server listens on `PORT` (default 3000). `.env` is loaded on startup.
 ## API
 
 Auth uses `HttpOnly` cookies: `access_token` (15 minutes, path `/`) and `refresh_token` (30 days, path
-`/auth`). Everything except `/auth/*` requires a valid access token.
+`/auth`). Everything except `/auth/*` and the OAuth callback requires a valid access token.
 
 | Method | Path             | Notes                                                              |
 | ------ | ---------------- | ------------------------------------------------------------------ |
@@ -50,6 +57,10 @@ Auth uses `HttpOnly` cookies: `access_token` (15 minutes, path `/`) and `refresh
 | POST   | `/auth/sign-in`  | sets both cookies                                                  |
 | POST   | `/auth/refresh`  | new token pair from the refresh cookie, 204                        |
 | POST   | `/auth/sign-out` | revokes all refresh tokens of the user and clears the cookies, 204 |
+| POST   | `/social-accounts/:provider/authorize` | `{ url }` to send the browser to the provider            |
+| GET    | `/social-accounts/:provider/callback`  | public; connects the account, redirects to the frontend |
+| GET    | `/social-accounts` | accounts of the current user, never any token                    |
+| DELETE | `/social-accounts/:id` | disconnect an account, 204                                    |
 | GET    | `/users/me`      | current user                                                       |
 | PATCH  | `/users/me`      | update name, age or email                                          |
 | DELETE | `/users/me`      | delete the account and clear the cookies                           |
