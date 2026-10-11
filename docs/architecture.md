@@ -33,6 +33,11 @@ src/modules/<name>/
 `src/shared/` holds cross-cutting code: env helpers, `PrismaModule`/`PrismaService`, exception filters,
 password hashing. It must not import from `src/modules/**` except stable domain types.
 
+A shared service gets its own (global) module only when it is a single shared instance (`PrismaModule`:
+one connection pool) or when it binds a port to an adapter (`HttpModule`). Any other shared class
+(`CredentialsService`, `EncryptionService`) is listed in `providers` of the module that uses it; make it a
+module when a second consumer appears.
+
 ## Ports and adapters
 
 A port is an `abstract class` in `domain/ports`, so it exists at runtime and doubles as the Nest DI token.
