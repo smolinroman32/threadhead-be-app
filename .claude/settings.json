@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run verify)",
+      "Bash(npm test)",
+      "Bash(npm run build)",
+      "Bash(npx tsc *)",
+      "Bash(npx vitest *)",
+      "Bash(npx nest build)",
+      "Bash(npx oxlint *)",
+      "Bash(npx prettier --check *)",
+      "Bash(npx prisma validate)",
+      "Bash(npx prisma generate)",
+      "Bash(npx prisma migrate status)",
+      "Bash(npx prisma migrate diff *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Bash(npx prisma migrate reset*)",
+      "Bash(npx prisma migrate dev*)",
+      "Bash(npx prisma db push*)"
+    ]
+  }
+}
