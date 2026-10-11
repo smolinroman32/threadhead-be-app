@@ -9,7 +9,7 @@ import { UserNotFoundError } from '../../domain/errors/user-not-found.error.js';
 import { UserMapper } from '../mappers/user.mapper.js';
 
 @Injectable()
-export class PrismaUserRepository implements UserRepositoryPort {
+export class UserRepository implements UserRepositoryPort {
     constructor(private prisma: PrismaService) {}
 
     async getUserById(userId: string) {

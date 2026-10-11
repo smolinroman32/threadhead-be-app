@@ -7,13 +7,13 @@ import { GetUserByIdUseCase } from './application/use-cases/get-user-by-id.use-c
 import { RevokeUserSessionsUseCase } from './application/use-cases/revoke-user-sessions.use-case.js';
 import { UpdateUserByIdUseCase } from './application/use-cases/update-user-by-id.use-case.js';
 import { UserRepositoryPort } from './domain/ports/user-repository.port.js';
-import { PrismaUserRepository } from './infrastructure/repositories/prisma-user.repository.js';
+import { UserRepository } from './infrastructure/repositories/user.repository.js';
 import { UsersController } from './presentation/users.controller.js';
 
 @Module({
     controllers: [UsersController],
     providers: [
-        { provide: UserRepositoryPort, useClass: PrismaUserRepository },
+        { provide: UserRepositoryPort, useClass: UserRepository },
         CreateUserUseCase,
         DeleteUserByIdUseCase,
         GetUserByIdUseCase,

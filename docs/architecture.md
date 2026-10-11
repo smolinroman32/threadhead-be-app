@@ -22,7 +22,7 @@ src/modules/<name>/
     use-cases/       one class = one action, method execute()
     <name>.service.ts   facade: the module's public entry point
   infrastructure/
-    repositories/    PrismaXxxRepository implements XxxPort
+    repositories/    XxxRepository implements XxxPort
     mappers/         Prisma model -> domain entity
   presentation/
     <name>.controller.ts
@@ -58,7 +58,7 @@ A port is an `abstract class` in `domain/ports`, so it exists at runtime and dou
 The adapter `implements` it, and the module binds the two:
 
 ```ts
-{ provide: UserRepositoryPort, useClass: PrismaUserRepository }
+{ provide: UserRepositoryPort, useClass: UserRepository }
 ```
 
 Use cases inject the port, not the adapter. Replace the adapter in one place (`overrideProvider` in a test,

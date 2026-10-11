@@ -34,9 +34,9 @@ Code, commit messages and documentation are in English.
 
 - ESM with `nodenext`: relative imports end in `.js` (`import { X } from './x.js'`).
 - Files are kebab-case with a role suffix: `sign-in.use-case.ts`, `user.entity.ts`,
-  `user-repository.port.ts`, `prisma-user.repository.ts`, `users.controller.ts`, `sign-up.dto.ts`,
+  `user-repository.port.ts`, `user.repository.ts`, `users.controller.ts`, `sign-up.dto.ts`,
   `jwt-payload.ts`.
-- Classes are `VerbNounUseCase`, `XxxEntity`, `XxxError`, `XxxPort`, `PrismaXxxRepository`,
+- Classes are `VerbNounUseCase`, `XxxEntity`, `XxxError`, `XxxPort`, `XxxRepository`,
   `XxxController`, `XxxService`.
 - Types in a file with a class go next to it; a type shared by several files lives in `domain`.
 
