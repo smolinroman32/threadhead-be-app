@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { getSecret } from '../../../../shared/env/get-env.js';
 import { SOCIAL_PROVIDERS, type SocialProvider } from '../../domain/entities/social-account.entity.js';
+import { OAuthStatePort } from '../../domain/ports/oauth-state.port.js';
 import { InvalidOAuthStateError } from '../../domain/errors/invalid-oauth-state.error.js';
 
 const PURPOSE = 'oauth-state';
@@ -10,7 +11,7 @@ const EXPIRES_IN = '10m';
 type StatePayload = { sub: string; provider: string; purpose: string };
 
 @Injectable()
-export class OAuthStateService {
+export class OAuthStateService implements OAuthStatePort {
     private readonly secret = getSecret('OAUTH_STATE_SECRET');
 
     constructor(private readonly jwtService: JwtService) {}

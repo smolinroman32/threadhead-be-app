@@ -13,6 +13,7 @@ export class ThreadsAccountApi implements SocialAccountApiPort {
         const response = await this.http.get('https://graph.threads.net/v1.0/me', {
             query: { fields: 'id,username,threads_profile_picture_url', access_token: accessToken },
         });
+
         const profile = readProviderBody<ProfileBody>(response);
 
         return {
