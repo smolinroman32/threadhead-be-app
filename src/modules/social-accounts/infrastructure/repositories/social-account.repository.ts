@@ -36,13 +36,15 @@ export class SocialAccountRepository implements SocialAccountRepositoryPort {
     }
 
     async create(data: NewSocialAccount) {
-        return SocialAccountMapper.toDomain(await this.prisma.socialAccount.create({ data }));
+        const account = await this.prisma.socialAccount.create({ data });
+
+        return SocialAccountMapper.toDomain(account);
     }
 
     async update(id: string, changes: SocialAccountChanges) {
-        return SocialAccountMapper.toDomain(
-            await this.prisma.socialAccount.update({ where: { id }, data: changes }),
-        );
+        const account = await this.prisma.socialAccount.update({ where: { id }, data: changes });
+
+        return SocialAccountMapper.toDomain(account);
     }
 
     async deleteByIdForUser(id: string, userId: string) {
