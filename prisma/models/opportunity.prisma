@@ -13,4 +13,6 @@ model Opportunity {
   createdAt                DateTime                 @default(now())
   updatedAt                DateTime                 @updatedAt
   opportunitySearchQueries OpportunitySearchQuery[]
+
+  @@unique([opportunityFeedId, externalPostId])
 }

@@ -9,10 +9,12 @@ model SearchQuery {
   opportunityFeed          OpportunityFeed          @relation(fields: [opportunityFeedId], references: [id], onDelete: Cascade)
   query                    String
   type                     SearchQueryType
-  isActive                 Boolean
+  isActive                 Boolean                  @default(true)
   matchedPosts             Int
   relevantPosts            Int
   createdAt                DateTime                 @default(now())
   updatedAt                DateTime                 @updatedAt
   opportunitySearchQueries OpportunitySearchQuery[]
+
+  @@index([opportunityFeedId])
 }

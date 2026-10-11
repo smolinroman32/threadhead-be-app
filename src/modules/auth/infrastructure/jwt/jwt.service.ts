@@ -1,25 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { getEnv } from '../../../../shared/env/get-env.js';
-
-type TokenPayload = {
-    sub: string;
-    email: string;
-};
+import { getSecret } from '../../../../shared/env/get-env.js';
+import type { JwtPayload } from '../../domain/jwt-payload.js';
 
 @Injectable()
 export class JwtTokenService {
     constructor(private readonly jwtService: JwtService) {}
 
-    async generateTokens(payload: TokenPayload) {
+    async generateTokens(payload: JwtPayload) {
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(payload, {
-                secret: getEnv('JWT_ACCESS_SECRET'),
+                secret: getSecret('JWT_ACCESS_SECRET'),
                 expiresIn: '15m',
             }),
 
             this.jwtService.signAsync(payload, {
-                secret: getEnv('JWT_REFRESH_SECRET'),
+                secret: getSecret('JWT_REFRESH_SECRET'),
                 expiresIn: '30d',
             }),
         ]);
@@ -31,14 +27,14 @@ export class JwtTokenService {
     }
 
     verifyAccessToken(token: string) {
-        return this.jwtService.verifyAsync<TokenPayload>(token, {
-            secret: getEnv('JWT_ACCESS_SECRET'),
+        return this.jwtService.verifyAsync<JwtPayload>(token, {
+            secret: getSecret('JWT_ACCESS_SECRET'),
         });
     }
 
     verifyRefreshToken(token: string) {
-        return this.jwtService.verifyAsync<TokenPayload>(token, {
-            secret: getEnv('JWT_REFRESH_SECRET'),
+        return this.jwtService.verifyAsync<JwtPayload>(token, {
+            secret: getSecret('JWT_REFRESH_SECRET'),
         });
     }
 }

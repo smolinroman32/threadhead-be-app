@@ -4,21 +4,22 @@ import { CreateUserUseCase } from './application/use-cases/create-user.use-case.
 import { DeleteUserByIdUseCase } from './application/use-cases/delete-user-by-id.use-case.js';
 import { GetUserByEmailUseCase } from './application/use-cases/get-user-by-email.use-case.js';
 import { GetUserByIdUseCase } from './application/use-cases/get-user-by-id.use-case.js';
+import { RevokeUserSessionsUseCase } from './application/use-cases/revoke-user-sessions.use-case.js';
 import { UpdateUserByIdUseCase } from './application/use-cases/update-user-by-id.use-case.js';
-import { UserRepository } from './infrastructure/repositories/users.repository.js';
+import { UserRepositoryPort } from './domain/ports/user-repository.port.js';
+import { PrismaUserRepository } from './infrastructure/repositories/prisma-user.repository.js';
 import { UsersController } from './presentation/users.controller.js';
-import { PrismaService } from '../../shared/prisma.service.js';
 
 @Module({
     controllers: [UsersController],
     providers: [
-        PrismaService,
-        UserRepository,
+        { provide: UserRepositoryPort, useClass: PrismaUserRepository },
         CreateUserUseCase,
         DeleteUserByIdUseCase,
         GetUserByIdUseCase,
         GetUserByEmailUseCase,
         UpdateUserByIdUseCase,
+        RevokeUserSessionsUseCase,
         UserService,
     ],
     exports: [UserService],

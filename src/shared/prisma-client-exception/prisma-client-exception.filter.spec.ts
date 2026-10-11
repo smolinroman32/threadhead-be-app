@@ -1,4 +1,4 @@
-import { HttpStatus, type ArgumentsHost } from '@nestjs/common';
+import { HttpStatus, Logger, type ArgumentsHost } from '@nestjs/common';
 import type { Response } from 'express';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaClientExceptionFilter } from './prisma-client-exception.filter.js';
@@ -23,12 +23,13 @@ describe('PrismaClientExceptionFilter', () => {
             switchToHttp: () => ({ getResponse: () => response }),
         } as ArgumentsHost;
         const exception = { code, message: 'Prisma error' } as Prisma.PrismaClientKnownRequestError;
-        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
 
         new PrismaClientExceptionFilter().catch(exception, host);
 
         expect(response.status).toHaveBeenCalledWith(statusCode);
         expect(response.json).toHaveBeenCalledWith({ statusCode, message });
+        expect(errorSpy).toHaveBeenCalledWith('Prisma error');
         errorSpy.mockRestore();
     });
 });

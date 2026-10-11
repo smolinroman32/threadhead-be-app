@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import type { UpdateUserDataBody } from '../../infrastructure/repositories/user.repositroy.interface.js';
-import { UserRepository } from '../../infrastructure/repositories/users.repository.js';
+import type { UpdateUserData } from '../../domain/ports/user-repository.port.js';
+import { UserRepositoryPort } from '../../domain/ports/user-repository.port.js';
 
 @Injectable()
 export class UpdateUserByIdUseCase {
-    constructor(private readonly userRepository: UserRepository) {}
+    constructor(private readonly userRepository: UserRepositoryPort) {}
 
-    execute(userId: string, userData: UpdateUserDataBody) {
+    execute(userId: string, userData: UpdateUserData) {
         return this.userRepository.updateUserById(userId, userData);
     }
 }

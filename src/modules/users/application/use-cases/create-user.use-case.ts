@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import type { CreateUserDateBody } from '../../infrastructure/repositories/user.repositroy.interface.js';
-import { UserRepository } from '../../infrastructure/repositories/users.repository.js';
+import type { CreateUserData } from '../../domain/ports/user-repository.port.js';
+import { UserRepositoryPort } from '../../domain/ports/user-repository.port.js';
 
 @Injectable()
 export class CreateUserUseCase {
-    constructor(private readonly userRepository: UserRepository) {}
+    constructor(private readonly userRepository: UserRepositoryPort) {}
 
-    execute(userData: CreateUserDateBody) {
+    execute(userData: CreateUserData) {
         return this.userRepository.createUser(userData);
     }
 }

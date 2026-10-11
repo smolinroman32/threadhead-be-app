@@ -3,6 +3,7 @@ export interface UserProps {
     age: number;
     email: string;
     passwordHash: string;
+    tokenVersion: number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -27,6 +28,10 @@ export class UserEntity {
 
     get passwordHash() {
         return this.props.passwordHash;
+    }
+
+    get tokenVersion() {
+        return this.props.tokenVersion;
     }
 
     get createdAt() {

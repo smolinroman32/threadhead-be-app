@@ -1,30 +1,37 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Res } from '@nestjs/common';
+import type { Response } from 'express';
+import type { JwtPayload } from '../../auth/domain/jwt-payload.js';
+import { clearAuthCookies } from '../../auth/presentation/auth-cookies.js';
+import { CurrentUser } from '../../auth/presentation/decorators/current-user.decorator.js';
 import { UserService } from '../application/user.service.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UserResponseMapper } from './mappers/user-response.mapper.js';
 
+// The user id always comes from the access token, never from the URL or body.
 @Controller('users')
 export class UsersController {
     constructor(private readonly userService: UserService) {}
 
-    @Get(':id')
-    async getUserById(@Param('id', ParseUUIDPipe) id: string) {
-        const user = await this.userService.getUserById(id);
+    @Get('me')
+    async getMe(@CurrentUser() currentUser: JwtPayload) {
+        const user = await this.userService.getUserById(currentUser.sub);
 
         return UserResponseMapper.toDto(user);
     }
 
-    @Patch(':id')
-    async updateUserById(@Param('id', ParseUUIDPipe) id: string, @Body() body: UpdateUserDto) {
+    @Patch('me')
+    async updateMe(@CurrentUser() currentUser: JwtPayload, @Body() body: UpdateUserDto) {
         const { name, age, email } = body;
-        const user = await this.userService.updateUserById(id, { name, age, email });
+        const user = await this.userService.updateUserById(currentUser.sub, { name, age, email });
 
         return UserResponseMapper.toDto(user);
     }
 
-    @Delete(':id')
-    async deleteUserById(@Param('id', ParseUUIDPipe) id: string) {
-        const user = await this.userService.deleteUserById(id);
+    @Delete('me')
+    async deleteMe(@CurrentUser() currentUser: JwtPayload, @Res({ passthrough: true }) res: Response) {
+        const user = await this.userService.deleteUserById(currentUser.sub);
+
+        clearAuthCookies(res);
 
         return UserResponseMapper.toDto(user);
     }

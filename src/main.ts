@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
@@ -8,12 +9,13 @@ import { getEnv } from './shared/env/get-env.js';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    app.enableShutdownHooks();
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-    const { httpAdapter } = app.get(HttpAdapterHost)
+    const { httpAdapter } = app.get(HttpAdapterHost);
 
-    app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter), new DomainExceptionFilter())
+    app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter), new DomainExceptionFilter());
 
     await app.listen(Number(getEnv('PORT', '3000')));
 }

@@ -1,16 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import type { CreateUserDateBody, IUserRepository, UpdateUserDataBody } from './user.repositroy.interface.js';
+import {
+    UserRepositoryPort,
+    type CreateUserData,
+    type UpdateUserData,
+} from '../../domain/ports/user-repository.port.js';
 import { PrismaService } from '../../../../shared/prisma.service.js';
+import { UserNotFoundError } from '../../domain/errors/user-not-found.error.js';
 import { UserMapper } from '../mappers/user.mapper.js';
 
 @Injectable()
-export class UserRepository implements IUserRepository {
+export class PrismaUserRepository implements UserRepositoryPort {
     constructor(private prisma: PrismaService) {}
 
     async getUserById(userId: string) {
-        const user = await this.prisma.user.findUniqueOrThrow({
+        const user = await this.prisma.user.findUnique({
             where: { id: userId },
         });
+
+        if (!user) throw new UserNotFoundError(userId);
 
         return UserMapper.toDomain(user);
     }
@@ -23,7 +30,7 @@ export class UserRepository implements IUserRepository {
         return UserMapper.toDomain(user);
     }
 
-    async updateUserById(userId: string, userData: UpdateUserDataBody) {
+    async updateUserById(userId: string, userData: UpdateUserData) {
         const user = await this.prisma.user.update({
             data: {
                 name: userData.name,
@@ -37,7 +44,7 @@ export class UserRepository implements IUserRepository {
         return UserMapper.toDomain(user);
     }
 
-    async createUser(userData: CreateUserDateBody) {
+    async createUser(userData: CreateUserData) {
         const user = await this.prisma.user.create({
             data: {
                 name: userData.name,
@@ -48,6 +55,14 @@ export class UserRepository implements IUserRepository {
         });
 
         return UserMapper.toDomain(user);
+    }
+
+    // updateMany, not update: revoking sessions of an already deleted user must not throw.
+    async revokeSessions(userId: string) {
+        await this.prisma.user.updateMany({
+            where: { id: userId },
+            data: { tokenVersion: { increment: 1 } },
+        });
     }
 
     async getUserByEmail(email: string) {
