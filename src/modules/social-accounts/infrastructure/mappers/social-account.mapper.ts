@@ -3,8 +3,7 @@ import { SocialAccountEntity } from '../../domain/entities/social-account.entity
 
 export class SocialAccountMapper {
     static toDomain(raw: SocialAccount): SocialAccountEntity {
-        return new SocialAccountEntity({
-            id: raw.id,
+        return new SocialAccountEntity(raw.id, {
             userId: raw.userId,
             provider: raw.provider,
             providerAccountId: raw.providerAccountId,

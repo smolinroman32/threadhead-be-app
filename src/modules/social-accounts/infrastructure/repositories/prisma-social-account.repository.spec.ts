@@ -44,7 +44,9 @@ describe('PrismaSocialAccountRepository', () => {
             orderBy: { createdAt: 'desc' },
         });
         expect(accounts[0]).toBeInstanceOf(SocialAccountEntity);
-        expect(accounts).toEqual([row]);
+        expect(accounts).toHaveLength(1);
+        expect(accounts[0]).toMatchObject({ id: row.id, userId: row.userId, username: row.username });
+        expect(accounts[0].accessTokenEncrypted).toBe(row.accessTokenEncrypted);
     });
 
     it('returns null when the account does not exist', async () => {
