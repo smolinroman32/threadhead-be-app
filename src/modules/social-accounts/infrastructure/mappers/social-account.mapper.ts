@@ -1,9 +1,9 @@
 import type { SocialAccount } from '../../../../generated/prisma/client.js';
-import type { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
+import { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
 
 export class SocialAccountMapper {
     static toDomain(raw: SocialAccount): SocialAccountEntity {
-        return {
+        return new SocialAccountEntity({
             id: raw.id,
             userId: raw.userId,
             provider: raw.provider,
@@ -17,6 +17,6 @@ export class SocialAccountMapper {
             isActive: raw.isActive,
             createdAt: raw.createdAt,
             updatedAt: raw.updatedAt,
-        };
+        });
     }
 }

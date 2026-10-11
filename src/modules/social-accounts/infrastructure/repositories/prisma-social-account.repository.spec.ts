@@ -1,5 +1,6 @@
 import { Prisma } from '../../../../generated/prisma/client.js';
 import type { PrismaService } from '../../../../shared/prisma.service.js';
+import { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
 import { SocialAccountAlreadyConnectedError } from '../../domain/errors/social-account-already-connected.error.js';
 import { PrismaSocialAccountRepository } from './prisma-social-account.repository.js';
 
@@ -42,6 +43,7 @@ describe('PrismaSocialAccountRepository', () => {
             where: { userId: 'user-id' },
             orderBy: { createdAt: 'desc' },
         });
+        expect(accounts[0]).toBeInstanceOf(SocialAccountEntity);
         expect(accounts).toEqual([row]);
     });
 
