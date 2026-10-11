@@ -1,4 +1,4 @@
-import { CredentialsService } from './credential.service.js';
+import { CredentialsService } from '../credential.service.js';
 
 describe('CredentialsService', () => {
     const service = new CredentialsService();

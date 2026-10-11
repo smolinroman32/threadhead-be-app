@@ -1,4 +1,4 @@
-import { EncryptionService } from './encryption.service.js';
+import { EncryptionService } from '../encryption.service.js';
 
 const KEY = 'a'.repeat(64);
 
