@@ -33,10 +33,24 @@ src/modules/<name>/
 `src/shared/` holds cross-cutting code: env helpers, `PrismaModule`/`PrismaService`, exception filters,
 password hashing. It must not import from `src/modules/**` except stable domain types.
 
-A shared service gets its own (global) module only when it is a single shared instance (`PrismaModule`:
-one connection pool) or when it binds a port to an adapter (`HttpModule`). Any other shared class
-(`CredentialsService`, `EncryptionService`) is listed in `providers` of the module that uses it; make it a
-module when a second consumer appears.
+### Module or plain service?
+
+Before adding a shared class, answer in order:
+
+1. Does it bind a port to an adapter (`{ provide: Port, useClass: Adapter }`)? Then it gets a module
+   (`HttpModule`).
+2. Must there be exactly one instance, or does it have `onModuleDestroy`/shared state (a connection pool)?
+   Then it gets a module (`PrismaModule`).
+3. Otherwise count the consumers. One or two: list it in `providers` of the module that uses it
+   (`CredentialsService`, `EncryptionService`). Three or more: make it a module and import it.
+
+`@Injectable()` does not make a class a singleton. A provider is one instance per module that registers
+it, so listing a class in two modules creates two instances; that only matters when it holds state.
+`@Global()` is a separate decision, for modules almost everything imports (`PrismaModule`, `HttpModule`).
+
+Social providers (Threads, X) are not modules: they are adapters in `providers` of `SocialAccountsModule`,
+chosen by the `provider` value. Give a provider its own module only when it has its own queue, webhooks or
+rate limiting.
 
 ## Ports and adapters
 
