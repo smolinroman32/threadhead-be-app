@@ -171,7 +171,7 @@ Deviations to note: the callback is `@Public()` and checks the cookie itself (ne
 - [x] `HttpClientPort` and `FetchHttpClient` with tests
 - [x] `EncryptionService`, `ENCRYPTION_KEY` check, tests
 - [x] Schema rename and hand-written migration, checked with `migrate diff`
-- [x] Domain: `SocialAccountEntity`, errors, repository port; `PrismaSocialAccountRepository`, mapper
+- [x] Domain: `SocialAccountEntity`, errors, repository port; `SocialAccountRepository`, mapper
 - [ ] OAuth state service and `AuthService.verifyAccessToken`
 - [ ] Threads adapters and provider registry with tests
 - [ ] Use cases: authorize, handle callback, list, disconnect, get access token (lazy refresh, row lock)

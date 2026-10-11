@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '../../../../generated/prisma/client.js';
 import { PrismaService } from '../../../../shared/prisma.service.js';
 import type { SocialProvider } from '../../domain/entities/social-account.entity.js';
-import { SocialAccountAlreadyConnectedError } from '../../domain/errors/social-account-already-connected.error.js';
 import {
     SocialAccountRepositoryPort,
     type NewSocialAccount,
@@ -11,7 +9,7 @@ import {
 import { SocialAccountMapper } from '../mappers/social-account.mapper.js';
 
 @Injectable()
-export class PrismaSocialAccountRepository implements SocialAccountRepositoryPort {
+export class SocialAccountRepository implements SocialAccountRepositoryPort {
     constructor(private readonly prisma: PrismaService) {}
 
     async listByUser(userId: string) {
@@ -38,15 +36,7 @@ export class PrismaSocialAccountRepository implements SocialAccountRepositoryPor
     }
 
     async create(data: NewSocialAccount) {
-        try {
-            return SocialAccountMapper.toDomain(await this.prisma.socialAccount.create({ data }));
-        } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-                throw new SocialAccountAlreadyConnectedError();
-            }
-
-            throw error;
-        }
+        return SocialAccountMapper.toDomain(await this.prisma.socialAccount.create({ data }));
     }
 
     async update(id: string, changes: SocialAccountChanges) {
