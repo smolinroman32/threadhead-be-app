@@ -7,7 +7,6 @@ import { UserService } from '../application/user.service.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UserResponseMapper } from './mappers/user-response.mapper.js';
 
-// The user id always comes from the access token, never from the URL or body.
 @Controller('users')
 export class UsersController {
     constructor(private readonly userService: UserService) {}

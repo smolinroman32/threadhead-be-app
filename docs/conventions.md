@@ -24,16 +24,19 @@ links the spec. When the feature is merged, delete the spec or fold what is last
 
 ## Language
 
-Code, comments, commit messages and documentation are in English. A comment explains *why*, in one line,
-and only when the code cannot show it. Do not narrate what the code does.
+Code, commit messages and documentation are in English.
+
+**No comments in code.** Names, types and tests carry the meaning. Anything that needs explaining goes in
+`docs/` (architecture, specs) or in the commit body, not in the source. Do not add comments, including
+`//` notes, JSDoc and `TODO`s.
 
 ## TypeScript and files
 
 - ESM with `nodenext`: relative imports end in `.js` (`import { X } from './x.js'`).
 - Files are kebab-case with a role suffix: `sign-in.use-case.ts`, `user.entity.ts`,
-  `user-repository.port.ts`, `prisma-user.repository.ts`, `users.controller.ts`, `sign-up.dto.ts`,
+  `user-repository.port.ts`, `user.repository.ts`, `users.controller.ts`, `sign-up.dto.ts`,
   `jwt-payload.ts`.
-- Classes are `VerbNounUseCase`, `XxxEntity`, `XxxError`, `XxxPort`, `PrismaXxxRepository`,
+- Classes are `VerbNounUseCase`, `XxxEntity`, `XxxError`, `XxxPort`, `XxxRepository`,
   `XxxController`, `XxxService`.
 - Types in a file with a class go next to it; a type shared by several files lives in `domain`.
 
@@ -70,7 +73,9 @@ table; the user adds the real value.
 2. Generate the SQL: `npx prisma migrate diff --from-schema <previous schema> --to-schema prisma --script`.
 3. Save it as `prisma/migrations/<UTCtimestamp>_<name>/migration.sql` and run `npx prisma generate`.
 4. Applied migrations are immutable; fix forward with a new one.
-5. Say in the commit body anything that can fail on existing data (a new `UNIQUE`, a `NOT NULL`
+5. No indexes or other performance structures ahead of need. Add an index only after a measured slow
+   query; a `UNIQUE` constraint that enforces a rule is not an optimization and is fine.
+6. Say in the commit body anything that can fail on existing data (a new `UNIQUE`, a `NOT NULL`
    without default).
 
 ## Commits

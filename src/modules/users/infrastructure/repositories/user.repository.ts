@@ -9,7 +9,7 @@ import { UserNotFoundError } from '../../domain/errors/user-not-found.error.js';
 import { UserMapper } from '../mappers/user.mapper.js';
 
 @Injectable()
-export class PrismaUserRepository implements UserRepositoryPort {
+export class UserRepository implements UserRepositoryPort {
     constructor(private prisma: PrismaService) {}
 
     async getUserById(userId: string) {
@@ -57,7 +57,6 @@ export class PrismaUserRepository implements UserRepositoryPort {
         return UserMapper.toDomain(user);
     }
 
-    // updateMany, not update: revoking sessions of an already deleted user must not throw.
     async revokeSessions(userId: string) {
         await this.prisma.user.updateMany({
             where: { id: userId },
