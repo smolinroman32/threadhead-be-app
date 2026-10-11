@@ -27,6 +27,12 @@ export class AuthService {
         return { user, tokens };
     }
 
+    verifyAccessToken(accessToken: string | undefined) {
+        if (!accessToken) return Promise.resolve(null);
+
+        return this.jwtTokenService.verifyAccessToken(accessToken).catch(() => null);
+    }
+
     signOut(refreshToken: string | undefined) {
         return this.signOutUseCase.execute(refreshToken);
     }

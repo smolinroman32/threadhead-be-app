@@ -9,7 +9,7 @@ import type { SignUpUseCase } from './use-cases/sign-up.use-case.js';
 describe('AuthService', () => {
     const user = { id: 'user-id', email: 'u@x.io', tokenVersion: 3 } as UserEntity;
     const expectedPayload = { sub: 'user-id', email: 'u@x.io', tokenVersion: 3 };
-    const jwtTokenService = { generateTokens: vi.fn().mockResolvedValue({}) };
+    const jwtTokenService = { generateTokens: vi.fn().mockResolvedValue({}), verifyAccessToken: vi.fn() };
     const service = new AuthService(
         {} as SignUpUseCase,
         { execute: vi.fn().mockResolvedValue(user) } as unknown as SignInUseCase,
@@ -28,5 +28,19 @@ describe('AuthService', () => {
         await service.refresh('refresh-token');
 
         expect(jwtTokenService.generateTokens).toHaveBeenLastCalledWith(expectedPayload);
+    });
+
+    it('verifyAccessToken returns the payload of a valid token', async () => {
+        const payload = { sub: 'user-id', email: 'u@x.io', tokenVersion: 3 };
+        jwtTokenService.verifyAccessToken.mockResolvedValue(payload);
+
+        await expect(service.verifyAccessToken('token')).resolves.toBe(payload);
+    });
+
+    it('verifyAccessToken returns null for a missing or invalid token', async () => {
+        jwtTokenService.verifyAccessToken.mockRejectedValue(new Error('jwt expired'));
+
+        await expect(service.verifyAccessToken('token')).resolves.toBeNull();
+        await expect(service.verifyAccessToken(undefined)).resolves.toBeNull();
     });
 });
