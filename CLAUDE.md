@@ -2,6 +2,10 @@
 
 # Claude Code — session protocol
 
+- Chat replies are short and to the point: the result first, then only what the user must decide or
+  know. No recap of the diff, no restating the question, no option lists unless asked.
+- Use the `ponytail` skill for code work: the smallest complete change, a test where the logic needs
+  one, and one line on what was skipped or risky.
 - Run `npm run verify` before you call a change done, and say which checks you ran.
 - Do not read or edit `.env`. Do not apply migrations, push or open a PR unless asked.
 - For anything that touches DI, routing or cookies, check against the built app, not only unit tests.
