@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { HttpTransportError } from './http-transport.error.js';
-import type { HttpBodyOptions, HttpOptions, HttpResponse } from './ports/http-client.port.js';
-import { HttpClientPort } from './ports/http-client.port.js';
+import { HttpTransportError } from '../errors/http-transport.error.js';
+import type { HttpBodyOptions, HttpOptions, HttpResponse } from '../ports/http-client.port.js';
+import { HttpClientPort } from '../ports/http-client.port.js';
 
 const DEFAULT_TIMEOUT_MS = 10_000;
 

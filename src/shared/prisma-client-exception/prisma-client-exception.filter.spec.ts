@@ -22,14 +22,14 @@ describe('PrismaClientExceptionFilter', () => {
         const host = {
             switchToHttp: () => ({ getResponse: () => response }),
         } as ArgumentsHost;
-        const exception = { code, message: 'Prisma error' } as Prisma.PrismaClientKnownRequestError;
+        const exception = { code, message: 'Prisma errors' } as Prisma.PrismaClientKnownRequestError;
         const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
 
         new PrismaClientExceptionFilter().catch(exception, host);
 
         expect(response.status).toHaveBeenCalledWith(statusCode);
         expect(response.json).toHaveBeenCalledWith({ statusCode, message });
-        expect(errorSpy).toHaveBeenCalledWith('Prisma error');
+        expect(errorSpy).toHaveBeenCalledWith('Prisma errors');
         errorSpy.mockRestore();
     });
 });
