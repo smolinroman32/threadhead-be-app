@@ -13,6 +13,10 @@ The result is a short spec in `docs/specs/<feature>.md`:
 3. Data: schema changes, and what can fail on existing rows.
 4. Acceptance checks. Each becomes a test or a step of an end-to-end run against `dist`.
 5. Open questions (empty before coding starts).
+6. Tasks, for a multi-step feature: a `- [ ]` checklist in build order, ticked as each step lands.
+
+Before coding, check the spec against `docs/architecture.md` (layers, ports, auth and error contracts) and
+note any deliberate deviation in the spec. Treat this as a checklist item, not a separate document.
 
 Then: tests first from the acceptance checks, `npm run verify`, a run against the built app, and a PR that
 links the spec. When the feature is merged, delete the spec or fold what is lasting into
