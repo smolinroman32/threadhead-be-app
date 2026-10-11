@@ -170,7 +170,7 @@ Deviations to note: the callback is `@Public()` and checks the cookie itself (ne
 - [x] Restore the scaffold (`git revert 53d76a9`), merge `main`, delete `src/modules/social-account/`
 - [x] `HttpClientPort` and `FetchHttpClient` with tests
 - [x] `EncryptionService`, `ENCRYPTION_KEY` check, tests
-- [ ] Schema rename and hand-written migration, checked with `migrate diff`
+- [x] Schema rename and hand-written migration, checked with `migrate diff`
 - [ ] Domain: `SocialAccountEntity`, errors, repository port; `PrismaSocialAccountRepository`, mapper
 - [ ] OAuth state service and `AuthService.verifyAccessToken`
 - [ ] Threads adapters and provider registry with tests
