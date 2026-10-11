@@ -1,9 +1,9 @@
-import { SocialAccountsService } from './social-accounts.service.js';
-import type { AuthorizeSocialAccountUseCase } from './use-cases/authorize-social-account.use-case.js';
-import type { ConnectSocialAccountUseCase } from './use-cases/connect-social-account.use-case.js';
-import type { DisconnectSocialAccountUseCase } from './use-cases/disconnect-social-account.use-case.js';
-import type { GetAccessTokenUseCase } from './use-cases/get-access-token.use-case.js';
-import type { ListSocialAccountsUseCase } from './use-cases/list-social-accounts.use-case.js';
+import { SocialAccountsService } from '../social-accounts.service.js';
+import type { AuthorizeSocialAccountUseCase } from '../use-cases/authorize-social-account.use-case.js';
+import type { ConnectSocialAccountUseCase } from '../use-cases/connect-social-account.use-case.js';
+import type { DisconnectSocialAccountUseCase } from '../use-cases/disconnect-social-account.use-case.js';
+import type { GetAccessTokenUseCase } from '../use-cases/get-access-token.use-case.js';
+import type { ListSocialAccountsUseCase } from '../use-cases/list-social-accounts.use-case.js';
 
 describe('SocialAccountsService', () => {
     const useCase = () => ({ execute: vi.fn() });

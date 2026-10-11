@@ -1,4 +1,4 @@
-import { PrismaService } from './prisma.service.js';
+import { PrismaService } from '../prisma.service.js';
 
 describe('PrismaService', () => {
     afterEach(() => {

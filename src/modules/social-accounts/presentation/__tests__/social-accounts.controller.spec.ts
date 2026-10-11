@@ -1,11 +1,11 @@
 import type { Request, Response } from 'express';
-import type { AuthService } from '../../auth/application/auth.service.js';
-import type { JwtPayload } from '../../auth/domain/jwt-payload.js';
-import type { SocialAccountsService } from '../application/social-accounts.service.js';
-import { SocialAccountEntity } from '../domain/entities/social-account.entity.js';
-import { InvalidOAuthStateError } from '../domain/errors/invalid-oauth-state.error.js';
-import { SocialAccountAlreadyConnectedError } from '../domain/errors/social-account-already-connected.error.js';
-import { SocialAccountsController } from './social-accounts.controller.js';
+import type { AuthService } from '../../../auth/application/auth.service.js';
+import type { JwtPayload } from '../../../auth/domain/jwt-payload.js';
+import type { SocialAccountsService } from '../../application/social-accounts.service.js';
+import { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
+import { InvalidOAuthStateError } from '../../domain/errors/invalid-oauth-state.error.js';
+import { SocialAccountAlreadyConnectedError } from '../../domain/errors/social-account-already-connected.error.js';
+import { SocialAccountsController } from '../social-accounts.controller.js';
 
 describe('SocialAccountsController', () => {
     const currentUser: JwtPayload = { sub: 'user-id', email: 'u@x.io', tokenVersion: 0 };

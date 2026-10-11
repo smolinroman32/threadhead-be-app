@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { PATH_METADATA } from '@nestjs/common/constants.js';
 import type { Response } from 'express';
-import type { JwtPayload } from '../../auth/domain/jwt-payload.js';
-import type { UserService } from '../application/user.service.js';
-import { UserEntity } from '../domain/entities/user.entity.js';
-import { UsersController } from './users.controller.js';
+import type { JwtPayload } from '../../../auth/domain/jwt-payload.js';
+import type { UserService } from '../../application/user.service.js';
+import { UserEntity } from '../../domain/entities/user.entity.js';
+import { UsersController } from '../users.controller.js';
 
 describe('UsersController', () => {
     const currentUser: JwtPayload = { sub: 'token-user-id', email: 'me@example.com', tokenVersion: 0 };

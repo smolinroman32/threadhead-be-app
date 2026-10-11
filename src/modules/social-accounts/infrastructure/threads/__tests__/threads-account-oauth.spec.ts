@@ -1,8 +1,8 @@
-import type { HttpClientPort } from '../../../../shared/http/ports/http-client.port.js';
-import { HttpTransportError } from '../../../../shared/http/errors/http-transport.error.js';
-import { SocialProviderRejectedError } from '../../domain/errors/social-provider-rejected.error.js';
-import { SocialProviderUnavailableError } from '../../domain/errors/social-provider-unavailable.error.js';
-import { ThreadsAccountOAuth } from './threads-account-oauth.js';
+import type { HttpClientPort } from '../../../../../shared/http/ports/http-client.port.js';
+import { HttpTransportError } from '../../../../../shared/http/errors/http-transport.error.js';
+import { SocialProviderRejectedError } from '../../../domain/errors/social-provider-rejected.error.js';
+import { SocialProviderUnavailableError } from '../../../domain/errors/social-provider-unavailable.error.js';
+import { ThreadsAccountOAuth } from '../threads-account-oauth.js';
 
 describe('ThreadsAccountOAuth', () => {
     const http = { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() };

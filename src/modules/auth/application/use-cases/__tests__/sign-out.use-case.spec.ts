@@ -1,6 +1,6 @@
-import type { UserService } from '../../../users/application/user.service.js';
-import type { JwtTokenService } from '../../infrastructure/jwt/jwt.service.js';
-import { SignOutUseCase } from './sign-out.use-case.js';
+import type { UserService } from '../../../../users/application/user.service.js';
+import type { JwtTokenService } from '../../../infrastructure/jwt/jwt.service.js';
+import { SignOutUseCase } from '../sign-out.use-case.js';
 
 describe('SignOutUseCase', () => {
     const jwtTokenService = { verifyRefreshToken: vi.fn() };

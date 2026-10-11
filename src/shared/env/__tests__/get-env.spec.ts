@@ -1,4 +1,4 @@
-import { getSecret } from './get-env.js';
+import { getSecret } from '../get-env.js';
 
 describe('getSecret', () => {
     afterEach(() => {

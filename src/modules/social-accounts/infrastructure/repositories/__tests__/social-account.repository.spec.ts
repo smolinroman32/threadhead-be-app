@@ -1,6 +1,6 @@
-import type { PrismaService } from '../../../../shared/prisma.service.js';
-import { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
-import { SocialAccountRepository } from './social-account.repository.js';
+import type { PrismaService } from '../../../../../shared/prisma.service.js';
+import { SocialAccountEntity } from '../../../domain/entities/social-account.entity.js';
+import { SocialAccountRepository } from '../social-account.repository.js';
 
 const row = {
     id: 'account-id',

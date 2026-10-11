@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import type { AuthService } from '../application/auth.service.js';
-import { AuthController } from './auth.controller.js';
+import type { AuthService } from '../../application/auth.service.js';
+import { AuthController } from '../auth.controller.js';
 
 describe('AuthController', () => {
     const user = { id: 'user-id', email: 'user@example.com' };

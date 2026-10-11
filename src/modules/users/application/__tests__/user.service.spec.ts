@@ -1,11 +1,11 @@
-import type { UserRepositoryPort } from '../domain/ports/user-repository.port.js';
-import { UserService } from './user.service.js';
-import { CreateUserUseCase } from './use-cases/create-user.use-case.js';
-import { DeleteUserByIdUseCase } from './use-cases/delete-user-by-id.use-case.js';
-import { GetUserByEmailUseCase } from './use-cases/get-user-by-email.use-case.js';
-import { GetUserByIdUseCase } from './use-cases/get-user-by-id.use-case.js';
-import { RevokeUserSessionsUseCase } from './use-cases/revoke-user-sessions.use-case.js';
-import { UpdateUserByIdUseCase } from './use-cases/update-user-by-id.use-case.js';
+import type { UserRepositoryPort } from '../../domain/ports/user-repository.port.js';
+import { UserService } from '../user.service.js';
+import { CreateUserUseCase } from '../use-cases/create-user.use-case.js';
+import { DeleteUserByIdUseCase } from '../use-cases/delete-user-by-id.use-case.js';
+import { GetUserByEmailUseCase } from '../use-cases/get-user-by-email.use-case.js';
+import { GetUserByIdUseCase } from '../use-cases/get-user-by-id.use-case.js';
+import { RevokeUserSessionsUseCase } from '../use-cases/revoke-user-sessions.use-case.js';
+import { UpdateUserByIdUseCase } from '../use-cases/update-user-by-id.use-case.js';
 
 describe('UserService', () => {
     const repository = {

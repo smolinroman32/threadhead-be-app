@@ -1,6 +1,6 @@
-import { UserNotFoundError } from '../../domain/errors/user-not-found.error.js';
-import type { PrismaService } from '../../../../shared/prisma.service.js';
-import { UserRepository } from './user.repository.js';
+import { UserNotFoundError } from '../../../domain/errors/user-not-found.error.js';
+import type { PrismaService } from '../../../../../shared/prisma.service.js';
+import { UserRepository } from '../user.repository.js';
 
 describe('UserRepository.getUserById', () => {
     const findUnique = vi.fn();

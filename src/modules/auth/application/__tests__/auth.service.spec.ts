@@ -1,10 +1,10 @@
-import type { UserEntity } from '../../users/domain/entities/user.entity.js';
-import type { JwtTokenService } from '../infrastructure/jwt/jwt.service.js';
-import { AuthService } from './auth.service.js';
-import type { RefreshUseCase } from './use-cases/refresh.use-case.js';
-import type { SignInUseCase } from './use-cases/sign-in.use-case.js';
-import type { SignOutUseCase } from './use-cases/sign-out.use-case.js';
-import type { SignUpUseCase } from './use-cases/sign-up.use-case.js';
+import type { UserEntity } from '../../../users/domain/entities/user.entity.js';
+import type { JwtTokenService } from '../../infrastructure/jwt/jwt.service.js';
+import { AuthService } from '../auth.service.js';
+import type { RefreshUseCase } from '../use-cases/refresh.use-case.js';
+import type { SignInUseCase } from '../use-cases/sign-in.use-case.js';
+import type { SignOutUseCase } from '../use-cases/sign-out.use-case.js';
+import type { SignUpUseCase } from '../use-cases/sign-up.use-case.js';
 
 describe('AuthService', () => {
     const user = { id: 'user-id', email: 'u@x.io', tokenVersion: 3 } as UserEntity;

@@ -1,9 +1,9 @@
-import type { UserService } from '../../../users/application/user.service.js';
-import type { UserEntity } from '../../../users/domain/entities/user.entity.js';
-import { UserNotFoundError } from '../../../users/domain/errors/user-not-found.error.js';
-import { InvalidRefreshTokenError } from '../../domain/errors/invalid-refresh-token.error.js';
-import type { JwtTokenService } from '../../infrastructure/jwt/jwt.service.js';
-import { RefreshUseCase } from './refresh.use-case.js';
+import type { UserService } from '../../../../users/application/user.service.js';
+import type { UserEntity } from '../../../../users/domain/entities/user.entity.js';
+import { UserNotFoundError } from '../../../../users/domain/errors/user-not-found.error.js';
+import { InvalidRefreshTokenError } from '../../../domain/errors/invalid-refresh-token.error.js';
+import type { JwtTokenService } from '../../../infrastructure/jwt/jwt.service.js';
+import { RefreshUseCase } from '../refresh.use-case.js';
 
 describe('RefreshUseCase', () => {
     const payload = { sub: 'user-id', email: 'user@example.com', tokenVersion: 0 };

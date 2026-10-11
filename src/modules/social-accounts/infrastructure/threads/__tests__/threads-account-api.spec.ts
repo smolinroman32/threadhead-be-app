@@ -1,7 +1,7 @@
-import type { HttpClientPort } from '../../../../shared/http/ports/http-client.port.js';
-import { SocialProviderRejectedError } from '../../domain/errors/social-provider-rejected.error.js';
-import { SocialProviderUnavailableError } from '../../domain/errors/social-provider-unavailable.error.js';
-import { ThreadsAccountApi } from './threads-account-api.js';
+import type { HttpClientPort } from '../../../../../shared/http/ports/http-client.port.js';
+import { SocialProviderRejectedError } from '../../../domain/errors/social-provider-rejected.error.js';
+import { SocialProviderUnavailableError } from '../../../domain/errors/social-provider-unavailable.error.js';
+import { ThreadsAccountApi } from '../threads-account-api.js';
 
 describe('ThreadsAccountApi', () => {
     const http = { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() };

@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { ParseSocialProviderPipe } from './parse-social-provider.pipe.js';
+import { ParseSocialProviderPipe } from '../parse-social-provider.pipe.js';
 
 describe('ParseSocialProviderPipe', () => {
     const pipe = new ParseSocialProviderPipe();

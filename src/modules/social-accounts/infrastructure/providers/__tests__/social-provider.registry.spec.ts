@@ -1,6 +1,6 @@
-import type { SocialAccountApiPort } from '../../domain/ports/social-account-api.port.js';
-import type { SocialAccountOauthPort } from '../../domain/ports/social-account-oauth.port.js';
-import { SocialProviderRegistry } from './social-provider.registry.js';
+import type { SocialAccountApiPort } from '../../../domain/ports/social-account-api.port.js';
+import type { SocialAccountOauthPort } from '../../../domain/ports/social-account-oauth.port.js';
+import { SocialProviderRegistry } from '../social-provider.registry.js';
 
 describe('SocialProviderRegistry', () => {
     const oauth = { provider: 'THREADS' } as SocialAccountOauthPort;

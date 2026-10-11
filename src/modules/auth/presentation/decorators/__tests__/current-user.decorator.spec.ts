@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants.js';
 import type { ExecutionContext } from '@nestjs/common';
-import type { JwtPayload } from '../../domain/jwt-payload.js';
-import { CurrentUser } from './current-user.decorator.js';
+import type { JwtPayload } from '../../../domain/jwt-payload.js';
+import { CurrentUser } from '../current-user.decorator.js';
 
 class Probe {
     handler(@CurrentUser() _user: JwtPayload) {}
