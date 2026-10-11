@@ -1,5 +1,23 @@
 # Conventions
 
+## Features: grill first
+
+Before building a feature (a new module, a change to an endpoint contract, a migration that touches
+data), run the `grilling` skill: the agent questions the plan until no open decision is left. Do not
+start code while a decision is open. Skip it for fixes, renames and steps already in an agreed plan.
+
+The result is a short spec in `docs/specs/<feature>.md`:
+
+1. Goal in two lines, and what is explicitly out of scope.
+2. Contract: endpoints, bodies, statuses, errors.
+3. Data: schema changes, and what can fail on existing rows.
+4. Acceptance checks. Each becomes a test or a step of an end-to-end run against `dist`.
+5. Open questions (empty before coding starts).
+
+Then: tests first from the acceptance checks, `npm run verify`, a run against the built app, and a PR that
+links the spec. When the feature is merged, delete the spec or fold what is lasting into
+`docs/architecture.md`.
+
 ## Language
 
 Code, comments, commit messages and documentation are in English. A comment explains *why*, in one line,

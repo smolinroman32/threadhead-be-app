@@ -7,7 +7,8 @@ change.
 Read when the task touches it:
 
 - [docs/architecture.md](docs/architecture.md): layers, module template, ports, auth and error contracts.
-- [docs/conventions.md](docs/conventions.md): naming, DTOs, tests, commits, migrations, formatting.
+- [docs/conventions.md](docs/conventions.md): the grill-then-spec workflow for features, naming, DTOs, tests,
+  commits, migrations, formatting.
 
 ## Commands
 
