@@ -51,7 +51,8 @@ Code, commit messages and documentation are in English.
 
 ## Tests
 
-- Vitest, `*.spec.ts` beside the code under test.
+- Vitest. A spec lives in a `__tests__/` folder next to the code it tests, named after the file
+  (`application/use-cases/__tests__/sign-in.use-case.spec.ts`), so a source folder never holds file pairs.
 - Write the failing test first, watch it fail for the right reason, then write the minimum code.
 - Build the class under test by hand with fakes for its dependencies (`new SignInUseCase(fakeUsers, ...)`).
   esbuild does not emit `emitDecoratorMetadata`, so `Test.createTestingModule` from a spec cannot resolve

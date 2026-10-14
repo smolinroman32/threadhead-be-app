@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EncryptionService } from '../../../../shared/encryption-service/encryption.service.js';
+import { EncryptionService } from '../../../../shared/services/encryption-service/encryption.service.js';
 import type { SocialAccountEntity } from '../../domain/entities/social-account.entity.js';
 import { SocialAccountNotFoundError } from '../../domain/errors/social-account-not-found.error.js';
 import { SocialAccountReconnectRequiredError } from '../../domain/errors/social-account-reconnect-required.error.js';

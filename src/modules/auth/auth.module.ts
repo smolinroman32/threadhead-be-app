@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { CredentialsService } from '../../shared/credential-service/credential.service.js';
+import { CredentialsService } from '../../shared/services/credential-service/credential.service.js';
 import { AuthService } from './application/auth.service.js';
 import { RefreshUseCase } from './application/use-cases/refresh.use-case.js';
 import { SignInUseCase } from './application/use-cases/sign-in.use-case.js';

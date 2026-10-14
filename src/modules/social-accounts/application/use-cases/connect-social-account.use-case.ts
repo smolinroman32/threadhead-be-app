@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EncryptionService } from '../../../../shared/encryption-service/encryption.service.js';
+import { EncryptionService } from '../../../../shared/services/encryption-service/encryption.service.js';
 import { InvalidOAuthStateError } from '../../domain/errors/invalid-oauth-state.error.js';
 import { SocialAccountAlreadyConnectedError } from '../../domain/errors/social-account-already-connected.error.js';
 import { OAuthStatePort } from '../../domain/ports/oauth-state.port.js';

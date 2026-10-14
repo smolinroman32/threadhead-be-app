@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../../../users/application/user.service.js';
 import { UserEmailTakenError } from '../../../users/domain/errors/user-email-taken.error.js';
-import { CredentialsService } from '../../../../shared/credential-service/credential.service.js';
+import { CredentialsService } from '../../../../shared/services/credential-service/credential.service.js';
 
 export type SignUpInput = {
     name: string;

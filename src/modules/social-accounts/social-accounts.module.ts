@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { EncryptionService } from '../../shared/encryption-service/encryption.service.js';
+import { EncryptionService } from '../../shared/services/encryption-service/encryption.service.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { SocialAccountsService } from './application/social-accounts.service.js';
 import { AuthorizeSocialAccountUseCase } from './application/use-cases/authorize-social-account.use-case.js';

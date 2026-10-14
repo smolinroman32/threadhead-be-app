@@ -31,7 +31,8 @@ src/modules/<name>/
 ```
 
 `src/shared/` holds cross-cutting code: env helpers, `PrismaModule`/`PrismaService`, exception filters,
-password hashing. It must not import from `src/modules/**` except stable domain types.
+and `services/` (`CredentialsService` for password hashing, `EncryptionService` for provider tokens).
+It must not import from `src/modules/**` except stable domain types.
 
 ### Module or plain service?
 
