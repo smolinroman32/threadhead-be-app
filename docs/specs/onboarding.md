@@ -189,8 +189,9 @@ End to end on `dist` with the real database:
 
 ## Tasks
 
-- [ ] Enums in `prisma/models/onboarding.prisma` and the migration, checked with `migrate diff`
-- [ ] Domain: entity with step order and merge rules, error, repository port; unit tests 1 to 3
-- [ ] `OnboardingRepository` with the conditional update and `P2002` translation, mapper
-- [ ] Use cases, facade, controller, DTOs with term normalization, route pipe, module wiring
-- [ ] `npm run verify`, end-to-end run (checks 4 to 11), PR linking this spec
+- [x] Enums in `prisma/models/onboarding.prisma` and the migration, checked with `migrate diff`
+- [x] Domain: entity with step order and merge rules, error, repository port; unit tests 1 to 3
+- [x] `OnboardingRepository` with the conditional update and `P2002` translation, mapper
+- [x] Use cases, facade, controller, DTOs with term normalization, route pipe, module wiring
+- [x] `npm run verify`, end-to-end run (checks 4 to 11)
+- [ ] PR linking this spec
