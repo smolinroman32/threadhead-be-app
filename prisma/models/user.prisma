@@ -10,4 +10,5 @@ model User {
 
   socialAccounts   SocialAccount[]
   opportunityFeeds OpportunityFeed[]
+  onboarding       Onboarding?
 }
