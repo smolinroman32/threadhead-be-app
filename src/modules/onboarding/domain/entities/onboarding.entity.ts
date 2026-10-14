@@ -5,7 +5,7 @@ import { normalizeIntentStep, normalizePreferencesStep } from './onboarding-draf
 export const ONBOARDING_STEPS = ['INTENT', 'PREFERENCES', 'REVIEW'] as const;
 export type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
 export type EditableOnboardingStep = Exclude<OnboardingStep, 'REVIEW'>;
-export type OnboardingStatus = 'IN_PROGRESS' | 'COMPLETED';
+export type OnboardingStatus = 'IN_PROGRESS' | 'COMPLETING' | 'COMPLETED';
 
 export type OnboardingDraft = {
     intent?: string;
