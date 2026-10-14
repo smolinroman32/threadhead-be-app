@@ -116,5 +116,6 @@ Domain code throws a `DomainError` subclass with a `kind`; it never mentions HTT
 ## Data
 
 Prisma schema is split by model in `prisma/models/*.prisma`; `prisma/schema.prisma` holds the generator and
-datasource. Current models: `User`, `ThreadsAccount`, `OpportunityFeed`, `SearchQuery`, `Opportunity` and
-the `OpportunitySearchQuery` join. Only `User` is used by code so far.
+datasource. Current models: `User`, `SocialAccount`, `Onboarding`, `OpportunityFeed`, `SearchQuery`,
+`Opportunity` and the `OpportunitySearchQuery` join. `SearchQuery`, `Opportunity` and the join are not used by
+code yet.

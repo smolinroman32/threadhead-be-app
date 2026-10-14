@@ -244,12 +244,13 @@ End to end on `dist` with the real database (scratch database, all migrations ap
 
 ## Tasks
 
-- [ ] Schema: `OpportunityFeed.onboardingId` and `COMPLETING`, two migrations checked with `migrate diff`
-- [ ] Shared `normalize-terms`; onboarding switched to it with its specs unchanged
-- [ ] Feeds domain: entity, errors, cap, repository port; unit checks 1 to 3
-- [ ] `OpportunityFeedRepository` with the advisory-lock transaction, mapper
-- [ ] Feeds use cases, facade, controller, DTOs, strict pipe, module wiring; end-to-end checks 7 to 10
-- [ ] Onboarding: `id` on the entity, `COMPLETING` transitions, `OnboardingNotEditableError`, unit checks 4 to 6
-- [ ] Onboarding: `OnboardingFeedPort`, adapter, `CompleteOnboardingUseCase`, `POST /onboarding/complete`,
+- [x] Schema: `OpportunityFeed.onboardingId` and `COMPLETING`, two migrations checked with `migrate diff`
+- [x] Shared `normalize-terms`; onboarding switched to it with its specs unchanged
+- [x] Feeds domain: entity, errors, cap, repository port; unit checks 1 to 3
+- [x] `OpportunityFeedRepository` with the advisory-lock transaction, mapper
+- [x] Feeds use cases, facade, controller, DTOs, strict pipe, module wiring; end-to-end checks 7 to 10
+- [x] Onboarding: `id` on the entity, `COMPLETING` transitions, `OnboardingNotEditableError`, unit checks 4 to 6
+- [x] Onboarding: `OnboardingFeedPort`, adapter, `CompleteOnboardingUseCase`, `POST /onboarding/complete`,
       module imports; end-to-end checks 11 to 16
-- [ ] `npm run verify`, end-to-end run, PR linking this spec
+- [x] `npm run verify`, end-to-end run
+- [ ] PR linking this spec
