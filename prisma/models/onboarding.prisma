@@ -1,10 +1,21 @@
+enum OnboardingStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum OnboardingStep {
+  INTENT
+  PREFERENCES
+  REVIEW
+}
+
 model Onboarding {
-  id          String @id @default(uuid()) @db.Uuid
-  userId      String @unique @db.Uuid
-  currentStep String
-  status      String
+  id          String           @id @default(uuid()) @db.Uuid
+  userId      String           @unique @db.Uuid
+  currentStep OnboardingStep
+  status      OnboardingStatus
   draft       Json
-  version     Int    @default(1)
+  version     Int              @default(1)
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
