@@ -1,8 +1,8 @@
 import { IsIn, IsInt, IsObject, Min } from 'class-validator';
-import type { EditableOnboardingStep } from '../../domain/entities/onboarding.entity.js';
+import { ONBOARDING_STEP, type EditableOnboardingStep } from '../../domain/entities/onboarding.entity.js';
 
 export class SaveOnboardingStepDto {
-    @IsIn(['INTENT', 'PREFERENCES'])
+    @IsIn([ONBOARDING_STEP.INTENT, ONBOARDING_STEP.PREFERENCES])
     step: EditableOnboardingStep;
 
     @IsInt()
