@@ -15,4 +15,5 @@ model OpportunityFeed {
   searchQueries  SearchQuery[]
   opportunities  Opportunity[]
   targetAudience String
+  onboardingId   String?       @unique @db.Uuid
 }

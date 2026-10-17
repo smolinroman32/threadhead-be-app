@@ -1,5 +1,6 @@
 enum OnboardingStatus {
   IN_PROGRESS
+  COMPLETING
   COMPLETED
 }
 

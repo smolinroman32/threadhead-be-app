@@ -22,6 +22,7 @@ export class OnboardingRepository implements OnboardingRepositoryPort {
             status: onboarding.status,
             draft: onboarding.draft,
             version: onboarding.version,
+            completedAt: onboarding.completedAt,
         };
 
         if (expectedVersion === 0) {
