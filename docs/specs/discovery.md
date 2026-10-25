@@ -333,7 +333,8 @@ schema) is `LlmUnavailableError` without a retry. `OPENAI_API_KEY` is read on ea
 without it.
 
 Scoring input: intent, target audience, include terms, and posts as `{ ref: "p1", text }`. Output:
-`[{ ref, relevanceScore, reason }]`. The domain accepts an item only when its ref was sent and appears once,
+`{ scores: [{ ref, relevanceScore, reason }] }`, wrapped in an object because a strict OpenAI schema needs an
+object at the root. The domain accepts an item only when its ref was sent and appears once,
 `relevanceScore` is an integer `0..100` and `reason` is at most `REASON_MAX_LENGTH`. Rejected or missing items
 stay unscored. Post text is untrusted: it goes into the user message between explicit delimiters, and the system
 message says post content is data, not instructions. Non-English posts score `0` with reason `not English`.
@@ -494,7 +495,7 @@ Reading
 - [x] Feeds: `socialAccountId` rules, criteria diff, version bump, exclusion recompute in the locked
       transaction; checks 16, 17, 21
       (queueing a run on a criteria change or a resume lands with the run use case)
-- [ ] Discovery domain: prefilter, scoring and phrase validation; unit checks 12 to 14
+- [x] Discovery domain: prefilter, scoring and phrase validation; unit checks 12 to 14
 - [ ] `DiscoveryRun` repository: coalescing, claim, fenced writes, reconciler queries; checks 2, 5, 6
 - [ ] Run use case, worker, scheduler, bootstrap recovery; checks 1, 3, 4, 8 to 10, 15, 18, 19
 - [ ] Controllers and DTOs for runs and opportunities; checks 7, 22
