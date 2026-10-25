@@ -245,8 +245,8 @@ type Opportunity = {
   permalink: string
   publishedAt: Date
 
-  score: number
-  reason?: string
+  relevanceScore: number
+  reason: string
 
   status:
     | "new"
@@ -329,15 +329,16 @@ The system generates multiple SearchQuery records from the intent.
 
 ### Step 5 — First Search
 
-The first search is executed.
+When the feed is bound to a connected Threads account, the first discovery run is queued as soon as the feed is
+created. Its results reach the feed when the run finishes.
 
-The user immediately receives the first Opportunities.
+### Step 6 — Threads Connection
 
-### Step 6 — Optional Threads Connection
+Completing onboarding does not require a Threads account, but discovery does: the search runs with the user's
+own Threads token, and every feed belongs to one connected account for good.
 
-Connecting a Threads account is not required to complete onboarding or use opportunity discovery.
-
-A Threads account is required only for actions that need authenticated account access, such as publishing a reply.
+If the user has exactly one active account when the feed is created, the feed is bound to it. A feed created
+before any account is connected is bound to the user's only active account on its first discovery request.
 
 ### Step 7 — Complete
 
@@ -457,10 +458,14 @@ Later, the model can be expanded to return:
 MVP score:
 
 ```text
-OpportunityScore =
-    relevance
-  × freshness
+relevanceScore = LLM relevance, an integer from 0 to 100
 ```
+
+Every scored post is stored with its `relevanceScore` and `reason`, whatever the feed's `minScore`. Freshness is
+not multiplied in: `freshnessHours` limits the search, and the list of `new` opportunities shows only posts with
+`relevanceScore >= minScore` published within `freshnessHours`. Saved, dismissed and replied opportunities are
+listed without these filters. A change of the feed's criteria marks stored scores as stale and the next run
+rescores them.
 
 A later version may include:
 
@@ -486,11 +491,7 @@ For each Opportunity, display:
 - author;
 - post text;
 - published time;
-- likes;
-- reposts;
-- views;
-- top comments/replies;
-- score;
+- relevance score;
 - reason;
 - matched SearchQuery;
 - permalink.
@@ -552,9 +553,11 @@ In the future, SearchQuery records with poor precision may be:
 
 ### FR-1
 
-The user can use opportunity discovery without connecting a Threads account.
+Opportunity discovery requires a connected Threads account. The search runs with that account's own token, so its
+quota and permissions are the user's.
 
-Connecting a Threads account is optional until the user wants to perform authenticated actions such as publishing a reply.
+The user can complete onboarding and create feeds without an account; a feed runs discovery only once it is
+bound to one.
 
 ### FR-2
 
@@ -598,15 +601,14 @@ A reply is published only after explicit user confirmation.
 
 ### FR-12
 
-The system should retrieve and display available engagement metrics for an Opportunity:
-
-- likes;
-- reposts;
-- views.
+Moved out of the MVP. The official API gives no engagement metrics for other users' posts; likes, reposts and
+views for an Opportunity need a separate metrics source (`getPostSnapshot`), decided after the M0 checks in
+`docs/opportunity-discovery.md`.
 
 ### FR-13
 
-The system should retrieve and display top comments/replies for an Opportunity when available.
+Moved out of the MVP for the same reason as FR-12: top comments/replies with their likes need the same metrics
+source.
 
 ---
 
@@ -614,16 +616,15 @@ The system should retrieve and display top comments/replies for an Opportunity w
 
 The MVP is considered useful if:
 
-1. the user can complete onboarding without connecting a Threads account;
+1. the user can complete onboarding, and discovery runs once a Threads account is connected;
 2. at least one Opportunity Feed is created;
 3. the system automatically creates SearchQuery records;
 4. the system finds fresh English-language Threads posts through `threads_keyword_search`;
 5. most displayed Opportunities match the user's intent;
-6. each Opportunity shows available likes, reposts, and views;
-7. each Opportunity shows top comments/replies when available;
-8. irrelevant Opportunities can be dismissed;
-9. the same post does not appear more than once in the same Feed;
-10. after optionally connecting a Threads account, the user can generate, review, and publish a reply.
+6. each Opportunity shows its relevance score and reason;
+7. irrelevant Opportunities can be dismissed;
+8. the same post does not appear more than once in the same Feed;
+9. the user can generate, review, and publish a reply from the connected account.
 
 ---
 
@@ -660,15 +661,14 @@ An empty search result must not automatically be interpreted as absence of discu
 - pre-filter;
 - LLM relevance scoring;
 - Opportunity list;
-- likes, reposts, and views when available;
-- top comments/replies when available;
 - dismiss/save;
-- optional Threads OAuth and ThreadsAccount connection;
+- Threads OAuth and ThreadsAccount connection, required for discovery;
 - reply draft;
 - manual reply publishing for connected accounts.
 
 ### Exclude
 
+- likes, reposts, views and top comments/replies of other users' posts (FR-12, FR-13);
 - watchlist metric polling;
 - automatic replies;
 - advanced analytics;

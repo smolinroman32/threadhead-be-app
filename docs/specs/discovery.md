@@ -503,6 +503,6 @@ Reading
 - [x] Run use case, worker, scheduler, bootstrap recovery; checks 1, 3, 4, 8 to 10, 15, 18, 19
       (the lazy account binding and the 409s of `POST /discovery-runs` land with the controllers)
 - [x] Controllers and DTOs for runs and opportunities; checks 7, 22
-- [ ] PRD: FR-1, onboarding step 6, section 11 score, FR-12 and FR-13 moved out
+- [x] PRD: FR-1, onboarding step 6, section 11 score, FR-12 and FR-13 moved out
 - [ ] `npm run verify`, end-to-end run against `dist` with Redis
 - [ ] PR linking this spec
