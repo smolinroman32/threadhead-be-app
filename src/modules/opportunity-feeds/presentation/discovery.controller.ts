@@ -35,16 +35,16 @@ export class DiscoveryController {
     @Post('opportunity-feeds/:feedId/discovery-runs')
     @HttpCode(HttpStatus.ACCEPTED)
     async requestRun(@CurrentUser() currentUser: JwtPayload, @Param('feedId', ParseUUIDPipe) feedId: string) {
-        const run = await this.feedsService.requestRun(currentUser.sub, feedId);
+        const { run, nextRunAt } = await this.feedsService.requestRun(currentUser.sub, feedId);
 
-        return DiscoveryResponseMapper.run(run);
+        return DiscoveryResponseMapper.run(run, nextRunAt);
     }
 
     @Get('opportunity-feeds/:feedId/discovery-runs/latest')
     async latestRun(@CurrentUser() currentUser: JwtPayload, @Param('feedId', ParseUUIDPipe) feedId: string) {
-        const run = await this.feedsService.getRun(currentUser.sub, feedId, 'latest');
+        const { run, nextRunAt } = await this.feedsService.getRun(currentUser.sub, feedId, 'latest');
 
-        return DiscoveryResponseMapper.run(run);
+        return DiscoveryResponseMapper.run(run, nextRunAt);
     }
 
     @Get('opportunity-feeds/:feedId/discovery-runs/:runId')
@@ -53,9 +53,9 @@ export class DiscoveryController {
         @Param('feedId', ParseUUIDPipe) feedId: string,
         @Param('runId', ParseUUIDPipe) runId: string,
     ) {
-        const run = await this.feedsService.getRun(currentUser.sub, feedId, runId);
+        const { run, nextRunAt } = await this.feedsService.getRun(currentUser.sub, feedId, runId);
 
-        return DiscoveryResponseMapper.run(run);
+        return DiscoveryResponseMapper.run(run, nextRunAt);
     }
 
     @Get('opportunity-feeds/:feedId/opportunities')

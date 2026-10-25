@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { cooldownEnd } from '../../domain/discovery/cooldown.js';
 import { DiscoveryRunNotFoundError } from '../../domain/errors/discovery-run-not-found.error.js';
 import { OpportunityFeedNotFoundError } from '../../domain/errors/opportunity-feed-not-found.error.js';
 import { DiscoveryRunRepositoryPort } from '../../domain/ports/discovery-run-repository.port.js';
@@ -23,6 +24,6 @@ export class GetDiscoveryRunUseCase {
 
         if (!run) throw new DiscoveryRunNotFoundError();
 
-        return run;
+        return { run, nextRunAt: cooldownEnd(await this.runs.findLastCountedRunAt(feedId), new Date()) };
     }
 }

@@ -4,7 +4,7 @@ import type { DiscoveryRunResponseDto } from '../dto/discovery-run-response.dto.
 import type { OpportunityResponseDto } from '../dto/opportunity-response.dto.js';
 
 export class DiscoveryResponseMapper {
-    static run(run: DiscoveryRunEntity): DiscoveryRunResponseDto {
+    static run(run: DiscoveryRunEntity, nextRunAt: Date | null): DiscoveryRunResponseDto {
         return {
             id: run.id,
             status: run.status.toLowerCase() as DiscoveryRunResponseDto['status'],
@@ -13,6 +13,7 @@ export class DiscoveryResponseMapper {
             createdAt: run.createdAt,
             startedAt: run.startedAt,
             finishedAt: run.finishedAt,
+            nextRunAt,
         };
     }
 

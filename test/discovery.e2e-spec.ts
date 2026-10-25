@@ -73,6 +73,57 @@ describe('discovery (dist)', () => {
         expect((await json(paused)).error).toBe('OpportunityFeedPausedError');
     });
 
+    it('refuses a manual run for six hours after a run that did not fail and reports nextRunAt', async () => {
+        const { cookie, userId } = await signUp(BASE);
+        const feed = await createFeed(cookie);
+        const account = await prisma.socialAccount.create({
+            data: {
+                userId,
+                provider: 'THREADS',
+                providerAccountId: randomUUID(),
+                username: 'owner',
+                scopes: [],
+                accessTokenEncrypted: null,
+                tokenExpiresAt: null,
+            },
+        });
+        await prisma.opportunityFeed.update({
+            where: { id: feed.id },
+            data: { socialAccountId: account.id },
+        });
+        const hour = 60 * 60 * 1000;
+        const succeededAt = new Date(Date.now() - hour);
+        const succeeded = await prisma.discoveryRun.create({
+            data: {
+                opportunityFeedId: feed.id,
+                status: 'SUCCEEDED',
+                createdAt: succeededAt,
+                finishedAt: succeededAt,
+            },
+        });
+        await prisma.discoveryRun.create({
+            data: { opportunityFeedId: feed.id, status: 'FAILED', error: 'llm_unavailable' },
+        });
+        const runs = `/opportunity-feeds/${feed.id}/discovery-runs`;
+
+        const refused = await call(BASE, cookie, 'POST', runs);
+        expect(refused.status).toBe(409);
+        expect((await json(refused)).error).toBe('DiscoveryCooldownError');
+
+        const latest = await json(await call(BASE, cookie, 'GET', `${runs}/latest`));
+        expect(latest.status).toBe('failed');
+        expect(latest.nextRunAt).toBe(new Date(succeededAt.getTime() + 6 * hour).toISOString());
+        const byId = await json(await call(BASE, cookie, 'GET', `${runs}/${succeeded.id}`));
+        expect(byId.nextRunAt).toBe(latest.nextRunAt);
+
+        await prisma.discoveryRun.update({
+            where: { id: succeeded.id },
+            data: { createdAt: new Date(Date.now() - 7 * hour) },
+        });
+        const open = await json(await call(BASE, cookie, 'GET', `${runs}/latest`));
+        expect(open.nextRunAt).toBeNull();
+    });
+
     it('lists new opportunities with the read filters and every other status without them', async () => {
         const { cookie } = await signUp(BASE);
         const feed = await createFeed(cookie);

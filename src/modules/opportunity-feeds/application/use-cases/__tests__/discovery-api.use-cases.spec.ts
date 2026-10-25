@@ -1,6 +1,7 @@
 import type { SocialAccountsService } from '../../../../social-accounts/application/social-accounts.service.js';
 import { SocialAccountReconnectRequiredError } from '../../../../social-accounts/domain/errors/social-account-reconnect-required.error.js';
 import { OpportunityEntity, type OpportunityStatus } from '../../../domain/entities/opportunity.entity.js';
+import { DiscoveryCooldownError } from '../../../domain/errors/discovery-cooldown.error.js';
 import { DiscoveryRunNotFoundError } from '../../../domain/errors/discovery-run-not-found.error.js';
 import { OpportunityFeedAccountRequiredError } from '../../../domain/errors/opportunity-feed-account-required.error.js';
 import { OpportunityFeedNotFoundError } from '../../../domain/errors/opportunity-feed-not-found.error.js';
@@ -17,10 +18,11 @@ import type { QueueDiscoveryRunUseCase } from '../queue-discovery-run.use-case.j
 import { RequestDiscoveryRunUseCase } from '../request-discovery-run.use-case.js';
 
 const NOW = new Date('2026-10-25T12:00:00Z');
+const HOUR = 60 * 60_000;
 
 describe('discovery API use cases', () => {
     const feeds = { findByIdForUser: vi.fn(), updateLocked: vi.fn() };
-    const runs = { findByIdForFeed: vi.fn(), findLatestForFeed: vi.fn() };
+    const runs = { findByIdForFeed: vi.fn(), findLatestForFeed: vi.fn(), findLastCountedRunAt: vi.fn() };
     const opportunities = { list: vi.fn(), findByIdForUser: vi.fn(), updateStatus: vi.fn() };
     const socialAccounts = { list: vi.fn() };
     const discovery = { execute: vi.fn() };
@@ -57,7 +59,8 @@ describe('discovery API use cases', () => {
         vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
         feeds.findByIdForUser.mockResolvedValue(feed());
         socialAccounts.list.mockResolvedValue([{ id: 'account-id', username: 'Owner', isActive: true }]);
-        discovery.execute.mockResolvedValue({ id: 'run-id' });
+        discovery.execute.mockResolvedValue({ id: 'run-id', createdAt: NOW });
+        runs.findLastCountedRunAt.mockResolvedValue(null);
     });
 
     afterEach(() => {
@@ -68,12 +71,16 @@ describe('discovery API use cases', () => {
         const useCase = () =>
             new RequestDiscoveryRunUseCase(
                 feedPort,
+                runs as unknown as DiscoveryRunRepositoryPort,
                 accounts,
                 discovery as unknown as QueueDiscoveryRunUseCase,
             );
 
         it('queues a run of an active feed with a usable account', async () => {
-            await expect(useCase().execute('user-id', 'feed-id')).resolves.toEqual({ id: 'run-id' });
+            await expect(useCase().execute('user-id', 'feed-id')).resolves.toEqual({
+                run: { id: 'run-id', createdAt: NOW },
+                nextRunAt: new Date(NOW.getTime() + 6 * HOUR),
+            });
             expect(feeds.findByIdForUser).toHaveBeenCalledWith('feed-id', 'user-id');
             expect(discovery.execute).toHaveBeenCalledWith('feed-id');
         });
@@ -117,6 +124,39 @@ describe('discovery API use cases', () => {
             expect(discovery.execute).not.toHaveBeenCalled();
         });
 
+        it('refuses a manual run within six hours of a run that did not fail and adds no job', async () => {
+            runs.findLastCountedRunAt.mockResolvedValue(new Date(NOW.getTime() - HOUR));
+
+            const refusal = await useCase()
+                .execute('user-id', 'feed-id')
+                .catch((error: unknown) => error);
+
+            expect(refusal).toBeInstanceOf(DiscoveryCooldownError);
+            expect((refusal as DiscoveryCooldownError).nextRunAt).toEqual(new Date(NOW.getTime() + 5 * HOUR));
+            expect(runs.findLastCountedRunAt).toHaveBeenCalledWith('feed-id');
+            expect(discovery.execute).not.toHaveBeenCalled();
+        });
+
+        it('queues a manual run once the cooldown passed', async () => {
+            runs.findLastCountedRunAt.mockResolvedValue(new Date(NOW.getTime() - 6 * HOUR));
+
+            await expect(useCase().execute('user-id', 'feed-id')).resolves.toMatchObject({
+                run: { id: 'run-id' },
+            });
+        });
+
+        it('returns no cooldown for an existing queued run that is older than six hours', async () => {
+            discovery.execute.mockResolvedValue({
+                id: 'old-run',
+                createdAt: new Date(NOW.getTime() - 7 * HOUR),
+            });
+
+            await expect(useCase().execute('user-id', 'feed-id')).resolves.toEqual({
+                run: expect.objectContaining({ id: 'old-run' }),
+                nextRunAt: null,
+            });
+        });
+
         it('binds the only active account of an unbound feed before queueing', async () => {
             feeds.findByIdForUser.mockResolvedValue(feed({ socialAccountId: null }));
             feeds.updateLocked.mockImplementation(async (_id, _user, mutate) => {
@@ -139,13 +179,33 @@ describe('discovery API use cases', () => {
             runs.findByIdForFeed.mockResolvedValue({ id: 'run-id' });
             runs.findLatestForFeed.mockResolvedValue({ id: 'latest-run' });
 
-            await expect(useCase().execute('user-id', 'feed-id', 'run-id')).resolves.toEqual({
-                id: 'run-id',
+            await expect(useCase().execute('user-id', 'feed-id', 'run-id')).resolves.toMatchObject({
+                run: { id: 'run-id' },
             });
-            await expect(useCase().execute('user-id', 'feed-id', 'latest')).resolves.toEqual({
-                id: 'latest-run',
+            await expect(useCase().execute('user-id', 'feed-id', 'latest')).resolves.toMatchObject({
+                run: { id: 'latest-run' },
             });
             expect(runs.findByIdForFeed).toHaveBeenCalledWith('feed-id', 'run-id');
+        });
+
+        it('adds the end of the cooldown of the newest run that did not fail', async () => {
+            runs.findLatestForFeed.mockResolvedValue({ id: 'latest-run' });
+            runs.findLastCountedRunAt.mockResolvedValue(new Date(NOW.getTime() - 2 * HOUR));
+
+            await expect(useCase().execute('user-id', 'feed-id', 'latest')).resolves.toEqual({
+                run: { id: 'latest-run' },
+                nextRunAt: new Date(NOW.getTime() + 4 * HOUR),
+            });
+
+            runs.findLastCountedRunAt.mockResolvedValue(new Date(NOW.getTime() - 6 * HOUR));
+            await expect(useCase().execute('user-id', 'feed-id', 'latest')).resolves.toMatchObject({
+                nextRunAt: null,
+            });
+
+            runs.findLastCountedRunAt.mockResolvedValue(null);
+            await expect(useCase().execute('user-id', 'feed-id', 'latest')).resolves.toMatchObject({
+                nextRunAt: null,
+            });
         });
 
         it('reports a foreign feed or a missing run as not found', async () => {

@@ -6,4 +6,5 @@ export class DiscoveryRunResponseDto {
     createdAt: Date;
     startedAt: Date | null;
     finishedAt: Date | null;
+    nextRunAt: Date | null;
 }

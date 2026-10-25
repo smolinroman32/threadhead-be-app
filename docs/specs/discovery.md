@@ -23,6 +23,7 @@ the frontend (`threadhead-fe/docs/specs`).
 | Search token           | the user's own token; discovery needs a connected Threads account (PRD FR-1 changes)                      |
 | Feed and account       | a feed belongs to one `SocialAccount`; `socialAccountId` is set once while `null`, then immutable         |
 | Trigger                | manual `POST`, plus automatic after feed creation, onboarding completion, a criteria change and a resume  |
+| Manual cooldown        | a manual `POST` is refused for 6 hours after the last run that did not fail; automatic runs are not blocked |
 | Execution              | BullMQ worker on the existing Redis; `DiscoveryRun` in Postgres is the source of truth                    |
 | Retries                | only `DiscoveryRun.attempt` counts; BullMQ `attempts: 1`, `maxStalledCount: 0`                            |
 | Status delivery        | polling a run by id; no SSE                                                                               |
@@ -137,6 +138,7 @@ Domain constants, not env:
 | `SEARCH_ACCESS_TTL_MS`      | 24 hours    |
 | `CONTROL_QUERY`             | `today`, `RECENT`, `limit=25`, no `since` |
 | `OPPORTUNITY_LIST_LIMIT`    | 100         |
+| `MANUAL_RUN_COOLDOWN_MS`    | 6 hours     |
 
 New env, read through `getEnv`: `REDIS_URL`, `OPENAI_API_KEY`, `DISCOVERY_QUERY_MODEL`,
 `DISCOVERY_SCORING_MODEL`.
@@ -156,14 +158,24 @@ another user, or a missing one, is 404.
 | `POST /social-accounts/:id/search-access-check`     | 200 `{ searchAccess, checkedAt }`; ignores the TTL            |
 
 `POST /discovery-runs` errors, all 409: `account_required` (no account and none can be bound),
-`reconnect_required` (account inactive or disconnected), `feed_paused`.
+`reconnect_required` (account inactive or disconnected), `feed_paused`, and `DiscoveryCooldownError` while the
+cooldown below is active.
+
+### Manual cooldown
+
+The newest run of the feed that is not `failed`, automatic or manual, starts a cooldown of
+`MANUAL_RUN_COOLDOWN_MS` from its `createdAt`. Only the manual `POST` is refused; the automatic triggers (feed
+creation, onboarding completion, a criteria change, a resume) go around it and, being runs, start the cooldown
+themselves. A failed run starts none, so a user can retry after a failure. Every run response carries
+`nextRunAt`: the end of the cooldown, or `null` when it has passed or no run counts. The `POST` response is
+computed from the run it returns, the `GET` responses from the newest run that is not `failed`.
 
 Run in a response:
 
 ```json
 {
   "id": "uuid", "status": "queued", "error": null,
-  "stats": {}, "createdAt": "iso", "startedAt": null, "finishedAt": null
+  "stats": {}, "createdAt": "iso", "startedAt": null, "finishedAt": null, "nextRunAt": "iso"
 }
 ```
 
@@ -421,8 +433,8 @@ the client on shutdown.
 Runs and queue
 
 1. `POST /discovery-runs` returns 202 `queued` and adds a job with `{ runId }`.
-2. A second `POST` while `queued` returns the same run id. While `running` it creates a `queued` run that gets
-   no job until the running one finishes, then gets one.
+2. Past the cooldown, a second `POST` while `queued` returns the same run id. While `running` it creates a
+   `queued` run that gets no job until the running one finishes, then gets one.
 3. A failed job add leaves the run `queued`; the reconciler, the bootstrap and the next `POST` each add a job
    and the run finishes.
 4. A `running` run with a stale heartbeat and no live job is re-queued and finishes with `attempt = 2`; at
@@ -482,6 +494,10 @@ Reading
 22. `new` applies `minScore`, freshness, `excludedTerm` and the author filter; other statuses apply none;
     order and `hasMore` with 101 rows; every cell of the transition table, `replied` is 409.
 
+23. Within 6 hours of a run that is not `failed`, a manual `POST` is 409 `DiscoveryCooldownError` and adds no job;
+    after a `failed` run, or after 6 hours, it is 202. `nextRunAt` is the end of the cooldown on `POST` and `GET`,
+    and `null` once it passed or when only failed runs exist. Automatic triggers are not blocked.
+
 ## Tasks
 
 - [x] Schema: enums, `DiscoveryRun`, `OpportunityFeed`, `Opportunity`, `SocialAccount` changes, migration
@@ -505,4 +521,5 @@ Reading
 - [x] Controllers and DTOs for runs and opportunities; checks 7, 22
 - [x] PRD: FR-1, onboarding step 6, section 11 score, FR-12 and FR-13 moved out
 - [x] `npm run verify`, end-to-end run against `dist` with Redis
+- [x] Manual cooldown: rule, `nextRunAt` on run responses, 409 on `POST`; check 23
 - [ ] PR linking this spec

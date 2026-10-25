@@ -23,5 +23,6 @@ export abstract class DiscoveryRunRepositoryPort {
     abstract pause(fence: RunFence, stats: DiscoveryRunStats): Promise<boolean>;
     abstract findByIdForFeed(feedId: string, runId: string): Promise<DiscoveryRunEntity | null>;
     abstract findLatestForFeed(feedId: string): Promise<DiscoveryRunEntity | null>;
+    abstract findLastCountedRunAt(feedId: string): Promise<Date | null>;
     abstract reconcile(): Promise<string[]>;
 }

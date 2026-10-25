@@ -159,6 +159,16 @@ export class DiscoveryRunRepository implements DiscoveryRunRepositoryPort {
         return row && DiscoveryRunMapper.toDomain(row);
     }
 
+    async findLastCountedRunAt(feedId: string) {
+        const row = await this.prisma.discoveryRun.findFirst({
+            where: { opportunityFeedId: feedId, status: { not: 'FAILED' } },
+            orderBy: { createdAt: 'desc' },
+            select: { createdAt: true },
+        });
+
+        return row?.createdAt ?? null;
+    }
+
     async reconcile() {
         const now = new Date();
         const staleBefore = new Date(now.getTime() - HEARTBEAT_STALE_MS);

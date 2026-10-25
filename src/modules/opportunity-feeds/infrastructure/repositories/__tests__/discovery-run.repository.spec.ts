@@ -251,6 +251,26 @@ describe('DiscoveryRunRepository', () => {
         });
     });
 
+    describe('findLastCountedRunAt', () => {
+        it('reads the newest run of the feed that did not fail', async () => {
+            const createdAt = new Date(NOW.getTime() - MINUTE);
+            discoveryRun.findFirst.mockResolvedValue({ createdAt });
+
+            await expect(repository.findLastCountedRunAt('feed-id')).resolves.toEqual(createdAt);
+            expect(discoveryRun.findFirst).toHaveBeenCalledWith({
+                where: { opportunityFeedId: 'feed-id', status: { not: 'FAILED' } },
+                orderBy: { createdAt: 'desc' },
+                select: { createdAt: true },
+            });
+        });
+
+        it('is null when the feed has no such run', async () => {
+            discoveryRun.findFirst.mockResolvedValue(null);
+
+            await expect(repository.findLastCountedRunAt('feed-id')).resolves.toBeNull();
+        });
+    });
+
     describe('reconcile', () => {
         it('requeues or fails stale running runs and returns the queued runs that are due', async () => {
             discoveryRun.findMany
