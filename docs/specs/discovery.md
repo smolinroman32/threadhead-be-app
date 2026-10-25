@@ -108,9 +108,11 @@ Only the changed fields are shown. The nullable `accessTokenEncrypted` and `toke
 disconnect task, together with the code that handles a missing token, in a migration of their own. `Opportunity.score` is renamed to `relevanceScore`; `status` moves from
 `String` to the enum.
 
-`onDelete: Restrict` blocks a physical delete of an account that still has feeds. Nothing deletes account rows
-today: disconnect is soft and there is no user deletion. When user deletion lands, it deletes the user's feeds
-before the accounts inside one transaction, with its own integration test.
+`onDelete: Restrict` blocks a physical delete of an account that still has feeds. Disconnect is soft, so the
+only path that removes account rows is `DELETE /users/me` (`prisma.user.delete`), which cascades to both the
+accounts and the feeds. A rolled-back probe on Postgres showed that this cascade passes with a bound feed while
+a direct account delete is refused, but the order of cascade actions is not a documented guarantee, so check 21
+pins it with an end-to-end run. If it ever fails, the user deletion deletes the feeds first in one transaction.
 
 ## Constants
 
@@ -464,7 +466,8 @@ Pause and account
     `account_disconnected` at the next safe point; reconnecting the same profile keeps the account id and the
     feed binding.
 21. `socialAccountId` is set once while `null`; replacing it is 409 `feed_account_locked`; a feed created by a
-    user with one account is bound to it; deleting an account row that has feeds fails.
+    user with one account is bound to it; deleting an account row that has feeds fails;
+    `DELETE /users/me` of a user with a bound feed succeeds and removes both.
 
 Reading
 
