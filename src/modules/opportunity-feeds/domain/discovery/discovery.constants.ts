@@ -12,3 +12,4 @@ export const QUEUED_STALE_MS = 60_000;
 export const SEARCH_ACCESS_TTL_MS = 24 * 60 * 60_000;
 export const WORKER_CONCURRENCY = 5;
 export const RECONCILE_EVERY_MS = 60_000;
+export const OPPORTUNITY_LIST_LIMIT = 100;

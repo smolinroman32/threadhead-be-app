@@ -22,15 +22,27 @@ import { DiscoveryWorkRepository } from './infrastructure/repositories/discovery
 import { OpportunityFeedRepositoryPort } from './domain/ports/opportunity-feed-repository.port.js';
 import { DiscoveryRunRepository } from './infrastructure/repositories/discovery-run.repository.js';
 import { OpportunityFeedRepository } from './infrastructure/repositories/opportunity-feed.repository.js';
+import { ChangeOpportunityStatusUseCase } from './application/use-cases/change-opportunity-status.use-case.js';
+import { GetDiscoveryRunUseCase } from './application/use-cases/get-discovery-run.use-case.js';
+import { ListOpportunitiesUseCase } from './application/use-cases/list-opportunities.use-case.js';
+import { RequestDiscoveryRunUseCase } from './application/use-cases/request-discovery-run.use-case.js';
+import { OpportunityRepositoryPort } from './domain/ports/opportunity-repository.port.js';
+import { OpportunityRepository } from './infrastructure/repositories/opportunity.repository.js';
+import { DiscoveryController } from './presentation/discovery.controller.js';
 import { OpportunityFeedsController } from './presentation/opportunity-feeds.controller.js';
 
 @Module({
     imports: [SocialAccountsModule, LlmModule, QueueModule],
-    controllers: [OpportunityFeedsController],
+    controllers: [OpportunityFeedsController, DiscoveryController],
     providers: [
         { provide: OpportunityFeedRepositoryPort, useClass: OpportunityFeedRepository },
         { provide: DiscoveryRunRepositoryPort, useClass: DiscoveryRunRepository },
         { provide: DiscoveryWorkPort, useClass: DiscoveryWorkRepository },
+        { provide: OpportunityRepositoryPort, useClass: OpportunityRepository },
+        RequestDiscoveryRunUseCase,
+        GetDiscoveryRunUseCase,
+        ListOpportunitiesUseCase,
+        ChangeOpportunityStatusUseCase,
         BullDiscoveryQueue,
         { provide: DiscoveryQueuePort, useExisting: BullDiscoveryQueue },
         QueueDiscoveryRunUseCase,

@@ -5,6 +5,10 @@ import type { FindFeedByOnboardingUseCase } from '../use-cases/find-feed-by-onbo
 import type { GetOpportunityFeedUseCase } from '../use-cases/get-opportunity-feed.use-case.js';
 import type { ListOpportunityFeedsUseCase } from '../use-cases/list-opportunity-feeds.use-case.js';
 import type { UpdateOpportunityFeedUseCase } from '../use-cases/update-opportunity-feed.use-case.js';
+import type { ChangeOpportunityStatusUseCase } from '../use-cases/change-opportunity-status.use-case.js';
+import type { GetDiscoveryRunUseCase } from '../use-cases/get-discovery-run.use-case.js';
+import type { ListOpportunitiesUseCase } from '../use-cases/list-opportunities.use-case.js';
+import type { RequestDiscoveryRunUseCase } from '../use-cases/request-discovery-run.use-case.js';
 import { OpportunityFeedsService } from '../opportunity-feeds.service.js';
 
 describe('OpportunityFeedsService', () => {
@@ -16,6 +20,10 @@ describe('OpportunityFeedsService', () => {
         update: { execute: vi.fn() },
         remove: { execute: vi.fn() },
         byOnboarding: { execute: vi.fn() },
+        requestRun: { execute: vi.fn() },
+        getRun: { execute: vi.fn() },
+        listOpportunities: { execute: vi.fn() },
+        changeStatus: { execute: vi.fn() },
     };
     const service = new OpportunityFeedsService(
         useCases.create as unknown as CreateOpportunityFeedUseCase,
@@ -25,6 +33,10 @@ describe('OpportunityFeedsService', () => {
         useCases.update as unknown as UpdateOpportunityFeedUseCase,
         useCases.remove as unknown as DeleteOpportunityFeedUseCase,
         useCases.byOnboarding as unknown as FindFeedByOnboardingUseCase,
+        useCases.requestRun as unknown as RequestDiscoveryRunUseCase,
+        useCases.getRun as unknown as GetDiscoveryRunUseCase,
+        useCases.listOpportunities as unknown as ListOpportunitiesUseCase,
+        useCases.changeStatus as unknown as ChangeOpportunityStatusUseCase,
     );
 
     it('delegates every operation to its use case', async () => {
@@ -50,6 +62,10 @@ describe('OpportunityFeedsService', () => {
         await service.update('user-id', 'feed-id', { minScore: 80 });
         await service.delete('user-id', 'feed-id');
         await service.findByOnboardingId('user-id', 'onboarding-id');
+        await service.requestRun('user-id', 'feed-id');
+        await service.getRun('user-id', 'feed-id', 'latest');
+        await service.listOpportunities('user-id', 'feed-id', 'SAVED');
+        await service.changeOpportunityStatus('user-id', 'opportunity-id', 'DISMISSED');
 
         expect(useCases.create.execute).toHaveBeenCalledWith('user-id', input);
         expect(useCases.fromOnboarding.execute).toHaveBeenCalledWith(fromOnboarding);
@@ -58,5 +74,9 @@ describe('OpportunityFeedsService', () => {
         expect(useCases.update.execute).toHaveBeenCalledWith('user-id', 'feed-id', { minScore: 80 });
         expect(useCases.remove.execute).toHaveBeenCalledWith('user-id', 'feed-id');
         expect(useCases.byOnboarding.execute).toHaveBeenCalledWith('user-id', 'onboarding-id');
+        expect(useCases.requestRun.execute).toHaveBeenCalledWith('user-id', 'feed-id');
+        expect(useCases.getRun.execute).toHaveBeenCalledWith('user-id', 'feed-id', 'latest');
+        expect(useCases.listOpportunities.execute).toHaveBeenCalledWith('user-id', 'feed-id', 'SAVED');
+        expect(useCases.changeStatus.execute).toHaveBeenCalledWith('user-id', 'opportunity-id', 'DISMISSED');
     });
 });
