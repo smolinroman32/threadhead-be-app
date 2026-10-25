@@ -8,7 +8,9 @@ import { FindFeedByOnboardingUseCase } from './application/use-cases/find-feed-b
 import { GetOpportunityFeedUseCase } from './application/use-cases/get-opportunity-feed.use-case.js';
 import { ListOpportunityFeedsUseCase } from './application/use-cases/list-opportunity-feeds.use-case.js';
 import { UpdateOpportunityFeedUseCase } from './application/use-cases/update-opportunity-feed.use-case.js';
+import { DiscoveryRunRepositoryPort } from './domain/ports/discovery-run-repository.port.js';
 import { OpportunityFeedRepositoryPort } from './domain/ports/opportunity-feed-repository.port.js';
+import { DiscoveryRunRepository } from './infrastructure/repositories/discovery-run.repository.js';
 import { OpportunityFeedRepository } from './infrastructure/repositories/opportunity-feed.repository.js';
 import { OpportunityFeedsController } from './presentation/opportunity-feeds.controller.js';
 
@@ -17,6 +19,7 @@ import { OpportunityFeedsController } from './presentation/opportunity-feeds.con
     controllers: [OpportunityFeedsController],
     providers: [
         { provide: OpportunityFeedRepositoryPort, useClass: OpportunityFeedRepository },
+        { provide: DiscoveryRunRepositoryPort, useClass: DiscoveryRunRepository },
         CreateOpportunityFeedUseCase,
         CreateFeedFromOnboardingUseCase,
         ListOpportunityFeedsUseCase,

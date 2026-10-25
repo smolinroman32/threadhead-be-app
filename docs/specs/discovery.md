@@ -360,7 +360,9 @@ the feed on each `POST /discovery-runs`:
 - `queued` runs older than `QUEUED_STALE_MS`, with `notBefore` null or past, of an active feed with no fresh
   `running` run: add a job.
 - `running` runs with `heartbeatAt < now - HEARTBEAT_STALE_MS`: back to `queued` with a job when
-  `attempt < MAX_RUN_ATTEMPTS`, else `failed` with `worker_lost`.
+  `attempt < MAX_RUN_ATTEMPTS` and the feed has no other `queued` run, else `failed` with `worker_lost` (the other
+  `queued` run does the work). There is no check for a live job: jobs carry no fixed id, and the stale heartbeat
+  plus the fence already keep a slow live executor from writing.
 
 ### Stats
 
@@ -496,7 +498,8 @@ Reading
       transaction; checks 16, 17, 21
       (queueing a run on a criteria change or a resume lands with the run use case)
 - [x] Discovery domain: prefilter, scoring and phrase validation; unit checks 12 to 14
-- [ ] `DiscoveryRun` repository: coalescing, claim, fenced writes, reconciler queries; checks 2, 5, 6
+- [x] `DiscoveryRun` repository: coalescing, claim, fenced writes, reconciler queries; checks 2, 5, 6
+      (the fenced opportunity batch writes land with the run use case)
 - [ ] Run use case, worker, scheduler, bootstrap recovery; checks 1, 3, 4, 8 to 10, 15, 18, 19
 - [ ] Controllers and DTOs for runs and opportunities; checks 7, 22
 - [ ] PRD: FR-1, onboarding step 6, section 11 score, FR-12 and FR-13 moved out

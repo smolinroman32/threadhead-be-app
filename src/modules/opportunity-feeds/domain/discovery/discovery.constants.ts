@@ -5,3 +5,7 @@ export const MIN_POST_TEXT_LENGTH = 20;
 export const MAX_SCORED_POSTS_PER_RUN = 300;
 export const SCORING_BATCH_SIZE = 20;
 export const REASON_MAX_LENGTH = 200;
+export const MAX_RUN_ATTEMPTS = 2;
+export const RETRY_DELAY_MS = 60_000;
+export const HEARTBEAT_STALE_MS = 5 * 60_000;
+export const QUEUED_STALE_MS = 60_000;
