@@ -28,6 +28,7 @@ export type OnboardingDraft = {
     targetAudience?: string;
     includeTerms?: string[];
     excludeTerms?: string[];
+    color?: string;
 };
 
 export type CompleteOnboardingDraft = {
@@ -35,9 +36,10 @@ export type CompleteOnboardingDraft = {
     targetAudience: string;
     includeTerms: string[];
     excludeTerms: string[];
+    color?: string;
 };
 
-export type IntentStepData = { intent: string; targetAudience: string };
+export type IntentStepData = { intent: string; targetAudience: string; color?: string };
 export type PreferencesStepData = { includeTerms: string[]; excludeTerms?: string[] | null };
 
 export type SaveOnboardingStepInput = { version: number } & (
@@ -140,12 +142,12 @@ export class OnboardingEntity {
     }
 
     completeDraft(): CompleteOnboardingDraft {
-        const { intent, targetAudience, includeTerms, excludeTerms } = this.draft;
+        const { intent, targetAudience, includeTerms, excludeTerms, color } = this.draft;
 
         if (!intent || !targetAudience || !includeTerms || !excludeTerms) {
             throw new OnboardingStepAheadError();
         }
 
-        return { intent, targetAudience, includeTerms, excludeTerms };
+        return { intent, targetAudience, includeTerms, excludeTerms, color };
     }
 }

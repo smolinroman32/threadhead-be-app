@@ -1,3 +1,4 @@
+import { normalizeHexColor } from '../../../../shared/colors/normalize-hex-color.js';
 import { normalizeTerms } from '../../../../shared/terms/normalize-terms.js';
 import { OnboardingDraftInvalidError } from '../errors/onboarding-draft-invalid.error.js';
 import type { IntentStepData, OnboardingDraft, PreferencesStepData } from './onboarding.entity.js';
@@ -10,6 +11,7 @@ export function normalizeIntentStep(data: IntentStepData): OnboardingDraft {
     return {
         intent: requireText('intent', data.intent, 10, 500),
         targetAudience: requireText('targetAudience', data.targetAudience, 3, 200),
+        ...(data.color === undefined ? {} : { color: requireColor(data.color) }),
     };
 }
 
@@ -29,6 +31,14 @@ export function normalizePreferencesStep(data: PreferencesStepData): OnboardingD
     }
 
     return { includeTerms, excludeTerms };
+}
+
+function requireColor(value: string) {
+    const color = normalizeHexColor(value);
+
+    if (!color) throw new OnboardingDraftInvalidError('color must be a #RRGGBB hex value.');
+
+    return color;
 }
 
 function requireText(field: string, value: string, min: number, max: number) {
