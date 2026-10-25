@@ -6,8 +6,10 @@ import { SocialAccountsService } from './application/social-accounts.service.js'
 import { AuthorizeSocialAccountUseCase } from './application/use-cases/authorize-social-account.use-case.js';
 import { ConnectSocialAccountUseCase } from './application/use-cases/connect-social-account.use-case.js';
 import { DisconnectSocialAccountUseCase } from './application/use-cases/disconnect-social-account.use-case.js';
+import { CheckSearchAccessUseCase } from './application/use-cases/check-search-access.use-case.js';
 import { GetAccessTokenUseCase } from './application/use-cases/get-access-token.use-case.js';
 import { ListSocialAccountsUseCase } from './application/use-cases/list-social-accounts.use-case.js';
+import { SearchPostsUseCase } from './application/use-cases/search-posts.use-case.js';
 import { OAuthStatePort } from './domain/ports/oauth-state.port.js';
 import { SocialAccountRepositoryPort } from './domain/ports/social-account-repository.port.js';
 import { SocialProviderRegistryPort } from './domain/ports/social-provider-registry.port.js';
@@ -33,6 +35,8 @@ import { SocialAccountsController } from './presentation/social-accounts.control
         ListSocialAccountsUseCase,
         DisconnectSocialAccountUseCase,
         GetAccessTokenUseCase,
+        SearchPostsUseCase,
+        CheckSearchAccessUseCase,
         SocialAccountsService,
     ],
     exports: [SocialAccountsService],

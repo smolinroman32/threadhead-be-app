@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../shared/prisma.service.js';
-import type { OpportunityFeedFields } from '../../domain/entities/opportunity-feed-fields.js';
+import type { Prisma } from '../../../../generated/prisma/client.js';
+import { matchExcludedTerm } from '../../../../shared/terms/match-excluded-term.js';
 import type { OpportunityFeedEntity } from '../../domain/entities/opportunity-feed.entity.js';
 import { OpportunityFeedLimitReachedError } from '../../domain/errors/opportunity-feed-limit-reached.error.js';
 import {
     OpportunityFeedRepositoryPort,
     type NewOpportunityFeed,
+    type OpportunityFeedUpdate,
 } from '../../domain/ports/opportunity-feed-repository.port.js';
 import { OpportunityFeedMapper } from '../mappers/opportunity-feed.mapper.js';
 
@@ -22,6 +24,12 @@ export class OpportunityFeedRepository implements OpportunityFeedRepositoryPort 
         });
 
         return rows.map(OpportunityFeedMapper.toDomain);
+    }
+
+    async findById(id: string) {
+        const row = await this.prisma.opportunityFeed.findUnique({ where: { id } });
+
+        return row && OpportunityFeedMapper.toDomain(row);
     }
 
     async findByIdForUser(id: string, userId: string) {
@@ -64,7 +72,7 @@ export class OpportunityFeedRepository implements OpportunityFeedRepositoryPort 
     updateLocked(
         id: string,
         userId: string,
-        mutate: (current: OpportunityFeedEntity) => OpportunityFeedFields,
+        mutate: (current: OpportunityFeedEntity) => OpportunityFeedUpdate,
     ) {
         return this.prisma.$transaction(
             async (tx) => {
@@ -77,8 +85,25 @@ export class OpportunityFeedRepository implements OpportunityFeedRepositoryPort 
                 if (locked.length === 0) return null;
 
                 const row = await tx.opportunityFeed.findUniqueOrThrow({ where: { id } });
-                const fields = mutate(OpportunityFeedMapper.toDomain(row));
-                const updated = await tx.opportunityFeed.update({ where: { id }, data: fields });
+                const { fields, socialAccountId, criteriaChanged } = mutate(
+                    OpportunityFeedMapper.toDomain(row),
+                );
+                const updated = await tx.opportunityFeed.update({
+                    where: { id },
+                    data: {
+                        ...fields,
+                        socialAccountId,
+                        ...(criteriaChanged && { scoringVersion: { increment: 1 } }),
+                    },
+                });
+
+                if (criteriaChanged) {
+                    await tx.searchQuery.updateMany({
+                        where: { opportunityFeedId: id, isActive: true },
+                        data: { isActive: false },
+                    });
+                    await recomputeExclusions(tx, id, fields.excludeTerms);
+                }
 
                 return OpportunityFeedMapper.toDomain(updated);
             },
@@ -90,5 +115,24 @@ export class OpportunityFeedRepository implements OpportunityFeedRepositoryPort 
         const { count } = await this.prisma.opportunityFeed.deleteMany({ where: { id, userId } });
 
         return count > 0;
+    }
+}
+
+async function recomputeExclusions(tx: Prisma.TransactionClient, feedId: string, excludeTerms: string[]) {
+    const opportunities = await tx.opportunity.findMany({
+        where: { opportunityFeedId: feedId, status: { in: ['NEW', 'SAVED'] } },
+        select: { id: true, text: true, excludedTerm: true },
+    });
+    const changed = new Map<string | null, string[]>();
+
+    for (const opportunity of opportunities) {
+        const term = matchExcludedTerm(opportunity.text, excludeTerms);
+
+        if (term !== opportunity.excludedTerm)
+            changed.set(term, [...(changed.get(term) ?? []), opportunity.id]);
+    }
+
+    for (const [excludedTerm, ids] of changed) {
+        await tx.opportunity.updateMany({ where: { id: { in: ids } }, data: { excludedTerm } });
     }
 }

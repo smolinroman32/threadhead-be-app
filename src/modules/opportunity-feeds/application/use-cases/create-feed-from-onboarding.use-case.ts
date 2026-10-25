@@ -5,7 +5,10 @@ import {
     buildFeedFields,
     feedNameFromIntent,
 } from '../../domain/entities/opportunity-feed-fields.js';
+import { SocialAccountsService } from '../../../social-accounts/application/social-accounts.service.js';
 import { OpportunityFeedRepositoryPort } from '../../domain/ports/opportunity-feed-repository.port.js';
+import { accountForNewFeed } from '../feed-account.js';
+import { QueueDiscoveryRunUseCase } from './queue-discovery-run.use-case.js';
 
 export type CreateFeedFromOnboardingInput = {
     userId: string;
@@ -19,9 +22,13 @@ export type CreateFeedFromOnboardingInput = {
 
 @Injectable()
 export class CreateFeedFromOnboardingUseCase {
-    constructor(private readonly repository: OpportunityFeedRepositoryPort) {}
+    constructor(
+        private readonly repository: OpportunityFeedRepositoryPort,
+        private readonly socialAccounts: SocialAccountsService,
+        private readonly discovery: QueueDiscoveryRunUseCase,
+    ) {}
 
-    execute(input: CreateFeedFromOnboardingInput) {
+    async execute(input: CreateFeedFromOnboardingInput) {
         const fields = buildFeedFields({
             name: feedNameFromIntent(input.intent),
             description: input.intent,
@@ -32,14 +39,21 @@ export class CreateFeedFromOnboardingUseCase {
             excludeTerms: input.excludeTerms,
         });
 
-        return this.repository.createWithinLimit(
+        const socialAccountId = await accountForNewFeed(this.socialAccounts, input.userId, undefined);
+
+        const feed = await this.repository.createWithinLimit(
             {
                 ...fields,
                 userId: input.userId,
                 onboardingId: input.onboardingId,
+                socialAccountId,
                 languages: [...FEED_LANGUAGES],
             },
             MAX_FEEDS_PER_USER,
         );
+
+        await this.discovery.afterChange(feed.id, { criteriaChanged: true, resumed: false });
+
+        return feed;
     }
 }

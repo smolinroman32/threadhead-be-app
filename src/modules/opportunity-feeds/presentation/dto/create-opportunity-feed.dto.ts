@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsInt, IsString, ValidateIf } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsString, IsUUID, ValidateIf } from 'class-validator';
 import { isSent } from './is-sent.js';
 
 export class CreateOpportunityFeedDto {
@@ -39,4 +39,8 @@ export class CreateOpportunityFeedDto {
     @ValidateIf(isSent)
     @IsBoolean()
     isActive?: boolean;
+
+    @ValidateIf(isSent)
+    @IsUUID()
+    socialAccountId?: string;
 }

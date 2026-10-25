@@ -1,3 +1,5 @@
+import type { SearchAccess } from '../search-access.js';
+
 export const SOCIAL_PROVIDERS = ['THREADS'] as const;
 export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
 
@@ -7,11 +9,14 @@ export interface SocialAccountProps {
     providerAccountId: string;
     username: string;
     avatarUrl: string | null;
-    accessTokenEncrypted: string;
+    accessTokenEncrypted: string | null;
     refreshTokenEncrypted: string | null;
-    tokenExpiresAt: Date;
+    tokenExpiresAt: Date | null;
     scopes: string[];
     isActive: boolean;
+    disconnectedAt: Date | null;
+    searchAccess: SearchAccess | null;
+    searchAccessCheckedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -60,6 +65,18 @@ export class SocialAccountEntity {
 
     get isActive() {
         return this.props.isActive;
+    }
+
+    get disconnectedAt() {
+        return this.props.disconnectedAt;
+    }
+
+    get searchAccess() {
+        return this.props.searchAccess;
+    }
+
+    get searchAccessCheckedAt() {
+        return this.props.searchAccessCheckedAt;
     }
 
     get createdAt() {

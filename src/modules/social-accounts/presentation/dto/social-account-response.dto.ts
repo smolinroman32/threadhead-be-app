@@ -7,6 +7,6 @@ export class SocialAccountResponseDto {
     avatarUrl: string | null;
     scopes: string[];
     isActive: boolean;
-    tokenExpiresAt: Date;
+    tokenExpiresAt: Date | null;
     createdAt: Date;
 }

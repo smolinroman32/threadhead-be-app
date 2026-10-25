@@ -3,6 +3,8 @@ import type {
     NewOpportunityFeedInput,
     OpportunityFeedChanges,
 } from '../domain/entities/opportunity-feed-fields.js';
+import type { OpportunityStatus, ReviewStatus } from '../domain/entities/opportunity.entity.js';
+import { ChangeOpportunityStatusUseCase } from './use-cases/change-opportunity-status.use-case.js';
 import {
     CreateFeedFromOnboardingUseCase,
     type CreateFeedFromOnboardingInput,
@@ -10,8 +12,11 @@ import {
 import { CreateOpportunityFeedUseCase } from './use-cases/create-opportunity-feed.use-case.js';
 import { DeleteOpportunityFeedUseCase } from './use-cases/delete-opportunity-feed.use-case.js';
 import { FindFeedByOnboardingUseCase } from './use-cases/find-feed-by-onboarding.use-case.js';
+import { GetDiscoveryRunUseCase } from './use-cases/get-discovery-run.use-case.js';
 import { GetOpportunityFeedUseCase } from './use-cases/get-opportunity-feed.use-case.js';
+import { ListOpportunitiesUseCase } from './use-cases/list-opportunities.use-case.js';
 import { ListOpportunityFeedsUseCase } from './use-cases/list-opportunity-feeds.use-case.js';
+import { RequestDiscoveryRunUseCase } from './use-cases/request-discovery-run.use-case.js';
 import { UpdateOpportunityFeedUseCase } from './use-cases/update-opportunity-feed.use-case.js';
 
 @Injectable()
@@ -24,6 +29,10 @@ export class OpportunityFeedsService {
         private readonly updateUseCase: UpdateOpportunityFeedUseCase,
         private readonly deleteUseCase: DeleteOpportunityFeedUseCase,
         private readonly findByOnboardingUseCase: FindFeedByOnboardingUseCase,
+        private readonly requestRunUseCase: RequestDiscoveryRunUseCase,
+        private readonly getRunUseCase: GetDiscoveryRunUseCase,
+        private readonly listOpportunitiesUseCase: ListOpportunitiesUseCase,
+        private readonly changeOpportunityStatusUseCase: ChangeOpportunityStatusUseCase,
     ) {}
 
     create(userId: string, input: NewOpportunityFeedInput) {
@@ -52,5 +61,21 @@ export class OpportunityFeedsService {
 
     findByOnboardingId(userId: string, onboardingId: string) {
         return this.findByOnboardingUseCase.execute(userId, onboardingId);
+    }
+
+    requestRun(userId: string, feedId: string) {
+        return this.requestRunUseCase.execute(userId, feedId);
+    }
+
+    getRun(userId: string, feedId: string, runId: string | 'latest') {
+        return this.getRunUseCase.execute(userId, feedId, runId);
+    }
+
+    listOpportunities(userId: string, feedId: string, status: OpportunityStatus) {
+        return this.listOpportunitiesUseCase.execute(userId, feedId, status);
+    }
+
+    changeOpportunityStatus(userId: string, id: string, status: ReviewStatus) {
+        return this.changeOpportunityStatusUseCase.execute(userId, id, status);
     }
 }

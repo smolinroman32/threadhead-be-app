@@ -75,6 +75,17 @@ export class SocialAccountsController {
         return accounts.map(SocialAccountResponseMapper.toDto);
     }
 
+    @Post(':id/search-access-check')
+    @HttpCode(HttpStatus.OK)
+    async checkSearchAccess(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() currentUser: JwtPayload) {
+        const { searchAccess, checkedAt } = await this.socialAccountsService.checkSearchAccess(
+            id,
+            currentUser.sub,
+        );
+
+        return { searchAccess: searchAccess.toLowerCase(), checkedAt };
+    }
+
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async disconnect(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() currentUser: JwtPayload) {

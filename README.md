@@ -35,6 +35,10 @@ The server listens on `PORT` (default 3000). `.env` is loaded on startup.
 | `THREADS_APP_SECRET` | yes      | Threads app secret                                       |
 | `ENCRYPTION_KEY`     | yes      | 64 hex characters (32 bytes), encrypts stored provider tokens |
 | `OAUTH_STATE_SECRET` | yes      | at least 32 characters, signs the OAuth `state`, distinct from the JWT secrets |
+| `REDIS_URL`          | for discovery | Redis connection URL for the BullMQ queues, e.g. `redis://localhost:6379` |
+| `OPENAI_API_KEY`     | for discovery | OpenAI key for `LlmModule`; read on each call, so the app boots without it |
+| `DISCOVERY_QUERY_MODEL` | for discovery | OpenAI model that writes the search phrases of a feed |
+| `DISCOVERY_SCORING_MODEL` | for discovery | OpenAI model that scores the relevance of found posts |
 
 ## Scripts
 
@@ -61,6 +65,7 @@ Auth uses `HttpOnly` cookies: `access_token` (15 minutes, path `/`) and `refresh
 | GET    | `/social-accounts/:provider/callback`  | public; connects the account, redirects to the frontend |
 | GET    | `/social-accounts` | accounts of the current user, never any token                    |
 | DELETE | `/social-accounts/:id` | disconnect an account, 204                                    |
+| POST   | `/social-accounts/:id/search-access-check` | rerun the search access check, `{ searchAccess, checkedAt }` |
 | GET    | `/users/me`      | current user                                                       |
 | PATCH  | `/users/me`      | update name, age or email                                          |
 | DELETE | `/users/me`      | delete the account and clear the cookies                           |

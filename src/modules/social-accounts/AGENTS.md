@@ -25,8 +25,25 @@ token and, when it expires within 7 days, refreshes it inside one transaction un
 `isActive = false` and throws `SocialAccountReconnectRequiredError`; a 5xx or a transport error changes
 nothing and propagates.
 
-Other routes: `GET /social-accounts` (the user's accounts, never a token) and
-`DELETE /social-accounts/:id` (204; 404 for a missing or foreign account).
+Other routes: `GET /social-accounts` (the user's connected accounts, never a token) and
+`DELETE /social-accounts/:id` (204; 404 for a missing, foreign or already disconnected account).
+
+Disconnect is soft: it sets `disconnectedAt`, `isActive = false` and erases every token, but keeps the
+row, so feeds bound to it keep their history. Connecting the same provider account again updates that row
+in place and clears `disconnectedAt`, so the id never changes. `isActive = false` without
+`disconnectedAt` means the refresh was rejected and the user must reconnect. `getAccessToken` throws
+`SocialAccountReconnectRequiredError` for both, and for any account without a stored token.
+
+Search (other modules): `searchPosts(accountId, { query, since?, limit })` runs a `RECENT` keyword search
+with the account token. A missing permission (403, Meta code 10 or 200-299) throws
+`SocialProviderPermissionDeniedError`; a 5xx or a rate limit (429, codes 4, 17, 32, 613) throws
+`SocialProviderUnavailableError`; any other 4xx throws `SocialProviderRejectedError`.
+
+Search access: `checkSearchAccess(accountId, userId?)` runs the control search (`today`, limit 25) and stores
+`searchAccess`: `OK` when another author shows up, `NARROWED` for only own posts or a missing permission,
+`UNKNOWN` for an empty result or a provider failure. It runs after every connect without blocking the
+redirect, and on `POST /social-accounts/:id/search-access-check` (200 `{ searchAccess, checkedAt }`, lower
+case), which ignores any TTL.
 
 ## Layout
 
@@ -58,7 +75,7 @@ presentation/
   responses carry `accessTokenEncrypted` / `refreshTokenEncrypted` only. Encrypt and decrypt in use cases
   through `EncryptionService`, never in the repository or the adapters.
 - The user id comes from the access token (`@CurrentUser()`) or the verified `state`, never from the URL
-  or body. Deletes are scoped by owner (`where { id, userId }`).
+  or body. Disconnects are scoped by owner (`where { id, userId }`).
 - The callback is `@Public()` because the browser arrives from the provider; it always answers with a
   redirect, never JSON, and reads the cookie itself. Map a new failure to one of the closed `reason`
   values, never put a provider message in the URL.
@@ -75,7 +92,7 @@ presentation/
 1. Add the value to `enum SocialProvider` in `prisma/models/social-account.prisma` (new migration) and
    to `SOCIAL_PROVIDERS` in the entity file.
 2. Write `XAccountOAuth implements SocialAccountOauthPort` and `XAccountApi implements
-   SocialAccountApiPort` in `infrastructure/x/`, over `HttpClientPort`, using `readProviderBody`.
+SocialAccountApiPort` in `infrastructure/x/`, over `HttpClientPort`, using `readProviderBody`.
 3. Add both to `SocialProviderRegistry` (its `Record<SocialProvider, ...>` fails to compile until you do)
    and to `providers` of `SocialAccountsModule`.
 4. Add its variables to `.env.example` and the README table, and register

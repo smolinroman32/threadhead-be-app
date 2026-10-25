@@ -13,6 +13,7 @@ export class OpportunityFeedResponseMapper {
             includeTerms: feed.includeTerms,
             excludeTerms: feed.excludeTerms,
             languages: feed.languages,
+            socialAccountId: feed.socialAccountId,
             freshnessHours: feed.freshnessHours,
             minScore: feed.minScore,
             isActive: feed.isActive,

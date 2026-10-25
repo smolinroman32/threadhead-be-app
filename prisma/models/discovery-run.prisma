@@ -1,0 +1,22 @@
+enum DiscoveryRunStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model DiscoveryRun {
+  id                String             @id @default(uuid()) @db.Uuid
+  opportunityFeedId String             @db.Uuid
+  opportunityFeed   OpportunityFeed    @relation(fields: [opportunityFeedId], references: [id], onDelete: Cascade)
+  status            DiscoveryRunStatus
+  scoringVersion    Int?
+  attempt           Int                @default(0)
+  heartbeatAt       DateTime?
+  notBefore         DateTime?
+  error             String?
+  stats             Json               @default("{}")
+  createdAt         DateTime           @default(now())
+  startedAt         DateTime?
+  finishedAt        DateTime?
+}

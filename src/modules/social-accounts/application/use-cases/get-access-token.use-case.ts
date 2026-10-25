@@ -21,23 +21,31 @@ export class GetAccessTokenUseCase {
         const account = await this.repository.findById(accountId);
 
         if (!account) throw new SocialAccountNotFoundError();
-        if (!account.isActive) throw new SocialAccountReconnectRequiredError();
-        if (!this.isExpiringSoon(account)) return this.encryption.decrypt(account.accessTokenEncrypted);
+
+        const token = this.storedToken(account);
+
+        if (!token) throw new SocialAccountReconnectRequiredError();
+        if (!this.isExpiringSoon(token.expiresAt)) return this.encryption.decrypt(token.encrypted);
 
         const current = await this.repository.mutateLocked(accountId, (locked) => this.refresh(locked));
 
         if (!current) throw new SocialAccountNotFoundError();
-        if (!current.isActive) throw new SocialAccountReconnectRequiredError();
 
-        return this.encryption.decrypt(current.accessTokenEncrypted);
+        const currentToken = this.storedToken(current);
+
+        if (!currentToken) throw new SocialAccountReconnectRequiredError();
+
+        return this.encryption.decrypt(currentToken.encrypted);
     }
 
     private async refresh(account: SocialAccountEntity) {
-        if (!account.isActive || !this.isExpiringSoon(account)) return null;
+        const token = this.storedToken(account);
+
+        if (!token || !this.isExpiringSoon(token.expiresAt)) return null;
 
         try {
             const oauth = this.registry.oauth(account.provider);
-            const tokens = await oauth.refreshToken(this.encryption.decrypt(account.accessTokenEncrypted));
+            const tokens = await oauth.refreshToken(this.encryption.decrypt(token.encrypted));
 
             return {
                 accessTokenEncrypted: this.encryption.encrypt(tokens.accessToken),
@@ -51,7 +59,13 @@ export class GetAccessTokenUseCase {
         }
     }
 
-    private isExpiringSoon(account: SocialAccountEntity) {
-        return account.tokenExpiresAt.getTime() - Date.now() <= REFRESH_WINDOW_MS;
+    private storedToken(account: SocialAccountEntity) {
+        if (!account.isActive || !account.accessTokenEncrypted || !account.tokenExpiresAt) return null;
+
+        return { encrypted: account.accessTokenEncrypted, expiresAt: account.tokenExpiresAt };
+    }
+
+    private isExpiringSoon(expiresAt: Date) {
+        return expiresAt.getTime() - Date.now() <= REFRESH_WINDOW_MS;
     }
 }
