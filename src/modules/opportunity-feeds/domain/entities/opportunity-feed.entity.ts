@@ -3,6 +3,8 @@ import type { OpportunityFeedFields } from './opportunity-feed-fields.js';
 export interface OpportunityFeedProps extends OpportunityFeedFields {
     userId: string;
     languages: string[];
+    socialAccountId: string | null;
+    scoringVersion: number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -59,6 +61,14 @@ export class OpportunityFeedEntity {
 
     get isActive() {
         return this.props.isActive;
+    }
+
+    get socialAccountId() {
+        return this.props.socialAccountId;
+    }
+
+    get scoringVersion() {
+        return this.props.scoringVersion;
     }
 
     get createdAt() {

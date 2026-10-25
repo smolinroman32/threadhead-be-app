@@ -5,6 +5,13 @@ export type NewOpportunityFeed = OpportunityFeedFields & {
     userId: string;
     languages: string[];
     onboardingId: string | null;
+    socialAccountId: string | null;
+};
+
+export type OpportunityFeedUpdate = {
+    fields: OpportunityFeedFields;
+    socialAccountId: string | null;
+    criteriaChanged: boolean;
 };
 
 export abstract class OpportunityFeedRepositoryPort {
@@ -15,7 +22,7 @@ export abstract class OpportunityFeedRepositoryPort {
     abstract updateLocked(
         id: string,
         userId: string,
-        mutate: (current: OpportunityFeedEntity) => OpportunityFeedFields,
+        mutate: (current: OpportunityFeedEntity) => OpportunityFeedUpdate,
     ): Promise<OpportunityFeedEntity | null>;
     abstract deleteByIdForUser(id: string, userId: string): Promise<boolean>;
 }

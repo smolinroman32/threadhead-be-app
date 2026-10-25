@@ -13,6 +13,8 @@ export class OpportunityFeedMapper {
             includeTerms: raw.includeTerms,
             excludeTerms: raw.excludeTerms,
             languages: raw.languages,
+            socialAccountId: raw.socialAccountId,
+            scoringVersion: raw.scoringVersion,
             freshnessHours: raw.freshnessHours,
             minScore: raw.minScore,
             isActive: raw.isActive,

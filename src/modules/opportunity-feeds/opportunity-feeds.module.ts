@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { SocialAccountsModule } from '../social-accounts/social-accounts.module.js';
 import { OpportunityFeedsService } from './application/opportunity-feeds.service.js';
 import { CreateFeedFromOnboardingUseCase } from './application/use-cases/create-feed-from-onboarding.use-case.js';
 import { CreateOpportunityFeedUseCase } from './application/use-cases/create-opportunity-feed.use-case.js';
@@ -12,6 +13,7 @@ import { OpportunityFeedRepository } from './infrastructure/repositories/opportu
 import { OpportunityFeedsController } from './presentation/opportunity-feeds.controller.js';
 
 @Module({
+    imports: [SocialAccountsModule],
     controllers: [OpportunityFeedsController],
     providers: [
         { provide: OpportunityFeedRepositoryPort, useClass: OpportunityFeedRepository },

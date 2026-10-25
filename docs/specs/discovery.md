@@ -491,8 +491,9 @@ Reading
       the check after connect; check 11
 - [x] `LlmModule`: port, `OpenAiLlmClient`, errors, env
 - [x] `QueueModule`: `bullmq` connection, shutdown, env
-- [ ] Feeds: `socialAccountId` rules, criteria diff, version bump, exclusion recompute in the locked
+- [x] Feeds: `socialAccountId` rules, criteria diff, version bump, exclusion recompute in the locked
       transaction; checks 16, 17, 21
+      (queueing a run on a criteria change or a resume lands with the run use case)
 - [ ] Discovery domain: prefilter, scoring and phrase validation; unit checks 12 to 14
 - [ ] `DiscoveryRun` repository: coalescing, claim, fenced writes, reconciler queries; checks 2, 5, 6
 - [ ] Run use case, worker, scheduler, bootstrap recovery; checks 1, 3, 4, 8 to 10, 15, 18, 19

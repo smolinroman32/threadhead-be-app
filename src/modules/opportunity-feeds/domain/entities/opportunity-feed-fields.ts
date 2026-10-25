@@ -40,9 +40,9 @@ export type NewOpportunityFeedInput = Pick<
             OpportunityFeedFields,
             'description' | 'color' | 'excludeTerms' | 'freshnessHours' | 'minScore' | 'isActive'
         >
-    >;
+    > & { socialAccountId?: string };
 
-export type OpportunityFeedChanges = Partial<OpportunityFeedFields>;
+export type OpportunityFeedChanges = Partial<OpportunityFeedFields> & { socialAccountId?: string };
 
 export function buildFeedFields(input: NewOpportunityFeedInput) {
     return validateFields({

@@ -19,6 +19,8 @@ const row = {
     minScore: 60,
     isActive: true,
     onboardingId: null,
+    socialAccountId: null,
+    scoringVersion: 1,
     createdAt: new Date('2026-10-14'),
     updatedAt: new Date('2026-10-14'),
 };
@@ -26,6 +28,7 @@ const row = {
 const data: NewOpportunityFeed = {
     userId: 'user-id',
     onboardingId: null,
+    socialAccountId: null,
     languages: ['en'],
     name: row.name,
     description: row.description,
@@ -50,6 +53,8 @@ describe('OpportunityFeedRepository', () => {
             create: vi.fn(),
             update: vi.fn(),
         },
+        searchQuery: { updateMany: vi.fn() },
+        opportunity: { findMany: vi.fn(), updateMany: vi.fn() },
     };
     const feed = {
         findMany: vi.fn(),
@@ -171,11 +176,16 @@ describe('OpportunityFeedRepository', () => {
         it('locks the row, reads it, applies the mutation and returns the updated feed', async () => {
             tx.$queryRaw.mockResolvedValue([{ id: 'feed-id' }]);
             tx.opportunityFeed.findUniqueOrThrow.mockResolvedValue(row);
-            tx.opportunityFeed.update.mockResolvedValue({ ...row, minScore: 80 });
+            tx.opportunityFeed.update.mockResolvedValue({
+                ...row,
+                minScore: 80,
+                socialAccountId: 'account-a',
+            });
 
             const updated = await repository.updateLocked('feed-id', 'user-id', (current) => ({
-                ...current.fields,
-                minScore: 80,
+                fields: { ...current.fields, minScore: 80 },
+                socialAccountId: 'account-a',
+                criteriaChanged: false,
             }));
 
             expect(tx.$queryRaw.mock.invocationCallOrder[0]).toBeLessThan(
@@ -183,9 +193,51 @@ describe('OpportunityFeedRepository', () => {
             );
             expect(tx.opportunityFeed.update).toHaveBeenCalledWith({
                 where: { id: 'feed-id' },
-                data: expect.objectContaining({ minScore: 80, name: 'AI agents' }),
+                data: expect.objectContaining({
+                    minScore: 80,
+                    name: 'AI agents',
+                    socialAccountId: 'account-a',
+                }),
             });
-            expect(updated?.minScore).toBe(80);
+            expect(tx.opportunityFeed.update.mock.calls[0][0].data).not.toHaveProperty('scoringVersion');
+            expect(tx.searchQuery.updateMany).not.toHaveBeenCalled();
+            expect(tx.opportunity.findMany).not.toHaveBeenCalled();
+            expect(updated).toMatchObject({ minScore: 80, socialAccountId: 'account-a' });
+        });
+
+        it('on a criteria change bumps the version, deactivates the queries and recomputes exclusions', async () => {
+            tx.$queryRaw.mockResolvedValue([{ id: 'feed-id' }]);
+            tx.opportunityFeed.findUniqueOrThrow.mockResolvedValue(row);
+            tx.opportunityFeed.update.mockResolvedValue({ ...row, scoringVersion: 2 });
+            tx.opportunity.findMany.mockResolvedValue([
+                { id: 'o1', text: 'Selling crypto courses', excludedTerm: null },
+                { id: 'o2', text: 'Our NFT drop', excludedTerm: 'nft' },
+                { id: 'o3', text: 'Plain question about agents', excludedTerm: 'nft' },
+                { id: 'o4', text: 'More crypto talk', excludedTerm: 'crypto' },
+                { id: 'o5', text: 'Nothing here', excludedTerm: null },
+            ]);
+
+            await repository.updateLocked('feed-id', 'user-id', (current) => ({
+                fields: { ...current.fields, excludeTerms: ['crypto', 'nft'] },
+                socialAccountId: null,
+                criteriaChanged: true,
+            }));
+
+            expect(tx.opportunityFeed.update.mock.calls[0][0].data).toMatchObject({
+                scoringVersion: { increment: 1 },
+            });
+            expect(tx.searchQuery.updateMany).toHaveBeenCalledWith({
+                where: { opportunityFeedId: 'feed-id', isActive: true },
+                data: { isActive: false },
+            });
+            expect(tx.opportunity.findMany).toHaveBeenCalledWith({
+                where: { opportunityFeedId: 'feed-id', status: { in: ['NEW', 'SAVED'] } },
+                select: { id: true, text: true, excludedTerm: true },
+            });
+            expect(tx.opportunity.updateMany.mock.calls.map((call) => call[0])).toEqual([
+                { where: { id: { in: ['o1'] } }, data: { excludedTerm: 'crypto' } },
+                { where: { id: { in: ['o3'] } }, data: { excludedTerm: null } },
+            ]);
         });
 
         it('writes nothing when the mutation throws', async () => {

@@ -8,6 +8,7 @@ export class OpportunityFeedResponseDto {
     includeTerms: string[];
     excludeTerms: string[];
     languages: string[];
+    socialAccountId: string | null;
     freshnessHours: number;
     minScore: number;
     isActive: boolean;

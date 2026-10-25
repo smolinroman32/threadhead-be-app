@@ -5,17 +5,23 @@ import {
     buildFeedFields,
     type NewOpportunityFeedInput,
 } from '../../domain/entities/opportunity-feed-fields.js';
+import { SocialAccountsService } from '../../../social-accounts/application/social-accounts.service.js';
 import { OpportunityFeedRepositoryPort } from '../../domain/ports/opportunity-feed-repository.port.js';
+import { accountForNewFeed } from '../feed-account.js';
 
 @Injectable()
 export class CreateOpportunityFeedUseCase {
-    constructor(private readonly repository: OpportunityFeedRepositoryPort) {}
+    constructor(
+        private readonly repository: OpportunityFeedRepositoryPort,
+        private readonly socialAccounts: SocialAccountsService,
+    ) {}
 
-    execute(userId: string, input: NewOpportunityFeedInput) {
+    async execute(userId: string, input: NewOpportunityFeedInput) {
         const fields = buildFeedFields(input);
+        const socialAccountId = await accountForNewFeed(this.socialAccounts, userId, input.socialAccountId);
 
         return this.repository.createWithinLimit(
-            { ...fields, userId, onboardingId: null, languages: [...FEED_LANGUAGES] },
+            { ...fields, userId, onboardingId: null, socialAccountId, languages: [...FEED_LANGUAGES] },
             MAX_FEEDS_PER_USER,
         );
     }
