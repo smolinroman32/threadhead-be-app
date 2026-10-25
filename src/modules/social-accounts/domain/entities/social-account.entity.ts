@@ -7,11 +7,12 @@ export interface SocialAccountProps {
     providerAccountId: string;
     username: string;
     avatarUrl: string | null;
-    accessTokenEncrypted: string;
+    accessTokenEncrypted: string | null;
     refreshTokenEncrypted: string | null;
-    tokenExpiresAt: Date;
+    tokenExpiresAt: Date | null;
     scopes: string[];
     isActive: boolean;
+    disconnectedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -60,6 +61,10 @@ export class SocialAccountEntity {
 
     get isActive() {
         return this.props.isActive;
+    }
+
+    get disconnectedAt() {
+        return this.props.disconnectedAt;
     }
 
     get createdAt() {

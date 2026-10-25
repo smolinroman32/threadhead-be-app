@@ -56,7 +56,11 @@ export class ConnectSocialAccountUseCase {
         if (existing) {
             this.logger.log(`Reconnecting existing account ${existing.id}`);
 
-            return this.repository.update(existing.id, { ...connection, isActive: true });
+            return this.repository.update(existing.id, {
+                ...connection,
+                isActive: true,
+                disconnectedAt: null,
+            });
         }
 
         this.logger.log(`Creating a new ${provider} account for user ${userId}`);

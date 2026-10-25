@@ -16,7 +16,7 @@ export class SocialAccountRepository implements SocialAccountRepositoryPort {
 
     async listByUser(userId: string) {
         const rows = await this.prisma.socialAccount.findMany({
-            where: { userId },
+            where: { userId, disconnectedAt: null },
             orderBy: { createdAt: 'desc' },
         });
 
@@ -72,8 +72,17 @@ export class SocialAccountRepository implements SocialAccountRepositoryPort {
         );
     }
 
-    async deleteByIdForUser(id: string, userId: string) {
-        const { count } = await this.prisma.socialAccount.deleteMany({ where: { id, userId } });
+    async disconnectForUser(id: string, userId: string) {
+        const { count } = await this.prisma.socialAccount.updateMany({
+            where: { id, userId, disconnectedAt: null },
+            data: {
+                disconnectedAt: new Date(),
+                isActive: false,
+                accessTokenEncrypted: null,
+                refreshTokenEncrypted: null,
+                tokenExpiresAt: null,
+            },
+        });
 
         return count > 0;
     }

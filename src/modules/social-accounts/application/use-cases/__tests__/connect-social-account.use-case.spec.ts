@@ -34,6 +34,7 @@ describe('ConnectSocialAccountUseCase', () => {
             tokenExpiresAt: new Date(),
             scopes: [],
             isActive: false,
+            disconnectedAt: new Date(),
             createdAt: new Date(),
             updatedAt: new Date(),
         });
@@ -66,7 +67,7 @@ describe('ConnectSocialAccountUseCase', () => {
         });
     });
 
-    it('updates and reactivates an account the same user connects again', async () => {
+    it('updates and reactivates in place an account the same user connects again after a disconnect', async () => {
         repository.findByProviderAccount.mockResolvedValue(existing('user-id'));
 
         await useCase.execute({ state: 'state', code: 'code', currentUserId: 'user-id' });
@@ -80,6 +81,7 @@ describe('ConnectSocialAccountUseCase', () => {
             tokenExpiresAt: expiresAt,
             scopes: ['threads_basic', 'threads_keyword_search'],
             isActive: true,
+            disconnectedAt: null,
         });
     });
 

@@ -14,6 +14,7 @@ const row = {
     tokenExpiresAt: new Date('2026-12-01'),
     scopes: ['threads_basic'],
     isActive: true,
+    disconnectedAt: null,
     createdAt: new Date('2026-10-01'),
     updatedAt: new Date('2026-10-02'),
 };
@@ -24,7 +25,7 @@ describe('SocialAccountRepository', () => {
         findUnique: vi.fn(),
         create: vi.fn(),
         update: vi.fn(),
-        deleteMany: vi.fn(),
+        updateMany: vi.fn(),
     };
     const repository = new SocialAccountRepository({ socialAccount } as unknown as PrismaService);
 
@@ -32,13 +33,13 @@ describe('SocialAccountRepository', () => {
         vi.resetAllMocks();
     });
 
-    it('lists only the accounts of the given user, newest first', async () => {
+    it('lists only the connected accounts of the given user, newest first', async () => {
         socialAccount.findMany.mockResolvedValue([row]);
 
         const accounts = await repository.listByUser('user-id');
 
         expect(socialAccount.findMany).toHaveBeenCalledWith({
-            where: { userId: 'user-id' },
+            where: { userId: 'user-id', disconnectedAt: null },
             orderBy: { createdAt: 'desc' },
         });
         expect(accounts[0]).toBeInstanceOf(SocialAccountEntity);
@@ -53,14 +54,23 @@ describe('SocialAccountRepository', () => {
         await expect(repository.findById('missing')).resolves.toBeNull();
     });
 
-    it('deletes only an account owned by the user and reports whether one was removed', async () => {
-        socialAccount.deleteMany.mockResolvedValueOnce({ count: 1 }).mockResolvedValueOnce({ count: 0 });
+    it('disconnects only a connected account of the user, erasing its tokens', async () => {
+        vi.useFakeTimers({ now: new Date('2026-10-25T12:00:00Z'), toFake: ['Date'] });
+        socialAccount.updateMany.mockResolvedValueOnce({ count: 1 }).mockResolvedValueOnce({ count: 0 });
 
-        await expect(repository.deleteByIdForUser('account-id', 'user-id')).resolves.toBe(true);
-        await expect(repository.deleteByIdForUser('account-id', 'someone-else')).resolves.toBe(false);
-        expect(socialAccount.deleteMany).toHaveBeenCalledWith({
-            where: { id: 'account-id', userId: 'user-id' },
+        await expect(repository.disconnectForUser('account-id', 'user-id')).resolves.toBe(true);
+        await expect(repository.disconnectForUser('account-id', 'someone-else')).resolves.toBe(false);
+        expect(socialAccount.updateMany).toHaveBeenCalledWith({
+            where: { id: 'account-id', userId: 'user-id', disconnectedAt: null },
+            data: {
+                disconnectedAt: new Date('2026-10-25T12:00:00Z'),
+                isActive: false,
+                accessTokenEncrypted: null,
+                refreshTokenEncrypted: null,
+                tokenExpiresAt: null,
+            },
         });
+        vi.useRealTimers();
     });
 
     describe('mutateLocked', () => {

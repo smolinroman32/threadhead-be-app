@@ -7,8 +7,8 @@ export class DisconnectSocialAccountUseCase {
     constructor(private readonly repository: SocialAccountRepositoryPort) {}
 
     async execute(userId: string, accountId: string) {
-        const removed = await this.repository.deleteByIdForUser(accountId, userId);
+        const disconnected = await this.repository.disconnectForUser(accountId, userId);
 
-        if (!removed) throw new SocialAccountNotFoundError();
+        if (!disconnected) throw new SocialAccountNotFoundError();
     }
 }

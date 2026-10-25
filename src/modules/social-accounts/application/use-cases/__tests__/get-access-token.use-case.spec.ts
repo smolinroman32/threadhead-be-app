@@ -54,6 +54,7 @@ describe('GetAccessTokenUseCase', () => {
         tokenExpiresAt: entity.tokenExpiresAt,
         scopes: entity.scopes,
         isActive: entity.isActive,
+        disconnectedAt: entity.disconnectedAt,
         createdAt: entity.createdAt,
         updatedAt: entity.updatedAt,
     });
@@ -70,6 +71,7 @@ describe('GetAccessTokenUseCase', () => {
             tokenExpiresAt: new Date(NOW.getTime() + 30 * DAY),
             scopes: [],
             isActive: true,
+            disconnectedAt: null,
             createdAt: NOW,
             updatedAt: NOW,
             ...overrides,
@@ -149,6 +151,25 @@ describe('GetAccessTokenUseCase', () => {
         await expect(useCase.execute('account-id')).rejects.toBeInstanceOf(
             SocialAccountReconnectRequiredError,
         );
+        expect(oauth.refreshToken).not.toHaveBeenCalled();
+    });
+
+    it.each([
+        {
+            isActive: false,
+            disconnectedAt: NOW,
+            accessTokenEncrypted: null,
+            refreshTokenEncrypted: null,
+            tokenExpiresAt: null,
+        },
+        { accessTokenEncrypted: null, tokenExpiresAt: null },
+    ])('asks to reconnect an account without a stored token (%o)', async (overrides) => {
+        stored = account(overrides);
+
+        await expect(useCase.execute('account-id')).rejects.toBeInstanceOf(
+            SocialAccountReconnectRequiredError,
+        );
+        expect(encryption.decrypt).not.toHaveBeenCalled();
         expect(oauth.refreshToken).not.toHaveBeenCalled();
     });
 

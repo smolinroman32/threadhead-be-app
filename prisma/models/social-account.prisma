@@ -15,9 +15,9 @@ model SocialAccount {
   providerAccountId     String
   username              String
   avatarUrl             String?
-  accessTokenEncrypted  String
+  accessTokenEncrypted  String?
   refreshTokenEncrypted String?
-  tokenExpiresAt        DateTime
+  tokenExpiresAt        DateTime?
   scopes                String[]
   isActive              Boolean        @default(true)
   disconnectedAt        DateTime?

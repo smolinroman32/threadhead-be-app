@@ -14,6 +14,7 @@ export class SocialAccountMapper {
             tokenExpiresAt: raw.tokenExpiresAt,
             scopes: raw.scopes,
             isActive: raw.isActive,
+            disconnectedAt: raw.disconnectedAt,
             createdAt: raw.createdAt,
             updatedAt: raw.updatedAt,
         });
