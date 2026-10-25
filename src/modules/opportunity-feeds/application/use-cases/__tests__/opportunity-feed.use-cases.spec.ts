@@ -15,6 +15,7 @@ import { DeleteOpportunityFeedUseCase } from '../delete-opportunity-feed.use-cas
 import { FindFeedByOnboardingUseCase } from '../find-feed-by-onboarding.use-case.js';
 import { GetOpportunityFeedUseCase } from '../get-opportunity-feed.use-case.js';
 import { ListOpportunityFeedsUseCase } from '../list-opportunity-feeds.use-case.js';
+import type { QueueDiscoveryRunUseCase } from '../queue-discovery-run.use-case.js';
 import { UpdateOpportunityFeedUseCase } from '../update-opportunity-feed.use-case.js';
 
 const entity = new OpportunityFeedEntity('feed-id', {
@@ -48,10 +49,12 @@ describe('opportunity feed use cases', () => {
     const port = repository as unknown as OpportunityFeedRepositoryPort;
     const socialAccounts = { list: vi.fn() };
     const accounts = socialAccounts as unknown as SocialAccountsService;
+    const discoveryRuns = { afterChange: vi.fn() };
+    const discovery = discoveryRuns as unknown as QueueDiscoveryRunUseCase;
     const account = (id: string, isActive = true) => ({ id, isActive });
     const mutationOf = () =>
         repository.updateLocked.mock.calls[0][2] as (current: OpportunityFeedEntity) => OpportunityFeedUpdate;
-    const feedWith = (overrides: Partial<{ socialAccountId: string | null }>) =>
+    const feedWith = (overrides: Partial<{ socialAccountId: string | null; isActive: boolean }>) =>
         new OpportunityFeedEntity('feed-id', {
             userId: entity.userId,
             ...entity.fields,
@@ -71,7 +74,7 @@ describe('opportunity feed use cases', () => {
     it('create applies the defaults, the language and no onboarding id', async () => {
         repository.createWithinLimit.mockResolvedValue(entity);
 
-        const created = await new CreateOpportunityFeedUseCase(port, accounts).execute('user-id', {
+        const created = await new CreateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', {
             name: 'AI agents',
             intent: 'Find people asking about AI agents',
             targetAudience: 'Founders',
@@ -104,7 +107,7 @@ describe('opportunity feed use cases', () => {
         repository.createWithinLimit.mockResolvedValue(entity);
         socialAccounts.list.mockResolvedValue([account('account-a'), account('stale', false)]);
 
-        await new CreateOpportunityFeedUseCase(port, accounts).execute('user-id', {
+        await new CreateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', {
             name: 'AI agents',
             intent: 'Find people asking about AI agents',
             targetAudience: 'Founders',
@@ -118,7 +121,7 @@ describe('opportunity feed use cases', () => {
         repository.createWithinLimit.mockResolvedValue(entity);
         socialAccounts.list.mockResolvedValue([account('account-a'), account('account-b')]);
 
-        await new CreateOpportunityFeedUseCase(port, accounts).execute('user-id', {
+        await new CreateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', {
             name: 'AI agents',
             intent: 'Find people asking about AI agents',
             targetAudience: 'Founders',
@@ -131,7 +134,7 @@ describe('opportunity feed use cases', () => {
     it('create binds a sent account the user owns and refuses a foreign one', async () => {
         repository.createWithinLimit.mockResolvedValue(entity);
         socialAccounts.list.mockResolvedValue([account('account-a'), account('account-b')]);
-        const useCase = new CreateOpportunityFeedUseCase(port, accounts);
+        const useCase = new CreateOpportunityFeedUseCase(port, accounts, discovery);
         const input = {
             name: 'AI agents',
             intent: 'Find people asking about AI agents',
@@ -148,10 +151,51 @@ describe('opportunity feed use cases', () => {
         expect(repository.createWithinLimit).toHaveBeenCalledTimes(1);
     });
 
+    it('create and createFromOnboarding queue the first discovery run of the new feed', async () => {
+        repository.createWithinLimit.mockResolvedValue(entity);
+
+        await new CreateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', {
+            name: 'AI agents',
+            intent: 'Find people asking about AI agents',
+            targetAudience: 'Founders',
+            includeTerms: ['ai agents'],
+        });
+        await new CreateFeedFromOnboardingUseCase(port, accounts, discovery).execute({
+            userId: 'user-id',
+            onboardingId: 'onboarding-id',
+            intent: 'Find people asking about AI agents',
+            targetAudience: 'Founders',
+            includeTerms: ['ai agents'],
+            excludeTerms: [],
+        });
+
+        expect(discoveryRuns.afterChange.mock.calls).toEqual([
+            ['feed-id', { criteriaChanged: true, resumed: false }],
+            ['feed-id', { criteriaChanged: true, resumed: false }],
+        ]);
+    });
+
+    it('update reports a criteria change and a resume to the discovery trigger', async () => {
+        repository.updateLocked.mockImplementation(async (_id, _user, mutate) => {
+            mutate(feedWith({ isActive: false }));
+            return entity;
+        });
+
+        await new UpdateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', 'feed-id', {
+            isActive: true,
+            intent: 'Find people comparing AI agent frameworks',
+        });
+
+        expect(discoveryRuns.afterChange).toHaveBeenCalledWith('feed-id', {
+            criteriaChanged: true,
+            resumed: true,
+        });
+    });
+
     it('create rejects an invalid input before it touches the repository', async () => {
         await expect(
             Promise.resolve().then(() =>
-                new CreateOpportunityFeedUseCase(port, accounts).execute('user-id', {
+                new CreateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', {
                     name: '',
                     intent: 'Find people asking about AI agents',
                     targetAudience: 'Founders',
@@ -166,7 +210,7 @@ describe('opportunity feed use cases', () => {
         repository.createWithinLimit.mockResolvedValue(entity);
         socialAccounts.list.mockResolvedValue([account('account-a')]);
 
-        await new CreateFeedFromOnboardingUseCase(port, accounts).execute({
+        await new CreateFeedFromOnboardingUseCase(port, accounts, discovery).execute({
             userId: 'user-id',
             onboardingId: 'onboarding-id',
             intent: 'Find people who are asking how to evaluate and compare AI agent frameworks for teams',
@@ -210,7 +254,7 @@ describe('opportunity feed use cases', () => {
     it('update merges the changes into the locked feed and keeps the criteria version', async () => {
         repository.updateLocked.mockResolvedValue(entity);
 
-        await new UpdateOpportunityFeedUseCase(port, accounts).execute('user-id', 'feed-id', {
+        await new UpdateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', 'feed-id', {
             minScore: 80,
         });
 
@@ -225,7 +269,7 @@ describe('opportunity feed use cases', () => {
 
     it('update reports a criteria change only for a real change of the criteria', async () => {
         repository.updateLocked.mockResolvedValue(entity);
-        const useCase = new UpdateOpportunityFeedUseCase(port, accounts);
+        const useCase = new UpdateOpportunityFeedUseCase(port, accounts, discovery);
 
         await useCase.execute('user-id', 'feed-id', { includeTerms: ['AI AGENTS'] });
         await useCase.execute('user-id', 'feed-id', { intent: 'Find people comparing AI agent frameworks' });
@@ -241,7 +285,7 @@ describe('opportunity feed use cases', () => {
         repository.updateLocked.mockResolvedValue(entity);
         socialAccounts.list.mockResolvedValue([account('account-a'), account('account-b')]);
 
-        await new UpdateOpportunityFeedUseCase(port, accounts).execute('user-id', 'feed-id', {
+        await new UpdateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', 'feed-id', {
             socialAccountId: 'account-b',
         });
 
@@ -256,7 +300,7 @@ describe('opportunity feed use cases', () => {
         socialAccounts.list.mockResolvedValue([account('account-a')]);
 
         await expect(
-            new UpdateOpportunityFeedUseCase(port, accounts).execute('user-id', 'feed-id', {
+            new UpdateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', 'feed-id', {
                 socialAccountId: 'foreign',
             }),
         ).rejects.toBeInstanceOf(SocialAccountNotFoundError);
@@ -267,7 +311,9 @@ describe('opportunity feed use cases', () => {
         repository.updateLocked.mockResolvedValue(null);
 
         await expect(
-            new UpdateOpportunityFeedUseCase(port, accounts).execute('user-id', 'feed-id', { minScore: 80 }),
+            new UpdateOpportunityFeedUseCase(port, accounts, discovery).execute('user-id', 'feed-id', {
+                minScore: 80,
+            }),
         ).rejects.toBeInstanceOf(OpportunityFeedNotFoundError);
     });
 

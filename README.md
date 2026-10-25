@@ -37,6 +37,8 @@ The server listens on `PORT` (default 3000). `.env` is loaded on startup.
 | `OAUTH_STATE_SECRET` | yes      | at least 32 characters, signs the OAuth `state`, distinct from the JWT secrets |
 | `REDIS_URL`          | for discovery | Redis connection URL for the BullMQ queues, e.g. `redis://localhost:6379` |
 | `OPENAI_API_KEY`     | for discovery | OpenAI key for `LlmModule`; read on each call, so the app boots without it |
+| `DISCOVERY_QUERY_MODEL` | for discovery | OpenAI model that writes the search phrases of a feed |
+| `DISCOVERY_SCORING_MODEL` | for discovery | OpenAI model that scores the relevance of found posts |
 
 ## Scripts
 

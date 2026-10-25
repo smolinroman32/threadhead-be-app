@@ -16,6 +16,7 @@ export type OpportunityFeedUpdate = {
 
 export abstract class OpportunityFeedRepositoryPort {
     abstract listByUser(userId: string): Promise<OpportunityFeedEntity[]>;
+    abstract findById(id: string): Promise<OpportunityFeedEntity | null>;
     abstract findByIdForUser(id: string, userId: string): Promise<OpportunityFeedEntity | null>;
     abstract findByOnboardingId(userId: string, onboardingId: string): Promise<OpportunityFeedEntity | null>;
     abstract createWithinLimit(data: NewOpportunityFeed, limit: number): Promise<OpportunityFeedEntity>;

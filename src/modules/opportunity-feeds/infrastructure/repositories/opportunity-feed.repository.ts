@@ -26,6 +26,12 @@ export class OpportunityFeedRepository implements OpportunityFeedRepositoryPort 
         return rows.map(OpportunityFeedMapper.toDomain);
     }
 
+    async findById(id: string) {
+        const row = await this.prisma.opportunityFeed.findUnique({ where: { id } });
+
+        return row && OpportunityFeedMapper.toDomain(row);
+    }
+
     async findByIdForUser(id: string, userId: string) {
         const row = await this.prisma.opportunityFeed.findFirst({ where: { id, userId } });
 

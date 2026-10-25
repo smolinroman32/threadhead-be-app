@@ -197,19 +197,26 @@ export class DiscoveryRunRepository implements DiscoveryRunRepositoryPort {
     }
 
     private fenced<T>(fence: RunFence, work: (tx: Tx) => Promise<T>) {
-        return this.transaction(async (tx) => {
+        return fencedTransaction(this.prisma, fence, work);
+    }
+
+    private transaction<T>(work: (tx: Tx) => Promise<T>) {
+        return this.prisma.$transaction(work, { timeout: TRANSACTION_TIMEOUT_MS });
+    }
+}
+
+export function fencedTransaction<T>(prisma: PrismaService, fence: RunFence, work: (tx: Tx) => Promise<T>) {
+    return prisma.$transaction(
+        async (tx) => {
             const { count } = await tx.discoveryRun.updateMany({
                 where: { id: fence.runId, attempt: fence.attempt, status: 'RUNNING' },
                 data: { heartbeatAt: new Date() },
             });
 
             return count === 0 ? null : work(tx);
-        });
-    }
-
-    private transaction<T>(work: (tx: Tx) => Promise<T>) {
-        return this.prisma.$transaction(work, { timeout: TRANSACTION_TIMEOUT_MS });
-    }
+        },
+        { timeout: TRANSACTION_TIMEOUT_MS },
+    );
 }
 
 async function lockFeed(tx: Tx, feedId: string) {
