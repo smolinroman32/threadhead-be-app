@@ -399,7 +399,9 @@ src/modules/social-accounts/
 
 `OpportunityFeedsModule` imports `SocialAccountsModule` (facade only), `LlmModule` and `QueueModule`.
 `social-accounts` does not import feeds. The worker uses `bullmq` directly through `QueueModule`, not
-`@nestjs/bullmq`.
+`@nestjs/bullmq`. BullMQ 6 makes `ioredis` an optional peer and cannot load it from native ESM, so
+`QueueFactory` passes its own `ioredis` client (`maxRetriesPerRequest: null`) and closes workers, queues and
+the client on shutdown.
 
 ## Architecture check
 
@@ -488,7 +490,7 @@ Reading
 - [x] Social accounts: keyword search in `ThreadsAccountApi`, `searchPosts`, `checkSearchAccess`, the endpoint,
       the check after connect; check 11
 - [x] `LlmModule`: port, `OpenAiLlmClient`, errors, env
-- [ ] `QueueModule`: `bullmq` connection, shutdown, env
+- [x] `QueueModule`: `bullmq` connection, shutdown, env
 - [ ] Feeds: `socialAccountId` rules, criteria diff, version bump, exclusion recompute in the locked
       transaction; checks 16, 17, 21
 - [ ] Discovery domain: prefilter, scoring and phrase validation; unit checks 12 to 14

@@ -35,6 +35,7 @@ The server listens on `PORT` (default 3000). `.env` is loaded on startup.
 | `THREADS_APP_SECRET` | yes      | Threads app secret                                       |
 | `ENCRYPTION_KEY`     | yes      | 64 hex characters (32 bytes), encrypts stored provider tokens |
 | `OAUTH_STATE_SECRET` | yes      | at least 32 characters, signs the OAuth `state`, distinct from the JWT secrets |
+| `REDIS_URL`          | for discovery | Redis connection URL for the BullMQ queues, e.g. `redis://localhost:6379` |
 | `OPENAI_API_KEY`     | for discovery | OpenAI key for `LlmModule`; read on each call, so the app boots without it |
 
 ## Scripts
