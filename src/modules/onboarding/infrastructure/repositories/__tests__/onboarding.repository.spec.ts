@@ -69,6 +69,7 @@ describe('OnboardingRepository', () => {
                 status: 'IN_PROGRESS',
                 draft: row.draft,
                 version: 1,
+                completedAt: null,
             },
         });
         expect(onboarding.updateMany).not.toHaveBeenCalled();
@@ -94,7 +95,13 @@ describe('OnboardingRepository', () => {
 
         expect(onboarding.updateMany).toHaveBeenCalledWith({
             where: { userId: 'user-id', version: 2 },
-            data: { currentStep: 'PREFERENCES', status: 'IN_PROGRESS', draft: row.draft, version: 3 },
+            data: {
+                currentStep: 'PREFERENCES',
+                status: 'IN_PROGRESS',
+                draft: row.draft,
+                version: 3,
+                completedAt: null,
+            },
         });
         expect(onboarding.create).not.toHaveBeenCalled();
     });
@@ -103,5 +110,21 @@ describe('OnboardingRepository', () => {
         onboarding.updateMany.mockResolvedValue({ count: 0 });
 
         await expect(repository.save(entity(3), 2)).rejects.toBeInstanceOf(OnboardingVersionConflictError);
+    });
+
+    it('maps id and completedAt from the row and writes completedAt on save', async () => {
+        const finished = new Date('2026-10-15');
+        onboarding.findUnique.mockResolvedValue({ ...row, status: 'COMPLETED', completedAt: finished });
+        onboarding.updateMany.mockResolvedValue({ count: 1 });
+
+        const found = await repository.findByUserId('user-id');
+
+        expect(found).toMatchObject({ id: 'onboarding-id', status: 'COMPLETED' });
+        expect(found?.completedAt).toBe(finished);
+        await repository.save(found!, 5);
+        expect(onboarding.updateMany).toHaveBeenCalledWith({
+            where: { userId: 'user-id', version: 5 },
+            data: expect.objectContaining({ status: 'COMPLETED', completedAt: finished }),
+        });
     });
 });

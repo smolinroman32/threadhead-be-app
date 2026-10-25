@@ -1,3 +1,5 @@
+import { normalizeHexColor } from '../../../../shared/colors/normalize-hex-color.js';
+import { normalizeTerms } from '../../../../shared/terms/normalize-terms.js';
 import { OnboardingDraftInvalidError } from '../errors/onboarding-draft-invalid.error.js';
 import type { IntentStepData, OnboardingDraft, PreferencesStepData } from './onboarding.entity.js';
 
@@ -9,12 +11,13 @@ export function normalizeIntentStep(data: IntentStepData): OnboardingDraft {
     return {
         intent: requireText('intent', data.intent, 10, 500),
         targetAudience: requireText('targetAudience', data.targetAudience, 3, 200),
+        ...(data.color === undefined ? {} : { color: requireColor(data.color) }),
     };
 }
 
 export function normalizePreferencesStep(data: PreferencesStepData): OnboardingDraft {
-    const includeTerms = normalizeTerms('includeTerms', data.includeTerms);
-    const excludeTerms = normalizeTerms('excludeTerms', data.excludeTerms ?? []);
+    const includeTerms = limitTerms('includeTerms', data.includeTerms);
+    const excludeTerms = limitTerms('excludeTerms', data.excludeTerms ?? []);
 
     if (includeTerms.length === 0) {
         throw new OnboardingDraftInvalidError('includeTerms must contain at least one term.');
@@ -30,6 +33,14 @@ export function normalizePreferencesStep(data: PreferencesStepData): OnboardingD
     return { includeTerms, excludeTerms };
 }
 
+function requireColor(value: string) {
+    const color = normalizeHexColor(value);
+
+    if (!color) throw new OnboardingDraftInvalidError('color must be a #RRGGBB hex value.');
+
+    return color;
+}
+
 function requireText(field: string, value: string, min: number, max: number) {
     const text = value.trim();
 
@@ -40,24 +51,15 @@ function requireText(field: string, value: string, min: number, max: number) {
     return text;
 }
 
-function normalizeTerms(field: string, terms: string[]) {
-    const seen = new Set<string>();
-    const result: string[] = [];
+function limitTerms(field: string, terms: string[]) {
+    const result = normalizeTerms(terms);
 
-    for (const raw of terms) {
-        const term = raw.trim();
-        const key = term.toLowerCase();
-
-        if (!term || seen.has(key)) continue;
-
+    for (const term of result) {
         if (term.length < TERM_MIN_LENGTH || term.length > TERM_MAX_LENGTH) {
             throw new OnboardingDraftInvalidError(
                 `Each ${field} item must be ${TERM_MIN_LENGTH} to ${TERM_MAX_LENGTH} characters.`,
             );
         }
-
-        seen.add(key);
-        result.push(term);
     }
 
     if (result.length > MAX_TERMS) {

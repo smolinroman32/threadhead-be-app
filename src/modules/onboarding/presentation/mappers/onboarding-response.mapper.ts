@@ -1,4 +1,5 @@
 import type { OnboardingEntity } from '../../domain/entities/onboarding.entity.js';
+import type { CompleteOnboardingResponseDto } from '../dto/complete-onboarding-response.dto.js';
 import type { OnboardingResponseDto } from '../dto/onboarding-response.dto.js';
 
 export class OnboardingResponseMapper {
@@ -9,5 +10,9 @@ export class OnboardingResponseMapper {
             version: onboarding.version,
             draft: onboarding.draft,
         };
+    }
+
+    static toCompleteDto(onboarding: OnboardingEntity, feedId: string | null): CompleteOnboardingResponseDto {
+        return { ...OnboardingResponseMapper.toDto(onboarding), feedId };
     }
 }

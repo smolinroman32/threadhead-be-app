@@ -27,6 +27,19 @@ describe('normalizeIntentStep', () => {
     });
 });
 
+describe('normalizeIntentStep color', () => {
+    const base = { intent: text(10), targetAudience: text(3) };
+
+    it('keeps an uppercased color and leaves the draft untouched without one', () => {
+        expect(normalizeIntentStep({ ...base, color: '#a1b2c3' }).color).toBe('#A1B2C3');
+        expect(normalizeIntentStep(base)).not.toHaveProperty('color');
+    });
+
+    it('rejects a color that is not #RRGGBB', () => {
+        expect(() => normalizeIntentStep({ ...base, color: 'red' })).toThrow(OnboardingDraftInvalidError);
+    });
+});
+
 describe('normalizePreferencesStep', () => {
     it('trims, drops empty items and collapses duplicates ignoring case, keeping the first spelling', () => {
         expect(

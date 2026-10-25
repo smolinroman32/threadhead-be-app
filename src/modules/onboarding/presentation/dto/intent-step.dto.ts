@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class IntentStepDto {
     @IsString()
@@ -6,4 +6,8 @@ export class IntentStepDto {
 
     @IsString()
     targetAudience: string;
+
+    @IsOptional()
+    @IsString()
+    color?: string;
 }

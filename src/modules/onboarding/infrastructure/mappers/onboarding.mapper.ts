@@ -4,11 +4,13 @@ import { OnboardingEntity, type OnboardingDraft } from '../../domain/entities/on
 export class OnboardingMapper {
     static toDomain(raw: Onboarding): OnboardingEntity {
         return new OnboardingEntity({
+            id: raw.id,
             userId: raw.userId,
             currentStep: raw.currentStep,
             status: raw.status,
             draft: raw.draft as OnboardingDraft,
             version: raw.version,
+            completedAt: raw.completedAt,
         });
     }
 }
