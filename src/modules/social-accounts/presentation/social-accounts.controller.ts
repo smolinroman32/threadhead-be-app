@@ -46,13 +46,24 @@ export class SocialAccountsController {
     ) {
         const url = await this.socialAccountsService.authorize(currentUser.sub, provider);
 
+        this.logger.log(
+            `Authorization URL issued for ${provider}, user ${currentUser.sub}, redirect_uri=${new URL(url).searchParams.get('redirect_uri')}`,
+        );
+
         return { url };
     }
 
     @Public()
     @Get(':provider/callback')
     async callback(@Query() query: CallbackQuery, @Req() req: Request, @Res() res: Response) {
+        this.logger.log(
+            `Callback received: code=${Boolean(query.code)}, state=${Boolean(query.state)}, providerError=${query.error ?? 'none'}`,
+        );
+
         const failure = await this.connect(query, req);
+
+        if (failure) this.logger.warn(`Connect failed: reason=${failure}`);
+        else this.logger.log('Connect succeeded, redirecting to the frontend');
 
         res.redirect(this.resultUrl(failure));
     }
@@ -80,6 +91,8 @@ export class SocialAccountsController {
 
         try {
             const currentUser = await this.authService.verifyAccessToken(req.cookies?.[ACCESS_TOKEN_COOKIE]);
+
+            if (!currentUser) this.logger.warn('Callback arrived without a valid access token cookie');
 
             await this.socialAccountsService.connect({
                 state,
