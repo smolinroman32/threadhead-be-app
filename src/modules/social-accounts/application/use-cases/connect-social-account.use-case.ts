@@ -3,8 +3,13 @@ import { EncryptionService } from '../../../../shared/services/encryption-servic
 import { InvalidOAuthStateError } from '../../domain/errors/invalid-oauth-state.error.js';
 import { SocialAccountAlreadyConnectedError } from '../../domain/errors/social-account-already-connected.error.js';
 import { OAuthStatePort } from '../../domain/ports/oauth-state.port.js';
-import { SocialAccountRepositoryPort } from '../../domain/ports/social-account-repository.port.js';
+import {
+    SocialAccountRepositoryPort,
+    type NewSocialAccount,
+    type SocialAccountChanges,
+} from '../../domain/ports/social-account-repository.port.js';
 import { SocialProviderRegistryPort } from '../../domain/ports/social-provider-registry.port.js';
+import { CheckSearchAccessUseCase } from './check-search-access.use-case.js';
 
 type ConnectInput = {
     state: string;
@@ -21,6 +26,7 @@ export class ConnectSocialAccountUseCase {
         private readonly registry: SocialProviderRegistryPort,
         private readonly repository: SocialAccountRepositoryPort,
         private readonly encryption: EncryptionService,
+        private readonly searchAccess: CheckSearchAccessUseCase,
     ) {}
 
     async execute({ state, code, currentUserId }: ConnectInput) {
@@ -53,18 +59,30 @@ export class ConnectSocialAccountUseCase {
             scopes: [...oauth.scopes],
         };
 
-        if (existing) {
-            this.logger.log(`Reconnecting existing account ${existing.id}`);
+        const account = existing
+            ? await this.reconnect(existing.id, connection)
+            : await this.create({ ...connection, userId, provider, providerAccountId: profile.id });
 
-            return this.repository.update(existing.id, {
-                ...connection,
-                isActive: true,
-                disconnectedAt: null,
-            });
-        }
+        this.checkSearchAccess(account.id);
 
-        this.logger.log(`Creating a new ${provider} account for user ${userId}`);
+        return account;
+    }
 
-        return this.repository.create({ ...connection, userId, provider, providerAccountId: profile.id });
+    private reconnect(accountId: string, connection: SocialAccountChanges) {
+        this.logger.log(`Reconnecting existing account ${accountId}`);
+
+        return this.repository.update(accountId, { ...connection, isActive: true, disconnectedAt: null });
+    }
+
+    private create(data: NewSocialAccount) {
+        this.logger.log(`Creating a new ${data.provider} account for user ${data.userId}`);
+
+        return this.repository.create(data);
+    }
+
+    private checkSearchAccess(accountId: string) {
+        this.searchAccess.execute(accountId).catch((error: unknown) => {
+            this.logger.warn(`Search access check failed for ${accountId}: ${String(error)}`);
+        });
     }
 }

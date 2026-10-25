@@ -479,7 +479,7 @@ Reading
 - [x] Shared `match-excluded-term` with unit check 13
 - [x] Social accounts: nullable token columns (second migration), soft disconnect, reconnect in place,
       `getAccessToken` on disconnected; check 20 (account part)
-- [ ] Social accounts: keyword search in `ThreadsAccountApi`, `searchPosts`, `checkSearchAccess`, the endpoint,
+- [x] Social accounts: keyword search in `ThreadsAccountApi`, `searchPosts`, `checkSearchAccess`, the endpoint,
       the check after connect; check 11
 - [ ] `LlmModule`: port, `OpenAiLlmClient`, errors, env
 - [ ] `QueueModule`: `bullmq` connection, shutdown, env

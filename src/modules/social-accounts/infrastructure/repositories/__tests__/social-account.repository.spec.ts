@@ -15,6 +15,8 @@ const row = {
     scopes: ['threads_basic'],
     isActive: true,
     disconnectedAt: null,
+    searchAccess: null,
+    searchAccessCheckedAt: null,
     createdAt: new Date('2026-10-01'),
     updatedAt: new Date('2026-10-02'),
 };

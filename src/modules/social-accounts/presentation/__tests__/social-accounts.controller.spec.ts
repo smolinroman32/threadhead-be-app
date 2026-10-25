@@ -9,7 +9,13 @@ import { SocialAccountsController } from '../social-accounts.controller.js';
 
 describe('SocialAccountsController', () => {
     const currentUser: JwtPayload = { sub: 'user-id', email: 'u@x.io', tokenVersion: 0 };
-    const service = { authorize: vi.fn(), connect: vi.fn(), list: vi.fn(), disconnect: vi.fn() };
+    const service = {
+        authorize: vi.fn(),
+        connect: vi.fn(),
+        list: vi.fn(),
+        disconnect: vi.fn(),
+        checkSearchAccess: vi.fn(),
+    };
     const auth = { verifyAccessToken: vi.fn() };
     const res = { redirect: vi.fn() };
     const controller = () =>
@@ -94,6 +100,8 @@ describe('SocialAccountsController', () => {
             scopes: ['threads_basic'],
             isActive: true,
             disconnectedAt: null,
+            searchAccess: null,
+            searchAccessCheckedAt: null,
             createdAt: new Date('2026-10-01'),
             updatedAt: new Date('2026-10-02'),
         });
@@ -115,6 +123,17 @@ describe('SocialAccountsController', () => {
         ]);
         expect(JSON.stringify(accounts)).not.toContain('secret');
         expect(service.list).toHaveBeenCalledWith('user-id');
+    });
+
+    it('checkSearchAccess checks the account of the token user and answers in lower case', async () => {
+        const checkedAt = new Date('2026-10-25T12:00:00Z');
+        service.checkSearchAccess.mockResolvedValue({ searchAccess: 'NARROWED', checkedAt });
+
+        await expect(controller().checkSearchAccess('account-id', currentUser)).resolves.toEqual({
+            searchAccess: 'narrowed',
+            checkedAt,
+        });
+        expect(service.checkSearchAccess).toHaveBeenCalledWith('account-id', 'user-id');
     });
 
     it('disconnect removes the account of the token user', async () => {

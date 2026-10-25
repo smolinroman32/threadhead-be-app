@@ -55,6 +55,8 @@ describe('GetAccessTokenUseCase', () => {
         scopes: entity.scopes,
         isActive: entity.isActive,
         disconnectedAt: entity.disconnectedAt,
+        searchAccess: entity.searchAccess,
+        searchAccessCheckedAt: entity.searchAccessCheckedAt,
         createdAt: entity.createdAt,
         updatedAt: entity.updatedAt,
     });
@@ -72,6 +74,8 @@ describe('GetAccessTokenUseCase', () => {
             scopes: [],
             isActive: true,
             disconnectedAt: null,
+            searchAccess: null,
+            searchAccessCheckedAt: null,
             createdAt: NOW,
             updatedAt: NOW,
             ...overrides,

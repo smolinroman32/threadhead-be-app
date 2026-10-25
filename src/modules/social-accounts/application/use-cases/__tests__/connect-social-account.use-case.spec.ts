@@ -5,6 +5,7 @@ import { SocialAccountAlreadyConnectedError } from '../../../domain/errors/socia
 import type { OAuthStatePort } from '../../../domain/ports/oauth-state.port.js';
 import type { SocialAccountRepositoryPort } from '../../../domain/ports/social-account-repository.port.js';
 import type { SocialProviderRegistryPort } from '../../../domain/ports/social-provider-registry.port.js';
+import type { CheckSearchAccessUseCase } from '../check-search-access.use-case.js';
 import { ConnectSocialAccountUseCase } from '../connect-social-account.use-case.js';
 
 describe('ConnectSocialAccountUseCase', () => {
@@ -15,11 +16,13 @@ describe('ConnectSocialAccountUseCase', () => {
     const registry = { oauth: vi.fn(() => oauth), api: vi.fn(() => api) };
     const repository = { findByProviderAccount: vi.fn(), create: vi.fn(), update: vi.fn() };
     const encryption = { encrypt: vi.fn((value: string) => `enc:${value}`) };
+    const searchAccess = { execute: vi.fn() };
     const useCase = new ConnectSocialAccountUseCase(
         oauthState as unknown as OAuthStatePort,
         registry as unknown as SocialProviderRegistryPort,
         repository as unknown as SocialAccountRepositoryPort,
         encryption as unknown as EncryptionService,
+        searchAccess as unknown as CheckSearchAccessUseCase,
     );
 
     const existing = (userId: string) =>
@@ -35,6 +38,8 @@ describe('ConnectSocialAccountUseCase', () => {
             scopes: [],
             isActive: false,
             disconnectedAt: new Date(),
+            searchAccess: null,
+            searchAccessCheckedAt: null,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
@@ -45,8 +50,9 @@ describe('ConnectSocialAccountUseCase', () => {
         oauth.exchangeCode.mockResolvedValue({ accessToken: 'long', refreshToken: null, expiresAt });
         api.getProfile.mockResolvedValue({ id: 'th-42', username: 'name', avatarUrl: 'https://img/x.png' });
         repository.findByProviderAccount.mockResolvedValue(null);
-        repository.create.mockImplementation(async (data) => data);
-        repository.update.mockImplementation(async (_id, changes) => changes);
+        repository.create.mockImplementation(async (data) => ({ id: 'new-id', ...data }));
+        repository.update.mockImplementation(async (id, changes) => ({ id, ...changes }));
+        searchAccess.execute.mockResolvedValue({ searchAccess: 'OK', checkedAt: new Date() });
     });
 
     it('creates the account with an encrypted token and the profile data', async () => {
@@ -83,6 +89,23 @@ describe('ConnectSocialAccountUseCase', () => {
             isActive: true,
             disconnectedAt: null,
         });
+    });
+
+    it('starts the search access check for the connected account without waiting for it', async () => {
+        searchAccess.execute.mockReturnValue(new Promise(() => {}));
+
+        await expect(
+            useCase.execute({ state: 'state', code: 'code', currentUserId: 'user-id' }),
+        ).resolves.toMatchObject({ id: 'new-id' });
+        expect(searchAccess.execute).toHaveBeenCalledWith('new-id');
+    });
+
+    it('still connects when the search access check fails', async () => {
+        searchAccess.execute.mockRejectedValue(new Error('boom'));
+
+        await expect(
+            useCase.execute({ state: 'state', code: 'code', currentUserId: 'user-id' }),
+        ).resolves.toMatchObject({ id: 'new-id' });
     });
 
     it('refuses an account that belongs to another user and writes nothing', async () => {

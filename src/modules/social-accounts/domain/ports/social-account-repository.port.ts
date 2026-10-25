@@ -2,7 +2,13 @@ import type { SocialAccountEntity, SocialProvider } from '../entities/social-acc
 
 export type NewSocialAccount = Omit<
     SocialAccountEntity,
-    'id' | 'isActive' | 'disconnectedAt' | 'createdAt' | 'updatedAt'
+    | 'id'
+    | 'isActive'
+    | 'disconnectedAt'
+    | 'searchAccess'
+    | 'searchAccessCheckedAt'
+    | 'createdAt'
+    | 'updatedAt'
 >;
 export type SocialAccountChanges = Partial<
     Pick<
@@ -15,6 +21,8 @@ export type SocialAccountChanges = Partial<
         | 'scopes'
         | 'isActive'
         | 'disconnectedAt'
+        | 'searchAccess'
+        | 'searchAccessCheckedAt'
     >
 >;
 

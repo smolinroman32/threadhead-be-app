@@ -34,6 +34,17 @@ in place and clears `disconnectedAt`, so the id never changes. `isActive = false
 `disconnectedAt` means the refresh was rejected and the user must reconnect. `getAccessToken` throws
 `SocialAccountReconnectRequiredError` for both, and for any account without a stored token.
 
+Search (other modules): `searchPosts(accountId, { query, since?, limit })` runs a `RECENT` keyword search
+with the account token. A missing permission (403, Meta code 10 or 200-299) throws
+`SocialProviderPermissionDeniedError`; a 5xx or a rate limit (429, codes 4, 17, 32, 613) throws
+`SocialProviderUnavailableError`; any other 4xx throws `SocialProviderRejectedError`.
+
+Search access: `checkSearchAccess(accountId, userId?)` runs the control search (`today`, limit 25) and stores
+`searchAccess`: `OK` when another author shows up, `NARROWED` for only own posts or a missing permission,
+`UNKNOWN` for an empty result or a provider failure. It runs after every connect without blocking the
+redirect, and on `POST /social-accounts/:id/search-access-check` (200 `{ searchAccess, checkedAt }`, lower
+case), which ignores any TTL.
+
 ## Layout
 
 ```
@@ -81,7 +92,7 @@ presentation/
 1. Add the value to `enum SocialProvider` in `prisma/models/social-account.prisma` (new migration) and
    to `SOCIAL_PROVIDERS` in the entity file.
 2. Write `XAccountOAuth implements SocialAccountOauthPort` and `XAccountApi implements
-   SocialAccountApiPort` in `infrastructure/x/`, over `HttpClientPort`, using `readProviderBody`.
+SocialAccountApiPort` in `infrastructure/x/`, over `HttpClientPort`, using `readProviderBody`.
 3. Add both to `SocialProviderRegistry` (its `Record<SocialProvider, ...>` fails to compile until you do)
    and to `providers` of `SocialAccountsModule`.
 4. Add its variables to `.env.example` and the README table, and register
