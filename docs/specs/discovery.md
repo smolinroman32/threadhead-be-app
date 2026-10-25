@@ -504,5 +504,5 @@ Reading
       (the lazy account binding and the 409s of `POST /discovery-runs` land with the controllers)
 - [x] Controllers and DTOs for runs and opportunities; checks 7, 22
 - [x] PRD: FR-1, onboarding step 6, section 11 score, FR-12 and FR-13 moved out
-- [ ] `npm run verify`, end-to-end run against `dist` with Redis
+- [x] `npm run verify`, end-to-end run against `dist` with Redis
 - [ ] PR linking this spec
