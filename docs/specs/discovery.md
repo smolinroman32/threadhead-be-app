@@ -137,7 +137,8 @@ Domain constants, not env:
 | `LLM_TIMEOUT_MS`            | 30 000      |
 | `SEARCH_ACCESS_TTL_MS`      | 24 hours    |
 | `CONTROL_QUERY`             | `today`, `RECENT`, `limit=25`, no `since` |
-| `OPPORTUNITY_LIST_LIMIT`    | 100         |
+| `OPPORTUNITY_PAGE_SIZE`     | 20          |
+| `MAX_OPPORTUNITY_PAGE`      | 1000        |
 | `MANUAL_RUN_COOLDOWN_MS`    | 6 hours     |
 
 New env, read through `getEnv`: `REDIS_URL`, `OPENAI_API_KEY`, `DISCOVERY_QUERY_MODEL`,
@@ -153,7 +154,8 @@ another user, or a missing one, is 404.
 | `POST /opportunity-feeds/:id/discovery-runs`        | 202 run: the feed's existing `queued` run or a new one         |
 | `GET /opportunity-feeds/:id/discovery-runs/:runId`  | 200 run                                                       |
 | `GET /opportunity-feeds/:id/discovery-runs/latest`  | 200 the newest run by `createdAt`; 404 if the feed never ran   |
-| `GET /opportunity-feeds/:id/opportunities?status=`  | 200 `{ items, hasMore }`; `status` defaults to `new`          |
+| `GET /opportunity-feeds/:id/opportunities?status=&page=` | 200 `{ items, total, page, pageSize }`; `status` defaults to `new`, `page` to 1 |
+| `GET /opportunity-feeds/:id/opportunity-counts`     | 200 `{ new, saved, dismissed }`                               |
 | `PATCH /opportunities/:id`                          | 200 opportunity; body `{ status: "new" \| "saved" \| "dismissed" }` |
 | `POST /social-accounts/:id/search-access-check`     | 200 `{ searchAccess, checkedAt }`; ignores the TTL            |
 
@@ -198,8 +200,12 @@ Opportunity in a response:
 | `new`                             | `relevanceScore >= minScore`, `publishedAt` within `freshnessHours`, `excludedTerm` is null, author is not the feed account |
 | `saved`, `dismissed`, `replied`   | none                                                                                        |
 
-Order: `relevanceScore DESC`, `publishedAt DESC`, `id`. The query takes `OPPORTUNITY_LIST_LIMIT + 1` rows;
-`hasMore` is whether the extra row came back.
+Order: `relevanceScore DESC`, `publishedAt DESC`, `id`. The page size is `OPPORTUNITY_PAGE_SIZE`, fixed on the
+server. `page` starts at 1 and is an integer up to `MAX_OPPORTUNITY_PAGE`, otherwise 400; a page past the last
+returns no items and the right `total`. `total` counts every row the filters above keep, not only the page.
+
+`opportunity-counts` counts `new` with the `new` filters above and `saved` and `dismissed` without filters, so
+the tab numbers equal the `total` of the matching list. `replied` has no tab and no count.
 
 ### Status transitions
 
@@ -492,7 +498,8 @@ Pause and account
 Reading
 
 22. `new` applies `minScore`, freshness, `excludedTerm` and the author filter; other statuses apply none;
-    order and `hasMore` with 101 rows; every cell of the transition table, `replied` is 409.
+    order, pagination with 25 rows (page 1 holds 20, page 2 holds 5, page 3 none, `total` 25, page 0 and `abc` are
+    400); `opportunity-counts` equals the three totals; every cell of the transition table, `replied` is 409.
 
 23. Within 6 hours of a run that is not `failed`, a manual `POST` is 409 `DiscoveryCooldownError` and adds no job;
     after a `failed` run, or after 6 hours, it is 202. `nextRunAt` is the end of the cooldown on `POST` and `GET`,
@@ -522,4 +529,5 @@ Reading
 - [x] PRD: FR-1, onboarding step 6, section 11 score, FR-12 and FR-13 moved out
 - [x] `npm run verify`, end-to-end run against `dist` with Redis
 - [x] Manual cooldown: rule, `nextRunAt` on run responses, 409 on `POST`; check 23
+- [x] Pagination: `page`, `pageSize` and `total` on the list, `opportunity-counts`; check 22
 - [ ] PR linking this spec

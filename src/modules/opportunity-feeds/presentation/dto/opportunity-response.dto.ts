@@ -15,5 +15,13 @@ export class OpportunityResponseDto {
 
 export class OpportunityListResponseDto {
     items: OpportunityResponseDto[];
-    hasMore: boolean;
+    total: number;
+    page: number;
+    pageSize: number;
+}
+
+export class OpportunityCountsResponseDto {
+    new: number;
+    saved: number;
+    dismissed: number;
 }

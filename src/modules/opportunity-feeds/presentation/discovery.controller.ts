@@ -1,12 +1,10 @@
 import {
     Body,
     Controller,
-    DefaultValuePipe,
     Get,
     HttpCode,
     HttpStatus,
     Param,
-    ParseEnumPipe,
     ParseUUIDPipe,
     Patch,
     Post,
@@ -18,15 +16,12 @@ import { CurrentUser } from '../../auth/presentation/decorators/current-user.dec
 import { OpportunityFeedsService } from '../application/opportunity-feeds.service.js';
 import type { OpportunityStatus, ReviewStatus } from '../domain/entities/opportunity.entity.js';
 import { ChangeOpportunityStatusDto } from './dto/change-opportunity-status.dto.js';
-import type { OpportunityListResponseDto } from './dto/opportunity-response.dto.js';
+import { ListOpportunitiesQueryDto } from './dto/list-opportunities-query.dto.js';
+import type {
+    OpportunityCountsResponseDto,
+    OpportunityListResponseDto,
+} from './dto/opportunity-response.dto.js';
 import { DiscoveryResponseMapper } from './mappers/discovery-response.mapper.js';
-
-enum ListStatus {
-    new = 'new',
-    saved = 'saved',
-    dismissed = 'dismissed',
-    replied = 'replied',
-}
 
 @Controller()
 export class DiscoveryController {
@@ -62,16 +57,24 @@ export class DiscoveryController {
     async listOpportunities(
         @CurrentUser() currentUser: JwtPayload,
         @Param('feedId', ParseUUIDPipe) feedId: string,
-        @Query('status', new DefaultValuePipe(ListStatus.new), new ParseEnumPipe(ListStatus))
-        status: ListStatus,
+        @Query() query: ListOpportunitiesQueryDto,
     ): Promise<OpportunityListResponseDto> {
-        const { items, hasMore } = await this.feedsService.listOpportunities(
+        const { items, total, page, pageSize } = await this.feedsService.listOpportunities(
             currentUser.sub,
             feedId,
-            status.toUpperCase() as OpportunityStatus,
+            (query.status ?? 'new').toUpperCase() as OpportunityStatus,
+            query.page ?? 1,
         );
 
-        return { items: items.map(DiscoveryResponseMapper.opportunity), hasMore };
+        return { items: items.map(DiscoveryResponseMapper.opportunity), total, page, pageSize };
+    }
+
+    @Get('opportunity-feeds/:feedId/opportunity-counts')
+    countOpportunities(
+        @CurrentUser() currentUser: JwtPayload,
+        @Param('feedId', ParseUUIDPipe) feedId: string,
+    ): Promise<OpportunityCountsResponseDto> {
+        return this.feedsService.countOpportunities(currentUser.sub, feedId);
     }
 
     @Patch('opportunities/:id')

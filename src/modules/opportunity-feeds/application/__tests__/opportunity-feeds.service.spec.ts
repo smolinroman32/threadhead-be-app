@@ -6,6 +6,7 @@ import type { GetOpportunityFeedUseCase } from '../use-cases/get-opportunity-fee
 import type { ListOpportunityFeedsUseCase } from '../use-cases/list-opportunity-feeds.use-case.js';
 import type { UpdateOpportunityFeedUseCase } from '../use-cases/update-opportunity-feed.use-case.js';
 import type { ChangeOpportunityStatusUseCase } from '../use-cases/change-opportunity-status.use-case.js';
+import type { CountOpportunitiesUseCase } from '../use-cases/count-opportunities.use-case.js';
 import type { GetDiscoveryRunUseCase } from '../use-cases/get-discovery-run.use-case.js';
 import type { ListOpportunitiesUseCase } from '../use-cases/list-opportunities.use-case.js';
 import type { RequestDiscoveryRunUseCase } from '../use-cases/request-discovery-run.use-case.js';
@@ -23,6 +24,7 @@ describe('OpportunityFeedsService', () => {
         requestRun: { execute: vi.fn() },
         getRun: { execute: vi.fn() },
         listOpportunities: { execute: vi.fn() },
+        countOpportunities: { execute: vi.fn() },
         changeStatus: { execute: vi.fn() },
     };
     const service = new OpportunityFeedsService(
@@ -36,6 +38,7 @@ describe('OpportunityFeedsService', () => {
         useCases.requestRun as unknown as RequestDiscoveryRunUseCase,
         useCases.getRun as unknown as GetDiscoveryRunUseCase,
         useCases.listOpportunities as unknown as ListOpportunitiesUseCase,
+        useCases.countOpportunities as unknown as CountOpportunitiesUseCase,
         useCases.changeStatus as unknown as ChangeOpportunityStatusUseCase,
     );
 
@@ -64,7 +67,8 @@ describe('OpportunityFeedsService', () => {
         await service.findByOnboardingId('user-id', 'onboarding-id');
         await service.requestRun('user-id', 'feed-id');
         await service.getRun('user-id', 'feed-id', 'latest');
-        await service.listOpportunities('user-id', 'feed-id', 'SAVED');
+        await service.listOpportunities('user-id', 'feed-id', 'SAVED', 2);
+        await service.countOpportunities('user-id', 'feed-id');
         await service.changeOpportunityStatus('user-id', 'opportunity-id', 'DISMISSED');
 
         expect(useCases.create.execute).toHaveBeenCalledWith('user-id', input);
@@ -76,7 +80,8 @@ describe('OpportunityFeedsService', () => {
         expect(useCases.byOnboarding.execute).toHaveBeenCalledWith('user-id', 'onboarding-id');
         expect(useCases.requestRun.execute).toHaveBeenCalledWith('user-id', 'feed-id');
         expect(useCases.getRun.execute).toHaveBeenCalledWith('user-id', 'feed-id', 'latest');
-        expect(useCases.listOpportunities.execute).toHaveBeenCalledWith('user-id', 'feed-id', 'SAVED');
+        expect(useCases.listOpportunities.execute).toHaveBeenCalledWith('user-id', 'feed-id', 'SAVED', 2);
+        expect(useCases.countOpportunities.execute).toHaveBeenCalledWith('user-id', 'feed-id');
         expect(useCases.changeStatus.execute).toHaveBeenCalledWith('user-id', 'opportunity-id', 'DISMISSED');
     });
 });

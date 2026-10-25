@@ -23,6 +23,7 @@ import { OpportunityFeedRepositoryPort } from './domain/ports/opportunity-feed-r
 import { DiscoveryRunRepository } from './infrastructure/repositories/discovery-run.repository.js';
 import { OpportunityFeedRepository } from './infrastructure/repositories/opportunity-feed.repository.js';
 import { ChangeOpportunityStatusUseCase } from './application/use-cases/change-opportunity-status.use-case.js';
+import { CountOpportunitiesUseCase } from './application/use-cases/count-opportunities.use-case.js';
 import { GetDiscoveryRunUseCase } from './application/use-cases/get-discovery-run.use-case.js';
 import { ListOpportunitiesUseCase } from './application/use-cases/list-opportunities.use-case.js';
 import { RequestDiscoveryRunUseCase } from './application/use-cases/request-discovery-run.use-case.js';
@@ -42,6 +43,7 @@ import { OpportunityFeedsController } from './presentation/opportunity-feeds.con
         RequestDiscoveryRunUseCase,
         GetDiscoveryRunUseCase,
         ListOpportunitiesUseCase,
+        CountOpportunitiesUseCase,
         ChangeOpportunityStatusUseCase,
         BullDiscoveryQueue,
         { provide: DiscoveryQueuePort, useExisting: BullDiscoveryQueue },

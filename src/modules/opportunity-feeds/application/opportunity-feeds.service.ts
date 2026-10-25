@@ -5,6 +5,7 @@ import type {
 } from '../domain/entities/opportunity-feed-fields.js';
 import type { OpportunityStatus, ReviewStatus } from '../domain/entities/opportunity.entity.js';
 import { ChangeOpportunityStatusUseCase } from './use-cases/change-opportunity-status.use-case.js';
+import { CountOpportunitiesUseCase } from './use-cases/count-opportunities.use-case.js';
 import {
     CreateFeedFromOnboardingUseCase,
     type CreateFeedFromOnboardingInput,
@@ -32,6 +33,7 @@ export class OpportunityFeedsService {
         private readonly requestRunUseCase: RequestDiscoveryRunUseCase,
         private readonly getRunUseCase: GetDiscoveryRunUseCase,
         private readonly listOpportunitiesUseCase: ListOpportunitiesUseCase,
+        private readonly countOpportunitiesUseCase: CountOpportunitiesUseCase,
         private readonly changeOpportunityStatusUseCase: ChangeOpportunityStatusUseCase,
     ) {}
 
@@ -71,8 +73,12 @@ export class OpportunityFeedsService {
         return this.getRunUseCase.execute(userId, feedId, runId);
     }
 
-    listOpportunities(userId: string, feedId: string, status: OpportunityStatus) {
-        return this.listOpportunitiesUseCase.execute(userId, feedId, status);
+    listOpportunities(userId: string, feedId: string, status: OpportunityStatus, page: number) {
+        return this.listOpportunitiesUseCase.execute(userId, feedId, status, page);
+    }
+
+    countOpportunities(userId: string, feedId: string) {
+        return this.countOpportunitiesUseCase.execute(userId, feedId);
     }
 
     changeOpportunityStatus(userId: string, id: string, status: ReviewStatus) {

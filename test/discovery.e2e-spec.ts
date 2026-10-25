@@ -146,7 +146,7 @@ describe('discovery (dist)', () => {
         });
 
         const fresh = await json(await list());
-        expect(fresh.hasMore).toBe(false);
+        expect(fresh).toMatchObject({ total: 1, page: 1, pageSize: 20 });
         expect(
             (fresh.items as { id: string; status: string }[]).map((item) => [item.id, item.status]),
         ).toEqual([[shown.id, 'new']]);
@@ -155,6 +155,56 @@ describe('discovery (dist)', () => {
         expect((saved.items as { id: string }[]).map((item) => item.id)).toEqual([savedOld.id]);
 
         expect((await list('bogus')).status).toBe(400);
+
+        const counts = await call(BASE, cookie, 'GET', `/opportunity-feeds/${feed.id}/opportunity-counts`);
+        expect(counts.status).toBe(200);
+        expect(await json(counts)).toEqual({ new: 1, saved: 1, dismissed: 0 });
+    });
+
+    it('pages the list by twenty and counts the same rows as the tabs', async () => {
+        const { cookie } = await signUp(BASE);
+        const other = await signUp(BASE);
+        const feed = await createFeed(cookie);
+        const page = (value: string) =>
+            call(BASE, cookie, 'GET', `/opportunity-feeds/${feed.id}/opportunities?page=${value}`);
+
+        for (let index = 0; index < 25; index++) await opportunity(feed.id, { relevanceScore: 100 - index });
+        await opportunity(feed.id, { status: 'DISMISSED' });
+
+        const first = await json(await page('1'));
+        const second = await json(await page('2'));
+        const third = await json(await page('3'));
+
+        expect(first).toMatchObject({ total: 25, page: 1, pageSize: 20 });
+        expect((first.items as unknown[]).length).toBe(20);
+        expect((second.items as unknown[]).length).toBe(5);
+        expect(third).toMatchObject({ items: [], total: 25, page: 3 });
+
+        const scores = [
+            ...(first.items as { relevanceScore: number }[]),
+            ...(second.items as { relevanceScore: number }[]),
+        ].map((item) => item.relevanceScore);
+        expect(scores).toEqual([...scores].sort((left, right) => right - left));
+        expect(
+            new Set(
+                (first.items as { id: string }[])
+                    .concat(second.items as { id: string }[])
+                    .map((item) => item.id),
+            ).size,
+        ).toBe(25);
+
+        for (const invalid of ['0', '-1', 'abc', '1.5', '1001']) {
+            expect((await page(invalid)).status, `page=${invalid}`).toBe(400);
+        }
+
+        const counts = await json(
+            await call(BASE, cookie, 'GET', `/opportunity-feeds/${feed.id}/opportunity-counts`),
+        );
+        expect(counts).toEqual({ new: 25, saved: 0, dismissed: 1 });
+        expect(
+            (await call(BASE, other.cookie, 'GET', `/opportunity-feeds/${feed.id}/opportunity-counts`))
+                .status,
+        ).toBe(404);
     });
 
     it('moves an opportunity between review statuses and never out of replied', async () => {

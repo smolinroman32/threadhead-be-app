@@ -12,6 +12,7 @@ import type { DiscoveryRunRepositoryPort } from '../../../domain/ports/discovery
 import type { OpportunityFeedRepositoryPort } from '../../../domain/ports/opportunity-feed-repository.port.js';
 import type { OpportunityRepositoryPort } from '../../../domain/ports/opportunity-repository.port.js';
 import { ChangeOpportunityStatusUseCase } from '../change-opportunity-status.use-case.js';
+import { CountOpportunitiesUseCase } from '../count-opportunities.use-case.js';
 import { GetDiscoveryRunUseCase } from '../get-discovery-run.use-case.js';
 import { ListOpportunitiesUseCase } from '../list-opportunities.use-case.js';
 import type { QueueDiscoveryRunUseCase } from '../queue-discovery-run.use-case.js';
@@ -23,7 +24,7 @@ const HOUR = 60 * 60_000;
 describe('discovery API use cases', () => {
     const feeds = { findByIdForUser: vi.fn(), updateLocked: vi.fn() };
     const runs = { findByIdForFeed: vi.fn(), findLatestForFeed: vi.fn(), findLastCountedRunAt: vi.fn() };
-    const opportunities = { list: vi.fn(), findByIdForUser: vi.fn(), updateStatus: vi.fn() };
+    const opportunities = { list: vi.fn(), count: vi.fn(), findByIdForUser: vi.fn(), updateStatus: vi.fn() };
     const socialAccounts = { list: vi.fn() };
     const discovery = { execute: vi.fn() };
     const feedPort = feeds as unknown as OpportunityFeedRepositoryPort;
@@ -229,10 +230,15 @@ describe('discovery API use cases', () => {
                 accounts,
             );
 
-        it('filters new opportunities by score, freshness and the feed account', async () => {
-            opportunities.list.mockResolvedValue({ items: [], hasMore: false });
+        it('filters new opportunities by score, freshness and the feed account and pages by twenty', async () => {
+            opportunities.list.mockResolvedValue({ items: [], total: 41 });
 
-            await useCase().execute('user-id', 'feed-id', 'NEW');
+            await expect(useCase().execute('user-id', 'feed-id', 'NEW', 3)).resolves.toEqual({
+                items: [],
+                total: 41,
+                page: 3,
+                pageSize: 20,
+            });
 
             expect(opportunities.list).toHaveBeenCalledWith({
                 feedId: 'feed-id',
@@ -242,14 +248,15 @@ describe('discovery API use cases', () => {
                     publishedSince: new Date(NOW.getTime() - 24 * 60 * 60_000),
                     excludeAuthor: 'Owner',
                 },
-                limit: 100,
+                page: 3,
+                pageSize: 20,
             });
         });
 
         it('applies no filters to saved, dismissed and replied', async () => {
-            opportunities.list.mockResolvedValue({ items: [], hasMore: false });
+            opportunities.list.mockResolvedValue({ items: [], total: 0 });
 
-            await useCase().execute('user-id', 'feed-id', 'SAVED');
+            await useCase().execute('user-id', 'feed-id', 'SAVED', 1);
 
             expect(opportunities.list.mock.calls[0][0]).toMatchObject({ status: 'SAVED', newOnly: null });
             expect(socialAccounts.list).not.toHaveBeenCalled();
@@ -258,9 +265,53 @@ describe('discovery API use cases', () => {
         it('reports a foreign feed as not found', async () => {
             feeds.findByIdForUser.mockResolvedValue(null);
 
-            await expect(useCase().execute('user-id', 'feed-id', 'NEW')).rejects.toBeInstanceOf(
+            await expect(useCase().execute('user-id', 'feed-id', 'NEW', 1)).rejects.toBeInstanceOf(
                 OpportunityFeedNotFoundError,
             );
+        });
+    });
+
+    describe('CountOpportunitiesUseCase', () => {
+        const useCase = () =>
+            new CountOpportunitiesUseCase(
+                feedPort,
+                opportunities as unknown as OpportunityRepositoryPort,
+                accounts,
+            );
+
+        it('counts new with the read filters and saved and dismissed without any', async () => {
+            opportunities.count.mockImplementation(
+                async (_feed, status) => ({ NEW: 24, SAVED: 3, DISMISSED: 7 })[status as string],
+            );
+
+            await expect(useCase().execute('user-id', 'feed-id')).resolves.toEqual({
+                new: 24,
+                saved: 3,
+                dismissed: 7,
+            });
+
+            expect(opportunities.count.mock.calls).toEqual([
+                [
+                    'feed-id',
+                    'NEW',
+                    {
+                        minScore: 60,
+                        publishedSince: new Date(NOW.getTime() - 24 * 60 * 60_000),
+                        excludeAuthor: 'Owner',
+                    },
+                ],
+                ['feed-id', 'SAVED', null],
+                ['feed-id', 'DISMISSED', null],
+            ]);
+        });
+
+        it('reports a foreign feed as not found', async () => {
+            feeds.findByIdForUser.mockResolvedValue(null);
+
+            await expect(useCase().execute('user-id', 'feed-id')).rejects.toBeInstanceOf(
+                OpportunityFeedNotFoundError,
+            );
+            expect(opportunities.count).not.toHaveBeenCalled();
         });
     });
 
