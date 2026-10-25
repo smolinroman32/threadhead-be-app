@@ -30,17 +30,17 @@ or body. A feed of another user, or a missing one, answers 404 `OpportunityFeedN
 Feed in a response (never contains `userId` or `onboardingId`):
 
 ```json
-{ "id": "uuid", "name": "string", "intent": "string", "targetAudience": "string",
+{ "id": "uuid", "name": "string", "description": "string", "color": "#5F947B", "intent": "string", "targetAudience": "string",
   "includeTerms": ["string"], "excludeTerms": ["string"], "languages": ["en"],
   "freshnessHours": 24, "minScore": 60, "isActive": true,
   "createdAt": "ISO date", "updatedAt": "ISO date" }
 ```
 
-`POST` body: `name`, `intent`, `targetAudience`, `includeTerms` are required; `excludeTerms` (default `[]`),
+`POST` body: `name`, `intent`, `targetAudience`, `includeTerms` are required; `description` (default `""`), `color` (default `#5F947B`), `excludeTerms` (default `[]`),
 `freshnessHours` (default 24), `minScore` (default 60) and `isActive` (default `true`) are optional.
 `languages` is not accepted and is always `["en"]` (MVP is English-first).
 
-`PATCH` body: any subset of `name`, `intent`, `targetAudience`, `includeTerms`, `excludeTerms`,
+`PATCH` body: any subset of `name`, `description`, `color`, `intent`, `targetAudience`, `includeTerms`, `excludeTerms`,
 `freshnessHours`, `minScore`, `isActive`. `languages`, `userId` and `onboardingId` are not editable. An empty
 body is 200 and changes nothing. There is no `version` and no optimistic lock: the last write wins.
 
@@ -51,7 +51,9 @@ the sent fields:
 
 | Field            | Rule                                                              |
 | ---------------- | ----------------------------------------------------------------- |
-| `name`           | required, trimmed, 1 to 60 characters                             |
+| `name`           | required, trimmed, 1 to 30 characters                             |
+| `description`    | optional, trimmed, 0 to 500 characters                            |
+| `color`          | optional, `#RRGGBB` hex, stored uppercase                         |
 | `intent`         | required, trimmed, 10 to 500 characters                           |
 | `targetAudience` | required, trimmed, 3 to 200 characters                            |
 | `includeTerms`   | 1 to 10 items, each trimmed, 2 to 50 characters                   |
@@ -125,8 +127,8 @@ Flow:
 3. Conditional `UPDATE ... WHERE userId AND status = 'COMPLETING'` sets `COMPLETED`, `completedAt = now()`,
    increments `version`. If it updates no row, the request re-reads: `COMPLETED` is answered as 200.
 
-Feed created from the draft: `name` is `intent` cut to 60 characters at a word boundary (a hard cut at 60
-when the first 60 characters hold no space), `intent`, `targetAudience`, `includeTerms`, `excludeTerms` from
+Feed created from the draft: `name` is `intent` cut to 30 characters at a word boundary (a hard cut at 30
+when the first 30 characters hold no space), `description` is the whole `intent`, `intent`, `targetAudience`, `includeTerms`, `excludeTerms` from
 the draft, `languages = ["en"]`, `freshnessHours = 24`, `minScore = 60`, `isActive = true`, `onboardingId`.
 The user renames it later through `PATCH`.
 
@@ -209,8 +211,8 @@ Unit (fakes for repositories and the feed port):
 1. Entity: each limit and each default; a term in both lists is rejected on the merged state of a `PATCH`;
    `PATCH` with only `excludeTerms` clashing with the stored `includeTerms` is rejected; an empty `PATCH` is
    a no-op.
-2. Feed name from the draft: an `intent` of 60 characters or less is used whole; a longer one is cut at a
-   word boundary; a long one without spaces is cut at 60.
+2. Feed name from the draft: an `intent` of 30 characters or less is used whole; a longer one is cut at a
+   word boundary; a long one without spaces is cut at 30.
 3. `createWithinLimit` use case: at 10 feeds throws `OpportunityFeedLimitReachedError`; with an existing
    feed for the `onboardingId` returns it at the cap without throwing.
 4. Onboarding entity: `startCompleting` needs `REVIEW` and a matching `version`; `markCompleted` sets

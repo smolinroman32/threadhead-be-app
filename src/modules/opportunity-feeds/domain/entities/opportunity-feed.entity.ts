@@ -21,6 +21,14 @@ export class OpportunityFeedEntity {
         return this.props.name;
     }
 
+    get description() {
+        return this.props.description;
+    }
+
+    get color() {
+        return this.props.color;
+    }
+
     get intent() {
         return this.props.intent;
     }
@@ -64,6 +72,8 @@ export class OpportunityFeedEntity {
     get fields(): OpportunityFeedFields {
         return {
             name: this.props.name,
+            description: this.props.description,
+            color: this.props.color,
             intent: this.props.intent,
             targetAudience: this.props.targetAudience,
             includeTerms: this.props.includeTerms,

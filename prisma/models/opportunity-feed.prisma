@@ -1,6 +1,8 @@
 model OpportunityFeed {
   id             String        @id @default(uuid()) @db.Uuid
   name           String
+  description    String        @default("")
+  color          String        @default("#5F947B")
   intent         String
   includeTerms   String[]
   excludeTerms   String[]

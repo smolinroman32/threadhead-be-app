@@ -5,6 +5,14 @@ export class CreateOpportunityFeedDto {
     @IsString()
     name: string;
 
+    @ValidateIf(isSent)
+    @IsString()
+    description?: string;
+
+    @ValidateIf(isSent)
+    @IsString()
+    color?: string;
+
     @IsString()
     intent: string;
 

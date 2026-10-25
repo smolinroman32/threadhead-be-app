@@ -8,6 +8,14 @@ export class UpdateOpportunityFeedDto {
 
     @ValidateIf(isSent)
     @IsString()
+    description?: string;
+
+    @ValidateIf(isSent)
+    @IsString()
+    color?: string;
+
+    @ValidateIf(isSent)
+    @IsString()
     intent?: string;
 
     @ValidateIf(isSent)

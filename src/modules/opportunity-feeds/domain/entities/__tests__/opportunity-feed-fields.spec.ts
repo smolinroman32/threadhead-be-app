@@ -9,6 +9,8 @@ import {
 const text = (length: number) => 'x'.repeat(length);
 const input = {
     name: 'AI agents',
+    description: '',
+    color: '#5F947B',
     intent: 'Find people asking about AI agents',
     targetAudience: 'Small team founders',
     includeTerms: ['ai agents'],
@@ -55,7 +57,11 @@ describe('buildFeedFields', () => {
 
     it.each([
         ['empty name', { name: '   ' }],
-        ['name over 60', { name: text(61) }],
+        ['name over 30', { name: text(31) }],
+        ['description over 500', { description: text(501) }],
+        ['color without a hash', { color: '5F947B' }],
+        ['color in short form', { color: '#5F9' }],
+        ['color by name', { color: 'red' }],
         ['intent under 10', { intent: text(9) }],
         ['intent over 500', { intent: text(501) }],
         ['targetAudience under 3', { targetAudience: 'ab' }],
@@ -85,7 +91,8 @@ describe('buildFeedFields', () => {
     it('accepts the exact bounds', () => {
         expect(() =>
             buildFeedFields({
-                name: text(60),
+                name: text(30),
+                description: text(500),
                 intent: text(500),
                 targetAudience: text(200),
                 includeTerms: Array.from({ length: 10 }, (_, index) => `term ${index}`),
@@ -139,12 +146,24 @@ describe('mergeFeedFields', () => {
     });
 });
 
+describe('feed color', () => {
+    it('uses the default when none is sent and uppercases a valid one', () => {
+        const input = {
+            name: 'AI agents',
+            intent: text(10),
+            targetAudience: 'Founders',
+            includeTerms: ['ai'],
+        };
+
+        expect(buildFeedFields(input).color).toBe('#5F947B');
+        expect(buildFeedFields({ ...input, color: ' #a1b2c3 ' }).color).toBe('#A1B2C3');
+    });
+});
+
 describe('feedNameFromIntent', () => {
-    it('uses an intent of 60 characters or less as it is', () => {
-        expect(feedNameFromIntent('Find people asking about AI agents')).toBe(
-            'Find people asking about AI agents',
-        );
-        expect(feedNameFromIntent(text(60))).toBe(text(60));
+    it('uses an intent of 30 characters or less as it is', () => {
+        expect(feedNameFromIntent('Find people asking about AI')).toBe('Find people asking about AI');
+        expect(feedNameFromIntent(text(30))).toBe(text(30));
     });
 
     it('cuts a longer intent at a word boundary', () => {
@@ -152,19 +171,16 @@ describe('feedNameFromIntent', () => {
 
         const name = feedNameFromIntent(intent);
 
-        expect(name.length).toBeLessThanOrEqual(60);
+        expect(name.length).toBeLessThanOrEqual(30);
         expect(intent.startsWith(name)).toBe(true);
         expect(intent[name.length]).toBe(' ');
     });
 
-    it('keeps the 60th word whole when it ends exactly there', () => {
-        const intent = `${text(59)} tail`;
-
-        expect(feedNameFromIntent(intent)).toBe(text(59));
-        expect(feedNameFromIntent(`${text(60)} tail`)).toBe(text(60));
+    it('keeps the 30th word whole when it ends exactly there', () => {
+        expect(feedNameFromIntent(`${text(30)} tail`)).toBe(text(30));
     });
 
-    it('cuts a long intent without spaces at 60', () => {
-        expect(feedNameFromIntent(text(80))).toBe(text(60));
+    it('cuts a long intent without spaces at 30', () => {
+        expect(feedNameFromIntent(text(80))).toBe(text(30));
     });
 });

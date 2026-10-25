@@ -6,6 +6,8 @@ export class OpportunityFeedMapper {
         return new OpportunityFeedEntity(raw.id, {
             userId: raw.userId,
             name: raw.name,
+            description: raw.description,
+            color: raw.color,
             intent: raw.intent,
             targetAudience: raw.targetAudience,
             includeTerms: raw.includeTerms,

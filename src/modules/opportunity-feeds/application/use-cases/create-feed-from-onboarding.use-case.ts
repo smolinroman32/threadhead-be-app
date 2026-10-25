@@ -14,6 +14,7 @@ export type CreateFeedFromOnboardingInput = {
     targetAudience: string;
     includeTerms: string[];
     excludeTerms: string[];
+    color?: string;
 };
 
 @Injectable()
@@ -23,6 +24,8 @@ export class CreateFeedFromOnboardingUseCase {
     execute(input: CreateFeedFromOnboardingInput) {
         const fields = buildFeedFields({
             name: feedNameFromIntent(input.intent),
+            description: input.intent,
+            color: input.color,
             intent: input.intent,
             targetAudience: input.targetAudience,
             includeTerms: input.includeTerms,

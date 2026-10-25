@@ -6,6 +6,8 @@ export class OpportunityFeedResponseMapper {
         return {
             id: feed.id,
             name: feed.name,
+            description: feed.description,
+            color: feed.color,
             intent: feed.intent,
             targetAudience: feed.targetAudience,
             includeTerms: feed.includeTerms,

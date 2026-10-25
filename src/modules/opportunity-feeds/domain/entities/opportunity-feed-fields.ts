@@ -1,17 +1,27 @@
+import { normalizeHexColor } from '../../../../shared/colors/normalize-hex-color.js';
 import { normalizeTerms } from '../../../../shared/terms/normalize-terms.js';
 import { OpportunityFeedInvalidError } from '../errors/opportunity-feed-invalid.error.js';
 
 export const MAX_FEEDS_PER_USER = 10;
 export const FEED_LANGUAGES = ['en'];
-export const FEED_DEFAULTS = { freshnessHours: 24, minScore: 60, isActive: true } as const;
+export const DEFAULT_FEED_COLOR = '#5F947B';
+export const FEED_DEFAULTS = {
+    freshnessHours: 24,
+    minScore: 60,
+    isActive: true,
+    color: DEFAULT_FEED_COLOR,
+} as const;
 
 const MAX_TERMS = 10;
 const TERM_MIN_LENGTH = 2;
 const TERM_MAX_LENGTH = 50;
-const NAME_MAX_LENGTH = 60;
+const NAME_MAX_LENGTH = 30;
+const DESCRIPTION_MAX_LENGTH = 500;
 
 export type OpportunityFeedFields = {
     name: string;
+    description: string;
+    color: string;
     intent: string;
     targetAudience: string;
     includeTerms: string[];
@@ -25,13 +35,20 @@ export type NewOpportunityFeedInput = Pick<
     OpportunityFeedFields,
     'name' | 'intent' | 'targetAudience' | 'includeTerms'
 > &
-    Partial<Pick<OpportunityFeedFields, 'excludeTerms' | 'freshnessHours' | 'minScore' | 'isActive'>>;
+    Partial<
+        Pick<
+            OpportunityFeedFields,
+            'description' | 'color' | 'excludeTerms' | 'freshnessHours' | 'minScore' | 'isActive'
+        >
+    >;
 
 export type OpportunityFeedChanges = Partial<OpportunityFeedFields>;
 
 export function buildFeedFields(input: NewOpportunityFeedInput) {
     return validateFields({
         name: input.name,
+        description: input.description ?? '',
+        color: input.color ?? FEED_DEFAULTS.color,
         intent: input.intent,
         targetAudience: input.targetAudience,
         includeTerms: input.includeTerms,
@@ -45,6 +62,8 @@ export function buildFeedFields(input: NewOpportunityFeedInput) {
 export function mergeFeedFields(current: OpportunityFeedFields, changes: OpportunityFeedChanges) {
     return validateFields({
         name: changes.name ?? current.name,
+        description: changes.description ?? current.description,
+        color: changes.color ?? current.color,
         intent: changes.intent ?? current.intent,
         targetAudience: changes.targetAudience ?? current.targetAudience,
         includeTerms: changes.includeTerms ?? current.includeTerms,
@@ -80,6 +99,8 @@ function validateFields(fields: OpportunityFeedFields): OpportunityFeedFields {
 
     return {
         name: requireText('name', fields.name, 1, NAME_MAX_LENGTH),
+        description: requireText('description', fields.description, 0, DESCRIPTION_MAX_LENGTH),
+        color: requireColor(fields.color),
         intent: requireText('intent', fields.intent, 10, 500),
         targetAudience: requireText('targetAudience', fields.targetAudience, 3, 200),
         includeTerms,
@@ -88,6 +109,14 @@ function validateFields(fields: OpportunityFeedFields): OpportunityFeedFields {
         minScore: requireInteger('minScore', fields.minScore, 0, 100),
         isActive: fields.isActive,
     };
+}
+
+function requireColor(value: string) {
+    const color = normalizeHexColor(value);
+
+    if (!color) throw new OpportunityFeedInvalidError('color must be a #RRGGBB hex value.');
+
+    return color;
 }
 
 function requireText(field: string, value: string, min: number, max: number) {

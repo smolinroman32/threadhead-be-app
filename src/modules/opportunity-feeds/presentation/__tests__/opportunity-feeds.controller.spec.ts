@@ -6,6 +6,8 @@ import { OpportunityFeedsController } from '../opportunity-feeds.controller.js';
 const entity = new OpportunityFeedEntity('feed-id', {
     userId: 'user-id',
     name: 'AI agents',
+    description: '',
+    color: '#5F947B',
     intent: 'Find people asking about AI agents',
     targetAudience: 'Founders',
     includeTerms: ['ai agents'],
@@ -21,6 +23,8 @@ const entity = new OpportunityFeedEntity('feed-id', {
 const expected = {
     id: 'feed-id',
     name: 'AI agents',
+    description: '',
+    color: '#5F947B',
     intent: 'Find people asking about AI agents',
     targetAudience: 'Founders',
     includeTerms: ['ai agents'],

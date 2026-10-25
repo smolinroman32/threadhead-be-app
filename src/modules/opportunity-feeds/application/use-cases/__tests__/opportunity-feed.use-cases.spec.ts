@@ -14,6 +14,8 @@ import { UpdateOpportunityFeedUseCase } from '../update-opportunity-feed.use-cas
 const entity = new OpportunityFeedEntity('feed-id', {
     userId: 'user-id',
     name: 'AI agents',
+    description: '',
+    color: '#5F947B',
     intent: 'Find people asking about AI agents',
     targetAudience: 'Founders',
     includeTerms: ['ai agents'],
@@ -58,6 +60,8 @@ describe('opportunity feed use cases', () => {
                 onboardingId: null,
                 languages: ['en'],
                 name: 'AI agents',
+                description: '',
+                color: '#5F947B',
                 intent: 'Find people asking about AI agents',
                 targetAudience: 'Founders',
                 includeTerms: ['ai agents'],
