@@ -326,8 +326,11 @@ abstract class LlmPort {
 ```
 
 `OpenAiLlmClient` posts to Chat Completions with `response_format: json_schema`, a `LLM_TIMEOUT_MS` timeout, and
-up to two retries of a 429 or 5xx honouring `retry-after`. It throws `LlmRateLimitedError`,
-`LlmUnavailableError` or `LlmInvalidResponseError`.
+up to two retries of a 429, a 5xx or a transport error after 1 s and 2 s. `HttpResponse` carries no
+headers, so `retry-after` is not read; add headers to the port if OpenAI limits show it is needed. It throws
+`LlmRateLimitedError`, `LlmUnavailableError` or `LlmInvalidResponseError`. Another 4xx (a bad key, a bad
+schema) is `LlmUnavailableError` without a retry. `OPENAI_API_KEY` is read on each call, so the app boots
+without it.
 
 Scoring input: intent, target audience, include terms, and posts as `{ ref: "p1", text }`. Output:
 `[{ ref, relevanceScore, reason }]`. The domain accepts an item only when its ref was sent and appears once,
@@ -484,7 +487,7 @@ Reading
       `getAccessToken` on disconnected; check 20 (account part)
 - [x] Social accounts: keyword search in `ThreadsAccountApi`, `searchPosts`, `checkSearchAccess`, the endpoint,
       the check after connect; check 11
-- [ ] `LlmModule`: port, `OpenAiLlmClient`, errors, env
+- [x] `LlmModule`: port, `OpenAiLlmClient`, errors, env
 - [ ] `QueueModule`: `bullmq` connection, shutdown, env
 - [ ] Feeds: `socialAccountId` rules, criteria diff, version bump, exclusion recompute in the locked
       transaction; checks 16, 17, 21
