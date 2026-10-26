@@ -8,8 +8,8 @@ spec too.
 
 ## Goal
 
-The opportunity card tells the user whether the post already had replies when discovery found it. A post with no
-replies yet is the best place for a comment, so it gets an accent chip.
+The opportunity card tells the user whether the post already had replies when discovery found it. A post with
+replies has a live conversation, so it gets the accent chip.
 
 ## Live API findings (2026-10-26)
 
@@ -34,7 +34,7 @@ free.
 | Freshness         | a snapshot taken when the post is first saved; never updated                                 |
 | Unknown value     | `null` end to end; a missing `has_replies` is not `false`                                     |
 | Existing rows     | `null`                                                                                       |
-| Card              | one chip: `false` is "No replies yet" (accent), `true` is "Has replies" (neutral), `null` none |
+| Card              | one chip: `true` is "Has replies" (accent), `false` is "No replies yet" (neutral), `null` none |
 | Counters, followers, display name from the design | dropped, no source                                           |
 | Filter or sort    | none, the snapshot goes stale                                                                |
 
