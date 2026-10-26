@@ -5,7 +5,7 @@ export type SearchQueryType = 'KEYWORD' | 'PHRASE';
 
 export type ActiveSearchQuery = { id: string; query: string; type: SearchQueryType };
 
-export type FoundPost = CandidatePost & { permalink: string };
+export type FoundPost = CandidatePost & { permalink: string; hasReplies: boolean | null };
 
 export type ScoredPost = { post: FoundPost; queryIds: string[]; relevanceScore: number; reason: string };
 

@@ -47,6 +47,7 @@ describe('discovery API use cases', () => {
             text: 'A question',
             permalink: 'https://www.threads.net/@someone/post/1',
             publishedAt: NOW,
+            hasReplies: false,
             relevanceScore: 80,
             reason: 'Asks exactly this',
             status,

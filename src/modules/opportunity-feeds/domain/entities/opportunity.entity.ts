@@ -11,6 +11,7 @@ export interface OpportunityProps {
     text: string;
     permalink: string;
     publishedAt: Date;
+    hasReplies: boolean | null;
     relevanceScore: number;
     reason: string;
     status: OpportunityStatus;
@@ -47,6 +48,10 @@ export class OpportunityEntity {
 
     get publishedAt() {
         return this.props.publishedAt;
+    }
+
+    get hasReplies() {
+        return this.props.hasReplies;
     }
 
     get relevanceScore() {

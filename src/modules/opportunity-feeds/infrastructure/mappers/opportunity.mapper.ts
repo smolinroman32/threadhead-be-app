@@ -15,6 +15,7 @@ export class OpportunityMapper {
             text: raw.text,
             permalink: raw.permalink,
             publishedAt: raw.publishedAt,
+            hasReplies: raw.hasReplies,
             relevanceScore: raw.relevanceScore,
             reason: raw.reason,
             status: raw.status,

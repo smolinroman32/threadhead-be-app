@@ -145,8 +145,12 @@ describe('RunDiscoveryUseCase', () => {
 
     it('searches every query, prefilters, scores and saves new posts, then queues the next run', async () => {
         socialAccounts.searchPosts
-            .mockResolvedValueOnce([post('a'), post('b'), post('own', { username: 'Owner' })])
-            .mockResolvedValueOnce([post('b'), post('known')]);
+            .mockResolvedValueOnce([
+                post('a', { hasReplies: true }),
+                post('b', { hasReplies: null }),
+                post('own', { username: 'Owner' }),
+            ])
+            .mockResolvedValueOnce([post('b', { hasReplies: null }), post('known')]);
         work.existingPostIds.mockResolvedValue(new Set(['known']));
         llm.completeJson.mockResolvedValue(scoresFor(2));
         runs.finish.mockResolvedValue('next-run');
@@ -174,6 +178,15 @@ describe('RunDiscoveryUseCase', () => {
         ).toEqual([
             ['a', ['q1']],
             ['b', ['q1', 'q2']],
+        ]);
+        expect(
+            saved.map((item: { post: { id: string; hasReplies: boolean | null } }) => [
+                item.post.id,
+                item.post.hasReplies,
+            ]),
+        ).toEqual([
+            ['a', true],
+            ['b', null],
         ]);
         expect(finished()).toMatchObject({
             status: 'SUCCEEDED',

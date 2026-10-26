@@ -14,6 +14,7 @@ model Opportunity {
   text                     String
   permalink                String
   publishedAt              DateTime
+  hasReplies               Boolean?
   relevanceScore           Int
   reason                   String
   status                   OpportunityStatus

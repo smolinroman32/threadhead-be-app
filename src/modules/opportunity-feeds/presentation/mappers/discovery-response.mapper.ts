@@ -25,6 +25,7 @@ export class DiscoveryResponseMapper {
             text: opportunity.text,
             permalink: opportunity.permalink,
             publishedAt: opportunity.publishedAt,
+            hasReplies: opportunity.hasReplies,
             relevanceScore: opportunity.relevanceScore,
             reason: opportunity.reason,
             status: opportunity.status.toLowerCase() as OpportunityResponseDto['status'],

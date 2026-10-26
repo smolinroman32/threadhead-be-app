@@ -161,6 +161,28 @@ describe('discovery (dist)', () => {
         expect(await json(counts)).toEqual({ new: 1, saved: 1, dismissed: 0 });
     });
 
+    it('returns hasReplies as stored, null for an unknown value', async () => {
+        const { cookie } = await signUp(BASE);
+        const feed = await createFeed(cookie);
+        const replied = await opportunity(feed.id, { hasReplies: true });
+        const quiet = await opportunity(feed.id, { hasReplies: false });
+        const unknown = await opportunity(feed.id);
+
+        const list = await json(
+            await call(BASE, cookie, 'GET', `/opportunity-feeds/${feed.id}/opportunities`),
+        );
+        const byId = new Map(
+            (list.items as { id: string; hasReplies: boolean | null }[]).map((item) => [
+                item.id,
+                item.hasReplies,
+            ]),
+        );
+
+        expect(byId.get(replied.id)).toBe(true);
+        expect(byId.get(quiet.id)).toBe(false);
+        expect(byId.get(unknown.id)).toBeNull();
+    });
+
     it('pages the list by twenty and counts the same rows as the tabs', async () => {
         const { cookie } = await signUp(BASE);
         const other = await signUp(BASE);

@@ -102,6 +102,7 @@ export class DiscoveryWorkRepository implements DiscoveryWorkPort {
                     text: post.text,
                     permalink: post.permalink,
                     publishedAt: post.publishedAt,
+                    hasReplies: post.hasReplies,
                     relevanceScore,
                     reason,
                     status: 'NEW' as const,

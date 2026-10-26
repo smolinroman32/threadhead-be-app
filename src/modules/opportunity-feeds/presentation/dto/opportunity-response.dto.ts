@@ -5,6 +5,7 @@ export class OpportunityResponseDto {
     text: string;
     permalink: string;
     publishedAt: Date;
+    hasReplies: boolean | null;
     relevanceScore: number;
     reason: string;
     status: 'new' | 'saved' | 'dismissed' | 'replied';
