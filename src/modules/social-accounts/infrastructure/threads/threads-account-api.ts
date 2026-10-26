@@ -15,7 +15,7 @@ type SearchBody = {
         username?: string;
         timestamp: string;
         permalink?: string;
-        has_replies?: boolean;
+        has_replies?: boolean | null;
         is_reply?: boolean;
         media_type?: string;
         is_quote_post?: boolean;
@@ -67,7 +67,7 @@ export class ThreadsAccountApi implements SocialAccountApiPort {
             username: post.username ?? '',
             publishedAt: new Date(post.timestamp),
             permalink: post.permalink ?? '',
-            hasReplies: post.has_replies ?? false,
+            hasReplies: post.has_replies ?? null,
             isReply: post.is_reply ?? false,
             mediaType: post.media_type ?? null,
             isQuotePost: post.is_quote_post ?? false,

@@ -58,7 +58,13 @@ describe('ThreadsAccountApi', () => {
         it('searches recent posts by keyword and maps them', async () => {
             http.get.mockResolvedValue({
                 status: 200,
-                body: { data: [raw, { id: '2', timestamp: raw.timestamp }] },
+                body: {
+                    data: [
+                        raw,
+                        { id: '2', timestamp: raw.timestamp },
+                        { ...raw, id: '3', has_replies: false },
+                    ],
+                },
             });
 
             const posts = await api.searchPosts('token', {
@@ -96,9 +102,20 @@ describe('ThreadsAccountApi', () => {
                     username: '',
                     publishedAt: new Date('2026-10-25T10:00:00Z'),
                     permalink: '',
-                    hasReplies: false,
+                    hasReplies: null,
                     isReply: false,
                     mediaType: null,
+                    isQuotePost: false,
+                },
+                {
+                    id: '3',
+                    text: 'Hello',
+                    username: 'someone',
+                    publishedAt: new Date('2026-10-25T10:00:00Z'),
+                    permalink: 'https://www.threads.net/@someone/post/abc',
+                    hasReplies: false,
+                    isReply: false,
+                    mediaType: 'TEXT_POST',
                     isQuotePost: false,
                 },
             ]);

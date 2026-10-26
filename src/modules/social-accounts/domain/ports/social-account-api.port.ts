@@ -10,7 +10,7 @@ export type SocialPost = {
     username: string;
     publishedAt: Date;
     permalink: string;
-    hasReplies: boolean;
+    hasReplies: boolean | null;
     isReply: boolean;
     mediaType: string | null;
     isQuotePost: boolean;
