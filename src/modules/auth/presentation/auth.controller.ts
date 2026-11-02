@@ -15,8 +15,8 @@ export class AuthController {
 
     @Post('/sign-up')
     async signUp(@Body() body: SignUpDto) {
-        const { name, age, email, password } = body;
-        const user = await this.authService.signUp({ name, age, email, password });
+        const { name, email, password } = body;
+        const user = await this.authService.signUp({ name, email, password });
 
         return UserResponseMapper.toDto(user);
     }

@@ -10,7 +10,6 @@ describe('UsersController', () => {
     const currentUser: JwtPayload = { sub: 'token-user-id', email: 'me@example.com', tokenVersion: 0 };
     const entity = new UserEntity(currentUser.sub, {
         name: 'Me',
-        age: 30,
         email: currentUser.email,
         passwordHash: 'secret-hash',
         tokenVersion: 0,
@@ -41,17 +40,15 @@ describe('UsersController', () => {
             id: currentUser.sub,
             name: 'Me',
             email: currentUser.email,
-            age: 30,
             createdAt: entity.createdAt,
         });
     });
 
     it('updates only the token user', async () => {
-        await controller.updateMe(currentUser, { name: 'New', age: 31 });
+        await controller.updateMe(currentUser, { name: 'New' });
 
         expect(userService.updateUserById).toHaveBeenCalledWith(currentUser.sub, {
             name: 'New',
-            age: 31,
             email: undefined,
         });
     });

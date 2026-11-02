@@ -67,7 +67,7 @@ Auth uses `HttpOnly` cookies: `access_token` (15 minutes, path `/`) and `refresh
 | DELETE | `/social-accounts/:id`                     | disconnect an account, 204                                         |
 | POST   | `/social-accounts/:id/search-access-check` | rerun the search access check, `{ searchAccess, checkedAt }`       |
 | GET    | `/users/me`                                | current user                                                       |
-| PATCH  | `/users/me`                                | update name, age or email                                          |
+| PATCH  | `/users/me`                                | update name or email                                               |
 | DELETE | `/users/me`                                | delete the account and clear the cookies                           |
 
 Access tokens are not checked against the database, so they stay valid for up to 15 minutes after

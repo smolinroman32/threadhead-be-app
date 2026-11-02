@@ -34,7 +34,6 @@ describe('UserService', () => {
 
         const userData = {
             name: 'Jane Doe',
-            age: 25,
             email: 'jane@example.com',
             passwordHash: 'hash',
         };

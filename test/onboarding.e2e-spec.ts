@@ -29,7 +29,7 @@ async function signedInCookie() {
     await fetch(`${BASE}/auth/sign-up`, {
         method: 'POST',
         headers: JSON_HEADERS,
-        body: JSON.stringify({ name: 'E2E', age: 30, email, password }),
+        body: JSON.stringify({ name: 'E2E', email, password }),
     });
     const signIn = await fetch(`${BASE}/auth/sign-in`, {
         method: 'POST',

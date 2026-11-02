@@ -20,8 +20,8 @@ export class UsersController {
 
     @Patch('me')
     async updateMe(@CurrentUser() currentUser: JwtPayload, @Body() body: UpdateUserDto) {
-        const { name, age, email } = body;
-        const user = await this.userService.updateUserById(currentUser.sub, { name, age, email });
+        const { name, email } = body;
+        const user = await this.userService.updateUserById(currentUser.sub, { name, email });
 
         return UserResponseMapper.toDto(user);
     }

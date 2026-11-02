@@ -1,5 +1,4 @@
-import { IsEmail, IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
     @IsOptional()
@@ -7,13 +6,6 @@ export class UpdateUserDto {
     @MinLength(2)
     @MaxLength(64)
     name?: string;
-
-    @IsOptional()
-    @Type(() => Number)
-    @IsInt()
-    @Min(13)
-    @Max(120)
-    age?: number;
 
     @IsOptional()
     @IsEmail()

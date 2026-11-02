@@ -5,7 +5,6 @@ import { CredentialsService } from '../../../../shared/services/credential-servi
 
 export type SignUpInput = {
     name: string;
-    age: number;
     email: string;
     password: string;
 };
@@ -17,13 +16,13 @@ export class SignUpUseCase {
         private readonly credentialsService: CredentialsService,
     ) {}
 
-    async execute({ name, age, email, password }: SignUpInput) {
+    async execute({ name, email, password }: SignUpInput) {
         const existingUser = await this.userService.getUserByEmail(email);
 
         if (existingUser) throw new UserEmailTakenError(email);
 
         const passwordHash = await this.credentialsService.hashPassword(password);
 
-        return this.userService.createUser({ name, age, email, passwordHash });
+        return this.userService.createUser({ name, email, passwordHash });
     }
 }

@@ -34,7 +34,7 @@ export async function signUp(base: string) {
     const created = await fetch(`${base}/auth/sign-up`, {
         method: 'POST',
         headers: JSON_HEADERS,
-        body: JSON.stringify({ name: 'E2E', age: 30, email, password }),
+        body: JSON.stringify({ name: 'E2E', email, password }),
     });
     const { id } = (await created.json()) as { id: string };
     const signIn = await fetch(`${base}/auth/sign-in`, {

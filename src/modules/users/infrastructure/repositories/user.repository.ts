@@ -36,7 +36,6 @@ export class UserRepository implements UserRepositoryPort {
                 name: userData.name,
                 email: userData.email,
                 passwordHash: userData.passwordHash,
-                age: userData.age,
             },
             where: { id: userId },
         });
@@ -50,7 +49,6 @@ export class UserRepository implements UserRepositoryPort {
                 name: userData.name,
                 email: userData.email,
                 passwordHash: userData.passwordHash,
-                age: userData.age,
             },
         });
 

@@ -1,6 +1,5 @@
 export interface UserProps {
     name: string;
-    age: number;
     email: string;
     passwordHash: string;
     tokenVersion: number;
@@ -20,10 +19,6 @@ export class UserEntity {
 
     get email() {
         return this.props.email;
-    }
-
-    get age() {
-        return this.props.age;
     }
 
     get passwordHash() {

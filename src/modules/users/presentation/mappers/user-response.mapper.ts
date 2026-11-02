@@ -7,7 +7,6 @@ export class UserResponseMapper {
             id: user.id,
             name: user.name,
             email: user.email,
-            age: user.age,
             createdAt: user.createdAt,
         };
     }
