@@ -21,7 +21,13 @@ const row = (id: string, scoringVersion = 2) => ({
 });
 
 describe('OpportunityRepository', () => {
-    const opportunity = { findMany: vi.fn(), count: vi.fn(), findFirst: vi.fn(), update: vi.fn() };
+    const opportunity = {
+        findMany: vi.fn(),
+        count: vi.fn(),
+        findFirst: vi.fn(),
+        update: vi.fn(),
+        updateMany: vi.fn(),
+    };
     const repository = new OpportunityRepository({ opportunity } as unknown as PrismaService);
 
     beforeEach(() => {
@@ -111,6 +117,28 @@ describe('OpportunityRepository', () => {
         expect(opportunity.findFirst.mock.calls[0][0].where).toEqual({
             id: 'opportunity-id',
             opportunityFeed: { userId: 'user-id' },
+        });
+    });
+
+    it('claims an opportunity for a reply only from the status it was read in', async () => {
+        opportunity.updateMany.mockResolvedValueOnce({ count: 1 }).mockResolvedValueOnce({ count: 0 });
+
+        await expect(repository.claimForReply('a', 'SAVED')).resolves.toBe(true);
+        await expect(repository.claimForReply('a', 'SAVED')).resolves.toBe(false);
+        expect(opportunity.updateMany).toHaveBeenCalledWith({
+            where: { id: 'a', status: 'SAVED' },
+            data: { status: 'REPLIED' },
+        });
+    });
+
+    it('releases a claimed opportunity back to its previous status', async () => {
+        opportunity.updateMany.mockResolvedValue({ count: 1 });
+
+        await repository.releaseReply('a', 'NEW');
+
+        expect(opportunity.updateMany).toHaveBeenCalledWith({
+            where: { id: 'a', status: 'REPLIED' },
+            data: { status: 'NEW' },
         });
     });
 });

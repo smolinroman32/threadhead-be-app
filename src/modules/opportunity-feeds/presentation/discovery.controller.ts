@@ -17,6 +17,7 @@ import { OpportunityFeedsService } from '../application/opportunity-feeds.servic
 import type { OpportunityStatus, ReviewStatus } from '../domain/entities/opportunity.entity.js';
 import { ChangeOpportunityStatusDto } from './dto/change-opportunity-status.dto.js';
 import { ListOpportunitiesQueryDto } from './dto/list-opportunities-query.dto.js';
+import { ReplyToOpportunityDto } from './dto/reply-to-opportunity.dto.js';
 import type {
     OpportunityCountsResponseDto,
     OpportunityListResponseDto,
@@ -89,6 +90,18 @@ export class DiscoveryController {
             id,
             body.status.toUpperCase() as ReviewStatus,
         );
+
+        return DiscoveryResponseMapper.opportunity(opportunity);
+    }
+
+    @Post('opportunities/:id/reply')
+    @HttpCode(HttpStatus.OK)
+    async reply(
+        @CurrentUser() currentUser: JwtPayload,
+        @Param('id', ParseUUIDPipe) id: string,
+        @Body(new StrictBodyPipe(ReplyToOpportunityDto)) body: Pick<ReplyToOpportunityDto, 'text'>,
+    ) {
+        const opportunity = await this.feedsService.replyToOpportunity(currentUser.sub, id, body.text);
 
         return DiscoveryResponseMapper.opportunity(opportunity);
     }

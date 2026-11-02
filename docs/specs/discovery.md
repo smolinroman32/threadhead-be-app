@@ -149,15 +149,16 @@ New env, read through `getEnv`: `REDIS_URL`, `OPENAI_API_KEY`, `DISCOVERY_QUERY_
 All routes need the access cookie. The user id comes from the token. A feed, run, opportunity or account of
 another user, or a missing one, is 404.
 
-| Method and path                                          | Result                                                                          |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `POST /opportunity-feeds/:id/discovery-runs`             | 202 run: the feed's existing `queued` run or a new one                          |
-| `GET /opportunity-feeds/:id/discovery-runs/:runId`       | 200 run                                                                         |
-| `GET /opportunity-feeds/:id/discovery-runs/latest`       | 200 the newest run by `createdAt`; 404 if the feed never ran                    |
-| `GET /opportunity-feeds/:id/opportunities?status=&page=` | 200 `{ items, total, page, pageSize }`; `status` defaults to `new`, `page` to 1 |
-| `GET /opportunity-feeds/:id/opportunity-counts`          | 200 `{ new, saved, dismissed }`                                                 |
-| `PATCH /opportunities/:id`                               | 200 opportunity; body `{ status: "new" \| "saved" \| "dismissed" }`             |
-| `POST /social-accounts/:id/search-access-check`          | 200 `{ searchAccess, checkedAt }`; ignores the TTL                              |
+| Method and path                                          | Result                                                                                                      |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `POST /opportunity-feeds/:id/discovery-runs`             | 202 run: the feed's existing `queued` run or a new one                                                      |
+| `GET /opportunity-feeds/:id/discovery-runs/:runId`       | 200 run                                                                                                     |
+| `GET /opportunity-feeds/:id/discovery-runs/latest`       | 200 the newest run by `createdAt`; 404 if the feed never ran                                                |
+| `GET /opportunity-feeds/:id/opportunities?status=&page=` | 200 `{ items, total, page, pageSize }`; `status` defaults to `new`, `page` to 1                             |
+| `GET /opportunity-feeds/:id/opportunity-counts`          | 200 `{ new, saved, dismissed, replied }`                                                                    |
+| `PATCH /opportunities/:id`                               | 200 opportunity; body `{ status: "new" \| "saved" \| "dismissed" }`                                         |
+| `POST /opportunities/:id/reply`                          | 200 opportunity with `status: "replied"`; body `{ text }`; see [opportunity-reply.md](opportunity-reply.md) |
+| `POST /social-accounts/:id/search-access-check`          | 200 `{ searchAccess, checkedAt }`; ignores the TTL                                                          |
 
 `POST /discovery-runs` errors, all 409: `account_required` (no account and none can be bound),
 `reconnect_required` (account inactive or disconnected), `feed_paused`, and `DiscoveryCooldownError` while the
@@ -219,7 +220,7 @@ Order: `relevanceScore DESC`, `publishedAt DESC`, `id`. The page size is `OPPORT
 server. `page` starts at 1 and is an integer up to `MAX_OPPORTUNITY_PAGE`, otherwise 400; a page past the last
 returns no items and the right `total`. `total` counts every row the filters above keep, not only the page.
 
-`opportunity-counts` counts `new` with the `new` filters above and `saved` and `dismissed` without filters, so
+`opportunity-counts` counts `new` with the `new` filters above and `saved`, `dismissed` and `replied` without filters, so
 the tab numbers equal the `total` of the matching list. `replied` has no tab and no count.
 
 ### Status transitions
@@ -231,7 +232,7 @@ the tab numbers equal the `total` of the matching list. `replied` has no tab and
 | `dismissed` | yes                       | yes            | 200, no change |
 | `replied`   | 409 `opportunity_replied` | 409            | 409            |
 
-`replied` is set only by the future reply flow.
+`replied` is set only by `POST /opportunities/:id/reply` ([opportunity-reply.md](opportunity-reply.md)).
 
 ### Feed contract changes
 

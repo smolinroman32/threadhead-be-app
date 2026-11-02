@@ -158,7 +158,7 @@ describe('discovery (dist)', () => {
 
         const counts = await call(BASE, cookie, 'GET', `/opportunity-feeds/${feed.id}/opportunity-counts`);
         expect(counts.status).toBe(200);
-        expect(await json(counts)).toEqual({ new: 1, saved: 1, dismissed: 0 });
+        expect(await json(counts)).toEqual({ new: 1, saved: 1, dismissed: 0, replied: 0 });
     });
 
     it('returns hasReplies as stored, null for an unknown value', async () => {
@@ -222,7 +222,7 @@ describe('discovery (dist)', () => {
         const counts = await json(
             await call(BASE, cookie, 'GET', `/opportunity-feeds/${feed.id}/opportunity-counts`),
         );
-        expect(counts).toEqual({ new: 25, saved: 0, dismissed: 1 });
+        expect(counts).toEqual({ new: 25, saved: 0, dismissed: 1, replied: 0 });
         expect(
             (await call(BASE, other.cookie, 'GET', `/opportunity-feeds/${feed.id}/opportunity-counts`))
                 .status,

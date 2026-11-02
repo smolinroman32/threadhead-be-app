@@ -18,7 +18,7 @@ export class CountOpportunitiesUseCase {
 
         if (!feed) throw new OpportunityFeedNotFoundError();
 
-        const [newCount, saved, dismissed] = await Promise.all([
+        const [newCount, saved, dismissed, replied] = await Promise.all([
             this.opportunities.count(
                 feedId,
                 'NEW',
@@ -26,8 +26,9 @@ export class CountOpportunitiesUseCase {
             ),
             this.opportunities.count(feedId, 'SAVED', null),
             this.opportunities.count(feedId, 'DISMISSED', null),
+            this.opportunities.count(feedId, 'REPLIED', null),
         ]);
 
-        return { new: newCount, saved, dismissed };
+        return { new: newCount, saved, dismissed, replied };
     }
 }

@@ -19,4 +19,6 @@ export abstract class OpportunityRepositoryPort {
     ): Promise<number>;
     abstract findByIdForUser(id: string, userId: string): Promise<OpportunityEntity | null>;
     abstract updateStatus(id: string, status: ReviewStatus): Promise<OpportunityEntity>;
+    abstract claimForReply(id: string, from: ReviewStatus): Promise<boolean>;
+    abstract releaseReply(id: string, to: ReviewStatus): Promise<void>;
 }

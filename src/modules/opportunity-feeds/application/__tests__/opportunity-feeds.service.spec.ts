@@ -6,6 +6,7 @@ import type { GetOpportunityFeedUseCase } from '../use-cases/get-opportunity-fee
 import type { ListOpportunityFeedsUseCase } from '../use-cases/list-opportunity-feeds.use-case.js';
 import type { UpdateOpportunityFeedUseCase } from '../use-cases/update-opportunity-feed.use-case.js';
 import type { ChangeOpportunityStatusUseCase } from '../use-cases/change-opportunity-status.use-case.js';
+import type { ReplyToOpportunityUseCase } from '../use-cases/reply-to-opportunity.use-case.js';
 import type { CountOpportunitiesUseCase } from '../use-cases/count-opportunities.use-case.js';
 import type { GetDiscoveryRunUseCase } from '../use-cases/get-discovery-run.use-case.js';
 import type { ListOpportunitiesUseCase } from '../use-cases/list-opportunities.use-case.js';
@@ -26,6 +27,7 @@ describe('OpportunityFeedsService', () => {
         listOpportunities: { execute: vi.fn() },
         countOpportunities: { execute: vi.fn() },
         changeStatus: { execute: vi.fn() },
+        reply: { execute: vi.fn() },
     };
     const service = new OpportunityFeedsService(
         useCases.create as unknown as CreateOpportunityFeedUseCase,
@@ -40,6 +42,7 @@ describe('OpportunityFeedsService', () => {
         useCases.listOpportunities as unknown as ListOpportunitiesUseCase,
         useCases.countOpportunities as unknown as CountOpportunitiesUseCase,
         useCases.changeStatus as unknown as ChangeOpportunityStatusUseCase,
+        useCases.reply as unknown as ReplyToOpportunityUseCase,
     );
 
     it('delegates every operation to its use case', async () => {
@@ -70,6 +73,7 @@ describe('OpportunityFeedsService', () => {
         await service.listOpportunities('user-id', 'feed-id', 'SAVED', 2);
         await service.countOpportunities('user-id', 'feed-id');
         await service.changeOpportunityStatus('user-id', 'opportunity-id', 'DISMISSED');
+        await service.replyToOpportunity('user-id', 'opportunity-id', 'Hi');
 
         expect(useCases.create.execute).toHaveBeenCalledWith('user-id', input);
         expect(useCases.fromOnboarding.execute).toHaveBeenCalledWith(fromOnboarding);
@@ -83,5 +87,6 @@ describe('OpportunityFeedsService', () => {
         expect(useCases.listOpportunities.execute).toHaveBeenCalledWith('user-id', 'feed-id', 'SAVED', 2);
         expect(useCases.countOpportunities.execute).toHaveBeenCalledWith('user-id', 'feed-id');
         expect(useCases.changeStatus.execute).toHaveBeenCalledWith('user-id', 'opportunity-id', 'DISMISSED');
+        expect(useCases.reply.execute).toHaveBeenCalledWith('user-id', 'opportunity-id', 'Hi');
     });
 });

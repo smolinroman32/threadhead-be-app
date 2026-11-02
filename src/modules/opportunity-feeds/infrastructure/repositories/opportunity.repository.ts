@@ -56,6 +56,19 @@ export class OpportunityRepository implements OpportunityRepositoryPort {
 
         return OpportunityMapper.toDomain(row);
     }
+
+    async claimForReply(id: string, from: ReviewStatus) {
+        const { count } = await this.prisma.opportunity.updateMany({
+            where: { id, status: from },
+            data: { status: 'REPLIED' },
+        });
+
+        return count === 1;
+    }
+
+    async releaseReply(id: string, to: ReviewStatus) {
+        await this.prisma.opportunity.updateMany({ where: { id, status: 'REPLIED' }, data: { status: to } });
+    }
 }
 
 function listWhere(

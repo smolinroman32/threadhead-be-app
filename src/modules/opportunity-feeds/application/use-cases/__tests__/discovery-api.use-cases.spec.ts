@@ -280,15 +280,16 @@ describe('discovery API use cases', () => {
                 accounts,
             );
 
-        it('counts new with the read filters and saved and dismissed without any', async () => {
+        it('counts new with the read filters and saved, dismissed and replied without any', async () => {
             opportunities.count.mockImplementation(
-                async (_feed, status) => ({ NEW: 24, SAVED: 3, DISMISSED: 7 })[status as string],
+                async (_feed, status) => ({ NEW: 24, SAVED: 3, DISMISSED: 7, REPLIED: 2 })[status as string],
             );
 
             await expect(useCase().execute('user-id', 'feed-id')).resolves.toEqual({
                 new: 24,
                 saved: 3,
                 dismissed: 7,
+                replied: 2,
             });
 
             expect(opportunities.count.mock.calls).toEqual([
@@ -303,6 +304,7 @@ describe('discovery API use cases', () => {
                 ],
                 ['feed-id', 'SAVED', null],
                 ['feed-id', 'DISMISSED', null],
+                ['feed-id', 'REPLIED', null],
             ]);
         });
 

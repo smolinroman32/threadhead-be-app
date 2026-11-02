@@ -25,4 +25,5 @@ export class OpportunityCountsResponseDto {
     new: number;
     saved: number;
     dismissed: number;
+    replied: number;
 }
