@@ -16,12 +16,12 @@ than Threads (the model and ports allow them later, e.g. X).
 All routes are under `/social-accounts`. `:provider` is validated against `SocialProvider`; an unknown value
 answers 404. The user id always comes from the access token.
 
-| Method and path                               | Auth             | Result                                                       |
-| --------------------------------------------- | ---------------- | ------------------------------------------------------------ |
-| `POST /social-accounts/:provider/authorize`   | access cookie    | 200 `{ url }`, the provider authorization URL                |
-| `GET /social-accounts/:provider/callback`     | public route\*   | always a 302 to the frontend (see below)                     |
-| `GET /social-accounts`                        | access cookie    | 200 array of accounts of the current user                    |
-| `DELETE /social-accounts/:id`                 | access cookie    | 204; 404 if it does not exist or belongs to someone else     |
+| Method and path                             | Auth           | Result                                                   |
+| ------------------------------------------- | -------------- | -------------------------------------------------------- |
+| `POST /social-accounts/:provider/authorize` | access cookie  | 200 `{ url }`, the provider authorization URL            |
+| `GET /social-accounts/:provider/callback`   | public route\* | always a 302 to the frontend (see below)                 |
+| `GET /social-accounts`                      | access cookie  | 200 array of accounts of the current user                |
+| `DELETE /social-accounts/:id`               | access cookie  | 204; 404 if it does not exist or belongs to someone else |
 
 \* The callback is `@Public()` because the browser arrives from the provider and a 401 would hide the reason.
 The handler reads the `access_token` cookie itself and treats a missing, invalid or mismatching cookie as
@@ -30,8 +30,16 @@ The handler reads the `access_token` cookie itself and treats a missing, invalid
 Account in the list (never contains a token or its ciphertext):
 
 ```json
-{ "id": "uuid", "provider": "THREADS", "username": "string", "avatarUrl": "string|null",
-  "scopes": ["threads_basic"], "isActive": true, "tokenExpiresAt": "ISO date", "createdAt": "ISO date" }
+{
+    "id": "uuid",
+    "provider": "THREADS",
+    "username": "string",
+    "avatarUrl": "string|null",
+    "scopes": ["threads_basic"],
+    "isActive": true,
+    "tokenExpiresAt": "ISO date",
+    "createdAt": "ISO date"
+}
 ```
 
 Callback redirect target: `${FRONTEND_URL}${FRONTEND_SOCIAL_RESULT_PATH}` plus
@@ -51,12 +59,12 @@ Internal API for other modules (`SocialAccountsService`, the module facade):
 
 Errors:
 
-| Case                                              | Behaviour                                                  |
-| ------------------------------------------------- | ---------------------------------------------------------- |
-| Token refresh answered 4xx (revoked, expired)     | `isActive = false`, throw `reconnect_required` (409)       |
-| Token refresh got 5xx or timed out                | nothing is stored, plain error, safe to retry              |
-| Account already connected by another user         | callback redirects with `reason=already_connected`         |
-| Same user connects it again                       | tokens, username, avatar and scopes updated, `isActive = true` |
+| Case                                          | Behaviour                                                      |
+| --------------------------------------------- | -------------------------------------------------------------- |
+| Token refresh answered 4xx (revoked, expired) | `isActive = false`, throw `reconnect_required` (409)           |
+| Token refresh got 5xx or timed out            | nothing is stored, plain error, safe to retry                  |
+| Account already connected by another user     | callback redirects with `reason=already_connected`             |
+| Same user connects it again                   | tokens, username, avatar and scopes updated, `isActive = true` |
 
 ## OAuth state
 

@@ -18,24 +18,24 @@ the frontend (`threadhead-fe/docs/specs`).
 
 ## Decisions
 
-| Topic                  | Decision                                                                                                  |
-| ---------------------- | --------------------------------------------------------------------------------------------------------- |
-| Search token           | the user's own token; discovery needs a connected Threads account (PRD FR-1 changes)                      |
-| Feed and account       | a feed belongs to one `SocialAccount`; `socialAccountId` is set once while `null`, then immutable         |
-| Trigger                | manual `POST`, plus automatic after feed creation, onboarding completion, a criteria change and a resume  |
-| Manual cooldown        | a manual `POST` is refused for 6 hours after the last run that did not fail; automatic runs are not blocked |
-| Execution              | BullMQ worker on the existing Redis; `DiscoveryRun` in Postgres is the source of truth                    |
-| Retries                | only `DiscoveryRun.attempt` counts; BullMQ `attempts: 1`, `maxStalledCount: 0`                            |
-| Status delivery        | polling a run by id; no SSE                                                                               |
-| Search queries         | `includeTerms` as `KEYWORD` plus up to `min(6, 10 - terms)` LLM `PHRASE` queries                          |
-| Search call            | `search_type=RECENT`, `search_mode=KEYWORD`, `since = now - freshnessHours`, `limit=100`, one page         |
-| Score                  | `relevanceScore`, LLM relevance `0..100`; `minScore` and freshness apply on read, for `new` only          |
-| Stored posts           | every LLM-scored post; prefilter drops are not stored                                                     |
-| Rescoring              | `scoringVersion` on the feed and on each opportunity                                                      |
-| Exclusions             | `excludedTerm` on the opportunity; hidden from `new`, kept and marked in `saved`                          |
-| LLM                    | `LlmPort` with `completeJson`, adapter `OpenAiLlmClient` over the existing `HttpClientPort`               |
-| Language               | English only; the scoring prompt returns `0` with reason `not English`                                    |
-| Disconnect             | soft: `disconnectedAt` set, token erased, the row and its id survive a reconnect                          |
+| Topic            | Decision                                                                                                    |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| Search token     | the user's own token; discovery needs a connected Threads account (PRD FR-1 changes)                        |
+| Feed and account | a feed belongs to one `SocialAccount`; `socialAccountId` is set once while `null`, then immutable           |
+| Trigger          | manual `POST`, plus automatic after feed creation, onboarding completion, a criteria change and a resume    |
+| Manual cooldown  | a manual `POST` is refused for 6 hours after the last run that did not fail; automatic runs are not blocked |
+| Execution        | BullMQ worker on the existing Redis; `DiscoveryRun` in Postgres is the source of truth                      |
+| Retries          | only `DiscoveryRun.attempt` counts; BullMQ `attempts: 1`, `maxStalledCount: 0`                              |
+| Status delivery  | polling a run by id; no SSE                                                                                 |
+| Search queries   | `includeTerms` as `KEYWORD` plus up to `min(6, 10 - terms)` LLM `PHRASE` queries                            |
+| Search call      | `search_type=RECENT`, `search_mode=KEYWORD`, `since = now - freshnessHours`, `limit=100`, one page          |
+| Score            | `relevanceScore`, LLM relevance `0..100`; `minScore` and freshness apply on read, for `new` only            |
+| Stored posts     | every LLM-scored post; prefilter drops are not stored                                                       |
+| Rescoring        | `scoringVersion` on the feed and on each opportunity                                                        |
+| Exclusions       | `excludedTerm` on the opportunity; hidden from `new`, kept and marked in `saved`                            |
+| LLM              | `LlmPort` with `completeJson`, adapter `OpenAiLlmClient` over the existing `HttpClientPort`                 |
+| Language         | English only; the scoring prompt returns `0` with reason `not English`                                      |
+| Disconnect       | soft: `disconnectedAt` set, token erased, the row and its id survive a reconnect                            |
 
 ## Data
 
@@ -119,27 +119,27 @@ pins it with an end-to-end run. If it ever fails, the user deletion deletes the 
 
 Domain constants, not env:
 
-| Name                        | Value       |
-| --------------------------- | ----------- |
-| `MAX_SEARCH_QUERIES`        | 10          |
-| `MAX_PHRASE_QUERIES`        | 6           |
-| `SEARCH_LIMIT`              | 100         |
-| `MIN_POST_TEXT_LENGTH`      | 20          |
-| `MAX_SCORED_POSTS_PER_RUN`  | 300         |
-| `SCORING_BATCH_SIZE`        | 20          |
-| `REASON_MAX_LENGTH`         | 200         |
-| `MAX_RUN_ATTEMPTS`          | 2           |
-| `RETRY_DELAY_MS`            | 60 000      |
-| `HEARTBEAT_STALE_MS`        | 5 minutes   |
-| `QUEUED_STALE_MS`           | 1 minute    |
-| `RECONCILE_EVERY_MS`        | 1 minute    |
-| `WORKER_CONCURRENCY`        | 5           |
-| `LLM_TIMEOUT_MS`            | 30 000      |
-| `SEARCH_ACCESS_TTL_MS`      | 24 hours    |
-| `CONTROL_QUERY`             | `today`, `RECENT`, `limit=25`, no `since` |
-| `OPPORTUNITY_PAGE_SIZE`     | 20          |
-| `MAX_OPPORTUNITY_PAGE`      | 1000        |
-| `MANUAL_RUN_COOLDOWN_MS`    | 6 hours     |
+| Name                       | Value                                     |
+| -------------------------- | ----------------------------------------- |
+| `MAX_SEARCH_QUERIES`       | 10                                        |
+| `MAX_PHRASE_QUERIES`       | 6                                         |
+| `SEARCH_LIMIT`             | 100                                       |
+| `MIN_POST_TEXT_LENGTH`     | 20                                        |
+| `MAX_SCORED_POSTS_PER_RUN` | 300                                       |
+| `SCORING_BATCH_SIZE`       | 20                                        |
+| `REASON_MAX_LENGTH`        | 200                                       |
+| `MAX_RUN_ATTEMPTS`         | 2                                         |
+| `RETRY_DELAY_MS`           | 60 000                                    |
+| `HEARTBEAT_STALE_MS`       | 5 minutes                                 |
+| `QUEUED_STALE_MS`          | 1 minute                                  |
+| `RECONCILE_EVERY_MS`       | 1 minute                                  |
+| `WORKER_CONCURRENCY`       | 5                                         |
+| `LLM_TIMEOUT_MS`           | 30 000                                    |
+| `SEARCH_ACCESS_TTL_MS`     | 24 hours                                  |
+| `CONTROL_QUERY`            | `today`, `RECENT`, `limit=25`, no `since` |
+| `OPPORTUNITY_PAGE_SIZE`    | 20                                        |
+| `MAX_OPPORTUNITY_PAGE`     | 1000                                      |
+| `MANUAL_RUN_COOLDOWN_MS`   | 6 hours                                   |
 
 New env, read through `getEnv`: `REDIS_URL`, `OPENAI_API_KEY`, `DISCOVERY_QUERY_MODEL`,
 `DISCOVERY_SCORING_MODEL`.
@@ -149,15 +149,15 @@ New env, read through `getEnv`: `REDIS_URL`, `OPENAI_API_KEY`, `DISCOVERY_QUERY_
 All routes need the access cookie. The user id comes from the token. A feed, run, opportunity or account of
 another user, or a missing one, is 404.
 
-| Method and path                                     | Result                                                        |
-| --------------------------------------------------- | ------------------------------------------------------------- |
-| `POST /opportunity-feeds/:id/discovery-runs`        | 202 run: the feed's existing `queued` run or a new one         |
-| `GET /opportunity-feeds/:id/discovery-runs/:runId`  | 200 run                                                       |
-| `GET /opportunity-feeds/:id/discovery-runs/latest`  | 200 the newest run by `createdAt`; 404 if the feed never ran   |
+| Method and path                                          | Result                                                                          |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `POST /opportunity-feeds/:id/discovery-runs`             | 202 run: the feed's existing `queued` run or a new one                          |
+| `GET /opportunity-feeds/:id/discovery-runs/:runId`       | 200 run                                                                         |
+| `GET /opportunity-feeds/:id/discovery-runs/latest`       | 200 the newest run by `createdAt`; 404 if the feed never ran                    |
 | `GET /opportunity-feeds/:id/opportunities?status=&page=` | 200 `{ items, total, page, pageSize }`; `status` defaults to `new`, `page` to 1 |
-| `GET /opportunity-feeds/:id/opportunity-counts`     | 200 `{ new, saved, dismissed }`                               |
-| `PATCH /opportunities/:id`                          | 200 opportunity; body `{ status: "new" \| "saved" \| "dismissed" }` |
-| `POST /social-accounts/:id/search-access-check`     | 200 `{ searchAccess, checkedAt }`; ignores the TTL            |
+| `GET /opportunity-feeds/:id/opportunity-counts`          | 200 `{ new, saved, dismissed }`                                                 |
+| `PATCH /opportunities/:id`                               | 200 opportunity; body `{ status: "new" \| "saved" \| "dismissed" }`             |
+| `POST /social-accounts/:id/search-access-check`          | 200 `{ searchAccess, checkedAt }`; ignores the TTL                              |
 
 `POST /discovery-runs` errors, all 409: `account_required` (no account and none can be bound),
 `reconnect_required` (account inactive or disconnected), `feed_paused`, and `DiscoveryCooldownError` while the
@@ -176,8 +176,14 @@ Run in a response:
 
 ```json
 {
-  "id": "uuid", "status": "queued", "error": null,
-  "stats": {}, "createdAt": "iso", "startedAt": null, "finishedAt": null, "nextRunAt": "iso"
+    "id": "uuid",
+    "status": "queued",
+    "error": null,
+    "stats": {},
+    "createdAt": "iso",
+    "startedAt": null,
+    "finishedAt": null,
+    "nextRunAt": "iso"
 }
 ```
 
@@ -185,9 +191,18 @@ Opportunity in a response:
 
 ```json
 {
-  "id": "uuid", "externalPostId": "string", "authorUsername": "string", "text": "string",
-  "permalink": "url", "publishedAt": "iso", "relevanceScore": 82, "reason": "string",
-  "status": "new", "stale": false, "excludedTerm": null, "matchedQueries": ["string"]
+    "id": "uuid",
+    "externalPostId": "string",
+    "authorUsername": "string",
+    "text": "string",
+    "permalink": "url",
+    "publishedAt": "iso",
+    "relevanceScore": 82,
+    "reason": "string",
+    "status": "new",
+    "stale": false,
+    "excludedTerm": null,
+    "matchedQueries": ["string"]
 }
 ```
 
@@ -195,10 +210,10 @@ Opportunity in a response:
 
 ### Reading opportunities
 
-| `status`                          | Filters                                                                                     |
-| --------------------------------- | ------------------------------------------------------------------------------------------- |
-| `new`                             | `relevanceScore >= minScore`, `publishedAt` within `freshnessHours`, `excludedTerm` is null, author is not the feed account |
-| `saved`, `dismissed`, `replied`   | none                                                                                        |
+| `status`                        | Filters                                                                                                                     |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `new`                           | `relevanceScore >= minScore`, `publishedAt` within `freshnessHours`, `excludedTerm` is null, author is not the feed account |
+| `saved`, `dismissed`, `replied` | none                                                                                                                        |
 
 Order: `relevanceScore DESC`, `publishedAt DESC`, `id`. The page size is `OPPORTUNITY_PAGE_SIZE`, fixed on the
 server. `page` starts at 1 and is an integer up to `MAX_OPPORTUNITY_PAGE`, otherwise 400; a page past the last
@@ -209,12 +224,12 @@ the tab numbers equal the `total` of the matching list. `replied` has no tab and
 
 ### Status transitions
 
-| From \ to   | `new`               | `saved`  | `dismissed` |
-| ----------- | ------------------- | -------- | ----------- |
-| `new`       | 200, no change      | yes      | yes         |
-| `saved`     | yes                 | 200, no change | yes   |
-| `dismissed` | yes                 | yes      | 200, no change |
-| `replied`   | 409 `opportunity_replied` | 409 | 409        |
+| From \ to   | `new`                     | `saved`        | `dismissed`    |
+| ----------- | ------------------------- | -------------- | -------------- |
+| `new`       | 200, no change            | yes            | yes            |
+| `saved`     | yes                       | 200, no change | yes            |
+| `dismissed` | yes                       | yes            | 200, no change |
+| `replied`   | 409 `opportunity_replied` | 409            | 409            |
 
 `replied` is set only by the future reply flow.
 
@@ -248,13 +263,13 @@ the tab numbers equal the `total` of the matching list. `replied` has no tab and
 
 The control query runs with the account's token.
 
-| Control result                         | `searchAccess` |
-| -------------------------------------- | -------------- |
-| at least one post by another author    | `OK`           |
-| only the account's own posts           | `NARROWED`     |
-| empty                                  | `UNKNOWN`      |
-| network error or 5xx                   | `UNKNOWN`      |
-| explicit missing-permission error      | `NARROWED`     |
+| Control result                      | `searchAccess` |
+| ----------------------------------- | -------------- |
+| at least one post by another author | `OK`           |
+| only the account's own posts        | `NARROWED`     |
+| empty                               | `UNKNOWN`      |
+| network error or 5xx                | `UNKNOWN`      |
+| explicit missing-permission error   | `NARROWED`     |
 
 ## Discovery run
 
@@ -362,11 +377,11 @@ characters), with phrases equal to an include term ignoring case removed, capped
 
 ### Failures
 
-| Failure                                      | Result                                                                   |
-| -------------------------------------------- | ------------------------------------------------------------------------ |
-| `LlmInvalidResponseError` on a batch         | the batch is retried once, then its posts stay unscored (`stats.unscored`) |
+| Failure                                                                      | Result                                                                                                                                                                       |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LlmInvalidResponseError` on a batch                                         | the batch is retried once, then its posts stay unscored (`stats.unscored`)                                                                                                   |
 | `LlmRateLimitedError`, `LlmUnavailableError`, Threads 5xx or transport error | `attempt < MAX_RUN_ATTEMPTS`: `queued`, `notBefore = now + RETRY_DELAY_MS`, a delayed job; else `failed` with `llm_rate_limited`, `llm_unavailable` or `threads_unavailable` |
-| Executor lost (stale heartbeat, no live job) | reconciler: `attempt < MAX_RUN_ATTEMPTS` back to `queued`, else `failed` with `worker_lost` |
+| Executor lost (stale heartbeat, no live job)                                 | reconciler: `attempt < MAX_RUN_ATTEMPTS` back to `queued`, else `failed` with `worker_lost`                                                                                  |
 
 Scored batches are already saved, so a later attempt does only the rest.
 
