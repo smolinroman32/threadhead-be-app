@@ -79,6 +79,27 @@ table; the user adds the real value.
 6. Say in the commit body anything that can fail on existing data (a new `UNIQUE`, a `NOT NULL`
    without default).
 
+## Review before done
+
+The `feature-reviewer-be` agent (`.claude/agents/feature-reviewer-be.md`) is read-only: it runs
+`npm run verify`, checks the change against `docs/architecture.md` and this file, and reports. Run it after
+the work is finished and before you say it is done, then fix the blockers and majors it lists.
+
+Run it when the change:
+
+- adds or changes a module, use case, port, adapter or repository;
+- changes an endpoint, a request or response DTO, an HTTP status or an error contract;
+- touches the Prisma schema or adds a migration;
+- touches auth, guards, cookies, DI wiring or routing;
+- touches environment variables;
+- completes a spec in `docs/specs/` (run it once, on the last task).
+
+Skip it for a typo, a rename inside one file, a docs-only change, or a step in the middle of a multi-step
+feature. `npm run verify` still runs every time.
+
+The agent does not start the app. If its report lists DI, routing or cookies as a gap, run the built app
+yourself.
+
 ## Commits
 
 Conventional Commits: `type(scope): subject`, imperative, no trailing period. Types in use: `feat`, `fix`,
