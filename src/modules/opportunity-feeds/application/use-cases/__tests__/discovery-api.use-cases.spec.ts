@@ -48,6 +48,13 @@ describe('discovery API use cases', () => {
             permalink: 'https://www.threads.net/@someone/post/1',
             publishedAt: NOW,
             hasReplies: false,
+            metrics: {
+                likeCount: null,
+                replyCount: null,
+                repostCount: null,
+                authorDisplayName: null,
+                fetchedAt: null,
+            },
             relevanceScore: 80,
             reason: 'Asks exactly this',
             status,

@@ -45,6 +45,13 @@ Search access: `checkSearchAccess(accountId, userId?)` runs the control search (
 redirect, and on `POST /social-accounts/:id/search-access-check` (200 `{ searchAccess, checkedAt }`, lower
 case), which ignores any TTL.
 
+Post metrics (other modules): `getPostMetrics(permalink)` needs no account or token. `ThreadsPostPage` fetches
+the public post page with the Googlebot user agent (5 s timeout), finds the JSON object whose `code` equals the
+permalink shortcode, and returns `likeCount`, `replyCount`, `repostCount` and `authorDisplayName`, each `null`
+when absent. A non-200 status or a page without the post throws `PostMetricsUnavailableError`; a timeout is an
+`HttpTransportError`. This is undocumented scraping: see
+[docs/specs/opportunity-metrics.md](../../../docs/specs/opportunity-metrics.md) for the risks.
+
 ## Layout
 
 ```
@@ -62,7 +69,7 @@ infrastructure/
   mappers/                               Prisma row -> entity
   oauth-state/oauth-state.service.ts     JWT state, own secret, purpose "oauth-state", 10 minutes
   providers/                             SocialProviderRegistry, readProviderBody (HTTP status -> error)
-  threads/                               ThreadsAccountOAuth, ThreadsAccountApi
+  threads/                               ThreadsAccountOAuth, ThreadsAccountApi, ThreadsPostPage
 presentation/
   social-accounts.controller.ts          routes, callback redirects
   pipes/parse-social-provider.pipe.ts    "threads" -> THREADS, else 404

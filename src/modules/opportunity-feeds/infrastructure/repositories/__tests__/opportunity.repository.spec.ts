@@ -141,4 +141,20 @@ describe('OpportunityRepository', () => {
             data: { status: 'NEW' },
         });
     });
+
+    it('saves metrics into their columns and reads them back', async () => {
+        const fetchedAt = new Date('2026-10-30T12:00:00Z');
+        const columns = { likeCount: 5, replyCount: 0, repostCount: null, authorDisplayName: 'Some One' };
+        opportunity.findFirst.mockResolvedValue({ ...row('a'), ...columns, metricsFetchedAt: fetchedAt });
+
+        await repository.saveMetrics('a', { ...columns, fetchedAt });
+
+        expect(opportunity.update).toHaveBeenCalledWith({
+            where: { id: 'a' },
+            data: { ...columns, metricsFetchedAt: fetchedAt },
+        });
+        await expect(repository.findByIdForUser('a', 'user-id')).resolves.toMatchObject({
+            metrics: { ...columns, fetchedAt },
+        });
+    });
 });

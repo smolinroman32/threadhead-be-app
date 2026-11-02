@@ -17,6 +17,7 @@ import { GetDiscoveryRunUseCase } from './use-cases/get-discovery-run.use-case.j
 import { GetOpportunityFeedUseCase } from './use-cases/get-opportunity-feed.use-case.js';
 import { ListOpportunitiesUseCase } from './use-cases/list-opportunities.use-case.js';
 import { ListOpportunityFeedsUseCase } from './use-cases/list-opportunity-feeds.use-case.js';
+import { RefreshOpportunityMetricsUseCase } from './use-cases/refresh-opportunity-metrics.use-case.js';
 import { ReplyToOpportunityUseCase } from './use-cases/reply-to-opportunity.use-case.js';
 import { RequestDiscoveryRunUseCase } from './use-cases/request-discovery-run.use-case.js';
 import { UpdateOpportunityFeedUseCase } from './use-cases/update-opportunity-feed.use-case.js';
@@ -37,6 +38,7 @@ export class OpportunityFeedsService {
         private readonly countOpportunitiesUseCase: CountOpportunitiesUseCase,
         private readonly changeOpportunityStatusUseCase: ChangeOpportunityStatusUseCase,
         private readonly replyToOpportunityUseCase: ReplyToOpportunityUseCase,
+        private readonly refreshOpportunityMetricsUseCase: RefreshOpportunityMetricsUseCase,
     ) {}
 
     create(userId: string, input: NewOpportunityFeedInput) {
@@ -89,5 +91,9 @@ export class OpportunityFeedsService {
 
     replyToOpportunity(userId: string, id: string, text: string) {
         return this.replyToOpportunityUseCase.execute(userId, id, text);
+    }
+
+    refreshOpportunityMetrics(userId: string, id: string) {
+        return this.refreshOpportunityMetricsUseCase.execute(userId, id);
     }
 }

@@ -8,11 +8,13 @@ import { ConnectSocialAccountUseCase } from './application/use-cases/connect-soc
 import { DisconnectSocialAccountUseCase } from './application/use-cases/disconnect-social-account.use-case.js';
 import { CheckSearchAccessUseCase } from './application/use-cases/check-search-access.use-case.js';
 import { GetAccessTokenUseCase } from './application/use-cases/get-access-token.use-case.js';
+import { GetPostMetricsUseCase } from './application/use-cases/get-post-metrics.use-case.js';
 import { ListSocialAccountsUseCase } from './application/use-cases/list-social-accounts.use-case.js';
 import { PublishReplyUseCase } from './application/use-cases/publish-reply.use-case.js';
 import { RefreshGrantedScopesUseCase } from './application/use-cases/refresh-granted-scopes.use-case.js';
 import { SearchPostsUseCase } from './application/use-cases/search-posts.use-case.js';
 import { OAuthStatePort } from './domain/ports/oauth-state.port.js';
+import { PostPagePort } from './domain/ports/post-page.port.js';
 import { SocialAccountRepositoryPort } from './domain/ports/social-account-repository.port.js';
 import { SocialProviderRegistryPort } from './domain/ports/social-provider-registry.port.js';
 import { OAuthStateService } from './infrastructure/oauth-state/oauth-state.service.js';
@@ -20,6 +22,7 @@ import { SocialProviderRegistry } from './infrastructure/providers/social-provid
 import { SocialAccountRepository } from './infrastructure/repositories/social-account.repository.js';
 import { ThreadsAccountApi } from './infrastructure/threads/threads-account-api.js';
 import { ThreadsAccountOAuth } from './infrastructure/threads/threads-account-oauth.js';
+import { ThreadsPostPage } from './infrastructure/threads/threads-post-page.js';
 import { SocialAccountsController } from './presentation/social-accounts.controller.js';
 
 @Module({
@@ -32,6 +35,7 @@ import { SocialAccountsController } from './presentation/social-accounts.control
         { provide: SocialAccountRepositoryPort, useClass: SocialAccountRepository },
         { provide: OAuthStatePort, useClass: OAuthStateService },
         { provide: SocialProviderRegistryPort, useClass: SocialProviderRegistry },
+        { provide: PostPagePort, useClass: ThreadsPostPage },
         AuthorizeSocialAccountUseCase,
         ConnectSocialAccountUseCase,
         ListSocialAccountsUseCase,
@@ -41,6 +45,7 @@ import { SocialAccountsController } from './presentation/social-accounts.control
         CheckSearchAccessUseCase,
         PublishReplyUseCase,
         RefreshGrantedScopesUseCase,
+        GetPostMetricsUseCase,
         SocialAccountsService,
     ],
     exports: [SocialAccountsService],

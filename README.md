@@ -21,24 +21,25 @@ The server listens on `PORT` (default 3000). `.env` is loaded on startup.
 
 ## Environment
 
-| Variable                      | Required      | Notes                                                                                           |
-| ----------------------------- | ------------- | ----------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`                | yes           | PostgreSQL connection string                                                                    |
-| `JWT_ACCESS_SECRET`           | yes           | at least 32 characters                                                                          |
-| `JWT_REFRESH_SECRET`          | yes           | at least 32 characters, different from the access secret                                        |
-| `PORT`                        | no            | default `3000`                                                                                  |
-| `NODE_ENV`                    | no            | `production` makes the auth cookies `Secure`                                                    |
-| `NEST_URL`                    | yes           | public base URL of this backend, no trailing slash; the OAuth `redirect_uri` is derived from it |
-| `FRONTEND_URL`                | yes           | base URL the OAuth callback redirects to                                                        |
-| `FRONTEND_SOCIAL_RESULT_PATH` | yes           | frontend path that receives `?social=connected` or `?social=error&reason=...`                   |
-| `THREADS_APP_ID`              | yes           | Threads app id                                                                                  |
-| `THREADS_APP_SECRET`          | yes           | Threads app secret                                                                              |
-| `ENCRYPTION_KEY`              | yes           | 64 hex characters (32 bytes), encrypts stored provider tokens                                   |
-| `OAUTH_STATE_SECRET`          | yes           | at least 32 characters, signs the OAuth `state`, distinct from the JWT secrets                  |
-| `REDIS_URL`                   | for discovery | Redis connection URL for the BullMQ queues, e.g. `redis://localhost:6379`                       |
-| `OPENAI_API_KEY`              | for discovery | OpenAI key for `LlmModule`; read on each call, so the app boots without it                      |
-| `DISCOVERY_QUERY_MODEL`       | for discovery | OpenAI model that writes the search phrases of a feed                                           |
-| `DISCOVERY_SCORING_MODEL`     | for discovery | OpenAI model that scores the relevance of found posts                                           |
+| Variable                       | Required      | Notes                                                                                                 |
+| ------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                 | yes           | PostgreSQL connection string                                                                          |
+| `JWT_ACCESS_SECRET`            | yes           | at least 32 characters                                                                                |
+| `JWT_REFRESH_SECRET`           | yes           | at least 32 characters, different from the access secret                                              |
+| `PORT`                         | no            | default `3000`                                                                                        |
+| `NODE_ENV`                     | no            | `production` makes the auth cookies `Secure`                                                          |
+| `NEST_URL`                     | yes           | public base URL of this backend, no trailing slash; the OAuth `redirect_uri` is derived from it       |
+| `FRONTEND_URL`                 | yes           | base URL the OAuth callback redirects to                                                              |
+| `FRONTEND_SOCIAL_RESULT_PATH`  | yes           | frontend path that receives `?social=connected` or `?social=error&reason=...`                         |
+| `THREADS_APP_ID`               | yes           | Threads app id                                                                                        |
+| `THREADS_APP_SECRET`           | yes           | Threads app secret                                                                                    |
+| `THREADS_POST_METRICS_ENABLED` | no            | `true` lets the reply panel scrape likes, replies and reposts from public post pages; default `false` |
+| `ENCRYPTION_KEY`               | yes           | 64 hex characters (32 bytes), encrypts stored provider tokens                                         |
+| `OAUTH_STATE_SECRET`           | yes           | at least 32 characters, signs the OAuth `state`, distinct from the JWT secrets                        |
+| `REDIS_URL`                    | for discovery | Redis connection URL for the BullMQ queues, e.g. `redis://localhost:6379`                             |
+| `OPENAI_API_KEY`               | for discovery | OpenAI key for `LlmModule`; read on each call, so the app boots without it                            |
+| `DISCOVERY_QUERY_MODEL`        | for discovery | OpenAI model that writes the search phrases of a feed                                                 |
+| `DISCOVERY_SCORING_MODEL`      | for discovery | OpenAI model that scores the relevance of found posts                                                 |
 
 ## Scripts
 

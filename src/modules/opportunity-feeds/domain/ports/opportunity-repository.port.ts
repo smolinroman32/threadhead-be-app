@@ -1,4 +1,9 @@
-import type { OpportunityEntity, OpportunityStatus, ReviewStatus } from '../entities/opportunity.entity.js';
+import type {
+    OpportunityEntity,
+    OpportunityMetrics,
+    OpportunityStatus,
+    ReviewStatus,
+} from '../entities/opportunity.entity.js';
 
 export type OpportunityReadFilter = { minScore: number; publishedSince: Date; excludeAuthor: string | null };
 
@@ -21,4 +26,5 @@ export abstract class OpportunityRepositoryPort {
     abstract updateStatus(id: string, status: ReviewStatus): Promise<OpportunityEntity>;
     abstract claimForReply(id: string, from: ReviewStatus): Promise<boolean>;
     abstract releaseReply(id: string, to: ReviewStatus): Promise<void>;
+    abstract saveMetrics(id: string, metrics: OpportunityMetrics): Promise<void>;
 }

@@ -31,6 +31,13 @@ describe('ReplyToOpportunityUseCase', () => {
             permalink: 'https://www.threads.net/@someone/post/1',
             publishedAt: new Date('2026-10-29T10:00:00Z'),
             hasReplies: false,
+            metrics: {
+                likeCount: null,
+                replyCount: null,
+                repostCount: null,
+                authorDisplayName: null,
+                fetchedAt: null,
+            },
             relevanceScore: 80,
             reason: 'Asks exactly this',
             status,

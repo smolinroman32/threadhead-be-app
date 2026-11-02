@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '../../../../generated/prisma/client.js';
 import { PrismaService } from '../../../../shared/prisma.service.js';
-import type { OpportunityStatus, ReviewStatus } from '../../domain/entities/opportunity.entity.js';
+import type {
+    OpportunityMetrics,
+    OpportunityStatus,
+    ReviewStatus,
+} from '../../domain/entities/opportunity.entity.js';
 import {
     OpportunityRepositoryPort,
     type OpportunityListFilter,
@@ -68,6 +72,13 @@ export class OpportunityRepository implements OpportunityRepositoryPort {
 
     async releaseReply(id: string, to: ReviewStatus) {
         await this.prisma.opportunity.updateMany({ where: { id, status: 'REPLIED' }, data: { status: to } });
+    }
+
+    async saveMetrics(id: string, { fetchedAt, ...metrics }: OpportunityMetrics) {
+        await this.prisma.opportunity.update({
+            where: { id },
+            data: { ...metrics, metricsFetchedAt: fetchedAt },
+        });
     }
 }
 

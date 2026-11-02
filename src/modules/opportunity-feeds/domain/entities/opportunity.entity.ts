@@ -4,6 +4,14 @@ export const OPPORTUNITY_STATUSES = ['NEW', 'SAVED', 'DISMISSED', 'REPLIED'] as 
 export type OpportunityStatus = (typeof OPPORTUNITY_STATUSES)[number];
 export type ReviewStatus = Exclude<OpportunityStatus, 'REPLIED'>;
 
+export type OpportunityMetrics = {
+    likeCount: number | null;
+    replyCount: number | null;
+    repostCount: number | null;
+    authorDisplayName: string | null;
+    fetchedAt: Date | null;
+};
+
 export interface OpportunityProps {
     opportunityFeedId: string;
     externalPostId: string;
@@ -12,6 +20,7 @@ export interface OpportunityProps {
     permalink: string;
     publishedAt: Date;
     hasReplies: boolean | null;
+    metrics: OpportunityMetrics;
     relevanceScore: number;
     reason: string;
     status: OpportunityStatus;
@@ -52,6 +61,10 @@ export class OpportunityEntity {
 
     get hasReplies() {
         return this.props.hasReplies;
+    }
+
+    get metrics() {
+        return this.props.metrics;
     }
 
     get relevanceScore() {

@@ -6,6 +6,7 @@ import { CheckSearchAccessUseCase } from './use-cases/check-search-access.use-ca
 import { ConnectSocialAccountUseCase } from './use-cases/connect-social-account.use-case.js';
 import { DisconnectSocialAccountUseCase } from './use-cases/disconnect-social-account.use-case.js';
 import { GetAccessTokenUseCase } from './use-cases/get-access-token.use-case.js';
+import { GetPostMetricsUseCase } from './use-cases/get-post-metrics.use-case.js';
 import { ListSocialAccountsUseCase } from './use-cases/list-social-accounts.use-case.js';
 import { PublishReplyUseCase } from './use-cases/publish-reply.use-case.js';
 import { RefreshGrantedScopesUseCase } from './use-cases/refresh-granted-scopes.use-case.js';
@@ -23,6 +24,7 @@ export class SocialAccountsService {
         private readonly checkSearchAccessUseCase: CheckSearchAccessUseCase,
         private readonly publishReplyUseCase: PublishReplyUseCase,
         private readonly refreshGrantedScopesUseCase: RefreshGrantedScopesUseCase,
+        private readonly getPostMetricsUseCase: GetPostMetricsUseCase,
     ) {}
 
     authorize(userId: string, provider: SocialProvider) {
@@ -59,5 +61,9 @@ export class SocialAccountsService {
 
     refreshGrantedScopes(accountId: string) {
         return this.refreshGrantedScopesUseCase.execute(accountId);
+    }
+
+    getPostMetrics(permalink: string) {
+        return this.getPostMetricsUseCase.execute(permalink);
     }
 }

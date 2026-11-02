@@ -15,6 +15,11 @@ model Opportunity {
   permalink                String
   publishedAt              DateTime
   hasReplies               Boolean?
+  likeCount                Int?
+  replyCount               Int?
+  repostCount              Int?
+  authorDisplayName        String?
+  metricsFetchedAt         DateTime?
   relevanceScore           Int
   reason                   String
   status                   OpportunityStatus

@@ -253,6 +253,33 @@ describe('discovery (dist)', () => {
         expect((await json(replied)).error).toBe('OpportunityRepliedError');
     });
 
+    it('returns fresh stored metrics to the owner and 404 to anyone else', async () => {
+        const { cookie } = await signUp(BASE);
+        const other = await signUp(BASE);
+        const feed = await createFeed(cookie);
+        const fetchedAt = new Date();
+        const created = await opportunity(feed.id, {
+            likeCount: 5,
+            replyCount: 0,
+            repostCount: null,
+            authorDisplayName: 'Some One',
+            metricsFetchedAt: fetchedAt,
+        });
+        const metrics = (who: string) => call(BASE, who, 'POST', `/opportunities/${created.id}/metrics`);
+
+        expect((await metrics(other.cookie)).status).toBe(404);
+
+        const own = await metrics(cookie);
+        expect(own.status).toBe(200);
+        expect(await json(own)).toEqual({
+            likeCount: 5,
+            replyCount: 0,
+            repostCount: null,
+            authorDisplayName: 'Some One',
+            fetchedAt: fetchedAt.toISOString(),
+        });
+    });
+
     it('deletes a user whose feed is bound to an account and refuses to delete the bound account row', async () => {
         const { cookie, userId } = await signUp(BASE);
         const feed = await createFeed(cookie);

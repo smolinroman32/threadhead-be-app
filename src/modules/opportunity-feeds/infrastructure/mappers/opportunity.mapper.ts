@@ -16,6 +16,13 @@ export class OpportunityMapper {
             permalink: raw.permalink,
             publishedAt: raw.publishedAt,
             hasReplies: raw.hasReplies,
+            metrics: {
+                likeCount: raw.likeCount,
+                replyCount: raw.replyCount,
+                repostCount: raw.repostCount,
+                authorDisplayName: raw.authorDisplayName,
+                fetchedAt: raw.metricsFetchedAt,
+            },
             relevanceScore: raw.relevanceScore,
             reason: raw.reason,
             status: raw.status,

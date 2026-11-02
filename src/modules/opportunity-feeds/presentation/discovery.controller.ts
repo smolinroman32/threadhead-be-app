@@ -21,6 +21,7 @@ import { ReplyToOpportunityDto } from './dto/reply-to-opportunity.dto.js';
 import type {
     OpportunityCountsResponseDto,
     OpportunityListResponseDto,
+    OpportunityMetricsResponseDto,
 } from './dto/opportunity-response.dto.js';
 import { DiscoveryResponseMapper } from './mappers/discovery-response.mapper.js';
 
@@ -104,5 +105,14 @@ export class DiscoveryController {
         const opportunity = await this.feedsService.replyToOpportunity(currentUser.sub, id, body.text);
 
         return DiscoveryResponseMapper.opportunity(opportunity);
+    }
+
+    @Post('opportunities/:id/metrics')
+    @HttpCode(HttpStatus.OK)
+    refreshMetrics(
+        @CurrentUser() currentUser: JwtPayload,
+        @Param('id', ParseUUIDPipe) id: string,
+    ): Promise<OpportunityMetricsResponseDto> {
+        return this.feedsService.refreshOpportunityMetrics(currentUser.sub, id);
     }
 }

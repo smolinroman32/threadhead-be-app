@@ -14,6 +14,14 @@ export class OpportunityResponseDto {
     matchedQueries: string[];
 }
 
+export class OpportunityMetricsResponseDto {
+    likeCount: number | null;
+    replyCount: number | null;
+    repostCount: number | null;
+    authorDisplayName: string | null;
+    fetchedAt: Date | null;
+}
+
 export class OpportunityListResponseDto {
     items: OpportunityResponseDto[];
     total: number;
