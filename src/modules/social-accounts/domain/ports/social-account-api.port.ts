@@ -22,7 +22,13 @@ export type PostSearch = {
     limit: number;
 };
 
+export type ReplyDraft = {
+    replyToId: string;
+    text: string;
+};
+
 export abstract class SocialAccountApiPort {
     abstract getProfile(accessToken: string): Promise<SocialProfile>;
     abstract searchPosts(accessToken: string, search: PostSearch): Promise<SocialPost[]>;
+    abstract publishReply(accessToken: string, reply: ReplyDraft): Promise<{ id: string }>;
 }

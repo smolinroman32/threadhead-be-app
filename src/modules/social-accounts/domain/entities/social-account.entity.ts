@@ -1,3 +1,4 @@
+import { canReplyWithScopes } from '../reply-access.js';
 import type { SearchAccess } from '../search-access.js';
 
 export const SOCIAL_PROVIDERS = ['THREADS'] as const;
@@ -61,6 +62,10 @@ export class SocialAccountEntity {
 
     get scopes() {
         return this.props.scopes;
+    }
+
+    get canReply() {
+        return canReplyWithScopes(this.props.scopes);
     }
 
     get isActive() {

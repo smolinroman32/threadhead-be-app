@@ -161,4 +161,43 @@ describe('ThreadsAccountApi', () => {
             );
         });
     });
+
+    describe('publishReply', () => {
+        it('publishes a text reply in one call and returns its id', async () => {
+            http.post.mockResolvedValue({ status: 200, body: { id: 'reply-1' } });
+
+            await expect(
+                api.publishReply('token', { replyToId: 'post-1', text: 'Hello there' }),
+            ).resolves.toEqual({ id: 'reply-1' });
+            expect(http.post).toHaveBeenCalledWith('https://graph.threads.net/v1.0/me/threads', {
+                form: {
+                    media_type: 'TEXT',
+                    text: 'Hello there',
+                    reply_to_id: 'post-1',
+                    auto_publish_text: 'true',
+                    access_token: 'token',
+                },
+            });
+        });
+
+        it.each([
+            { response: { status: 403, body: null }, error: SocialProviderPermissionDeniedError },
+            {
+                response: { status: 400, body: { error: { code: 10 } } },
+                error: SocialProviderPermissionDeniedError,
+            },
+            { response: { status: 500, body: null }, error: SocialProviderUnavailableError },
+            {
+                response: { status: 400, body: { error: { code: 4 } } },
+                error: SocialProviderUnavailableError,
+            },
+            { response: { status: 400, body: { error: { code: 100 } } }, error: SocialProviderRejectedError },
+        ])('maps a failed publish (%o)', async ({ response, error }) => {
+            http.post.mockResolvedValue(response);
+
+            await expect(
+                api.publishReply('token', { replyToId: 'post-1', text: 'x' }),
+            ).rejects.toBeInstanceOf(error);
+        });
+    });
 });

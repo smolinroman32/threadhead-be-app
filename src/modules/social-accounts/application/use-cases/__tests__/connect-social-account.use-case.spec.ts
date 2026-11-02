@@ -11,7 +11,7 @@ import { ConnectSocialAccountUseCase } from '../connect-social-account.use-case.
 describe('ConnectSocialAccountUseCase', () => {
     const expiresAt = new Date('2026-12-08T12:00:00Z');
     const oauthState = { verify: vi.fn() };
-    const oauth = { scopes: ['threads_basic', 'threads_keyword_search'], exchangeCode: vi.fn() };
+    const oauth = { exchangeCode: vi.fn(), getGrantedScopes: vi.fn() };
     const api = { getProfile: vi.fn() };
     const registry = { oauth: vi.fn(() => oauth), api: vi.fn(() => api) };
     const repository = { findByProviderAccount: vi.fn(), create: vi.fn(), update: vi.fn() };
@@ -48,6 +48,7 @@ describe('ConnectSocialAccountUseCase', () => {
         vi.clearAllMocks();
         oauthState.verify.mockResolvedValue({ userId: 'user-id', provider: 'THREADS' });
         oauth.exchangeCode.mockResolvedValue({ accessToken: 'long', refreshToken: null, expiresAt });
+        oauth.getGrantedScopes.mockResolvedValue(['threads_basic', 'threads_manage_replies']);
         api.getProfile.mockResolvedValue({ id: 'th-42', username: 'name', avatarUrl: 'https://img/x.png' });
         repository.findByProviderAccount.mockResolvedValue(null);
         repository.create.mockImplementation(async (data) => ({ id: 'new-id', ...data }));
@@ -59,6 +60,7 @@ describe('ConnectSocialAccountUseCase', () => {
         await useCase.execute({ state: 'state', code: 'code', currentUserId: 'user-id' });
 
         expect(oauth.exchangeCode).toHaveBeenCalledWith('code');
+        expect(oauth.getGrantedScopes).toHaveBeenCalledWith('long');
         expect(api.getProfile).toHaveBeenCalledWith('long');
         expect(repository.create).toHaveBeenCalledWith({
             userId: 'user-id',
@@ -69,7 +71,7 @@ describe('ConnectSocialAccountUseCase', () => {
             accessTokenEncrypted: 'enc:long',
             refreshTokenEncrypted: null,
             tokenExpiresAt: expiresAt,
-            scopes: ['threads_basic', 'threads_keyword_search'],
+            scopes: ['threads_basic', 'threads_manage_replies'],
         });
     });
 
@@ -85,7 +87,7 @@ describe('ConnectSocialAccountUseCase', () => {
             accessTokenEncrypted: 'enc:long',
             refreshTokenEncrypted: null,
             tokenExpiresAt: expiresAt,
-            scopes: ['threads_basic', 'threads_keyword_search'],
+            scopes: ['threads_basic', 'threads_manage_replies'],
             isActive: true,
             disconnectedAt: null,
         });
@@ -106,6 +108,16 @@ describe('ConnectSocialAccountUseCase', () => {
         await expect(
             useCase.execute({ state: 'state', code: 'code', currentUserId: 'user-id' }),
         ).resolves.toMatchObject({ id: 'new-id' });
+    });
+
+    it('writes nothing when the granted scopes cannot be read', async () => {
+        oauth.getGrantedScopes.mockRejectedValue(new Error('boom'));
+
+        await expect(
+            useCase.execute({ state: 'state', code: 'code', currentUserId: 'user-id' }),
+        ).rejects.toThrow('boom');
+        expect(repository.create).not.toHaveBeenCalled();
+        expect(repository.update).not.toHaveBeenCalled();
     });
 
     it('refuses an account that belongs to another user and writes nothing', async () => {

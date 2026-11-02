@@ -36,11 +36,17 @@ Account in the list (never contains a token or its ciphertext):
     "username": "string",
     "avatarUrl": "string|null",
     "scopes": ["threads_basic"],
+    "canReply": false,
     "isActive": true,
     "tokenExpiresAt": "ISO date",
     "createdAt": "ISO date"
 }
 ```
+
+`scopes` holds the permissions the user actually granted, read from Threads `debug_token` right after the code
+exchange. `canReply` is true only when both `threads_content_publish` and `threads_manage_replies` are granted;
+accounts connected before these scopes were requested report `false` until the user connects again. If
+`debug_token` fails, the connect fails with `reason=failed` and nothing is written.
 
 Callback redirect target: `${FRONTEND_URL}${FRONTEND_SOCIAL_RESULT_PATH}` plus
 
@@ -126,18 +132,21 @@ there.
   `post` and `patch`. 4xx and 5xx are returned, not thrown; a timeout or network error throws
   `HttpTransportError` (always transient). `FetchHttpClient` implements it with `fetch`.
 - `SocialAccountOauthPort`: authorization URL from `state`, exchange `code` for a long-lived token, refresh
-  a token, list scopes.
+  a token, read the granted scopes.
 - `SocialAccountApiPort`: `getProfile(accessToken)` returning `{ id, username, avatarUrl }`.
 - Adapters `ThreadsAccountOAuth` and `ThreadsAccountApi`, chosen by `provider` through a small registry.
   `ThreadsAccountOAuth` builds `redirect_uri` from `NEST_URL` for both the authorization URL and the code
   exchange (Threads requires the two to match).
-- Scopes requested: `threads_basic`, `threads_keyword_search`, `threads_read_replies`.
+- Scopes requested: `threads_basic`, `threads_keyword_search`, `threads_read_replies`, `threads_content_publish`,
+  `threads_manage_replies`.
 
 Threads endpoints (from the previous implementation; verify against the Threads docs when building):
 authorize `https://threads.net/oauth/authorize`; code exchange `POST https://graph.threads.net/oauth/access_token`
 (form); long-lived `GET https://graph.threads.net/access_token?grant_type=th_exchange_token`; refresh
 `GET https://graph.threads.net/refresh_access_token?grant_type=th_refresh_token`; profile
-`GET https://graph.threads.net/v1.0/me?fields=id,username,threads_profile_picture_url`.
+`GET https://graph.threads.net/v1.0/me?fields=id,username,threads_profile_picture_url`; granted scopes
+`GET https://graph.threads.com/v1.0/debug_token?input_token=<user token>&access_token=TH|<APP_ID>|<APP_SECRET>`
+(response `data.scopes`).
 
 ## Acceptance checks
 

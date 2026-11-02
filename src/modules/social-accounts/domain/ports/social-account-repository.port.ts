@@ -3,6 +3,7 @@ import type { SocialAccountEntity, SocialProvider } from '../entities/social-acc
 export type NewSocialAccount = Omit<
     SocialAccountEntity,
     | 'id'
+    | 'canReply'
     | 'isActive'
     | 'disconnectedAt'
     | 'searchAccess'

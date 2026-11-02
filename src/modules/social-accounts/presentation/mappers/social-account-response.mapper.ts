@@ -9,6 +9,7 @@ export class SocialAccountResponseMapper {
             username: account.username,
             avatarUrl: account.avatarUrl,
             scopes: account.scopes,
+            canReply: account.canReply,
             isActive: account.isActive,
             tokenExpiresAt: account.tokenExpiresAt,
             createdAt: account.createdAt,

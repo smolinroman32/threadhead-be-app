@@ -30,7 +30,7 @@ describe('ThreadsAccountOAuth', () => {
         expect(Object.fromEntries(url.searchParams)).toEqual({
             client_id: 'app-id',
             redirect_uri: REDIRECT,
-            scope: 'threads_basic,threads_keyword_search,threads_read_replies',
+            scope: 'threads_basic,threads_keyword_search,threads_read_replies,threads_content_publish,threads_manage_replies',
             response_type: 'code',
             state: 'the-state',
         });
@@ -74,6 +74,26 @@ describe('ThreadsAccountOAuth', () => {
             refreshToken: null,
             expiresAt: new Date('2026-12-08T12:00:00Z'),
         });
+    });
+
+    it('reads the granted scopes from debug_token with the app access token', async () => {
+        http.get.mockResolvedValue({
+            status: 200,
+            body: { data: { is_valid: true, scopes: ['threads_basic', 'threads_manage_replies'] } },
+        });
+
+        const scopes = await create().getGrantedScopes('user-token');
+
+        expect(http.get).toHaveBeenCalledWith('https://graph.threads.com/v1.0/debug_token', {
+            query: { input_token: 'user-token', access_token: 'TH|app-id|app-secret' },
+        });
+        expect(scopes).toEqual(['threads_basic', 'threads_manage_replies']);
+    });
+
+    it('treats a debug_token body without scopes as no granted scopes', async () => {
+        http.get.mockResolvedValue({ status: 200, body: { data: {} } });
+
+        await expect(create().getGrantedScopes('user-token')).resolves.toEqual([]);
     });
 
     it('reports a 4xx as a rejection, a 5xx as unavailable and lets transport errors through', async () => {

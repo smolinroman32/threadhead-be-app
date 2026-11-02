@@ -116,6 +116,7 @@ describe('SocialAccountsController', () => {
                 username: 'name',
                 avatarUrl: null,
                 scopes: ['threads_basic'],
+                canReply: false,
                 isActive: true,
                 tokenExpiresAt: new Date('2026-12-01'),
                 createdAt: new Date('2026-10-01'),

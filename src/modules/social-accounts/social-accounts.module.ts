@@ -9,6 +9,8 @@ import { DisconnectSocialAccountUseCase } from './application/use-cases/disconne
 import { CheckSearchAccessUseCase } from './application/use-cases/check-search-access.use-case.js';
 import { GetAccessTokenUseCase } from './application/use-cases/get-access-token.use-case.js';
 import { ListSocialAccountsUseCase } from './application/use-cases/list-social-accounts.use-case.js';
+import { PublishReplyUseCase } from './application/use-cases/publish-reply.use-case.js';
+import { RefreshGrantedScopesUseCase } from './application/use-cases/refresh-granted-scopes.use-case.js';
 import { SearchPostsUseCase } from './application/use-cases/search-posts.use-case.js';
 import { OAuthStatePort } from './domain/ports/oauth-state.port.js';
 import { SocialAccountRepositoryPort } from './domain/ports/social-account-repository.port.js';
@@ -37,6 +39,8 @@ import { SocialAccountsController } from './presentation/social-accounts.control
         GetAccessTokenUseCase,
         SearchPostsUseCase,
         CheckSearchAccessUseCase,
+        PublishReplyUseCase,
+        RefreshGrantedScopesUseCase,
         SocialAccountsService,
     ],
     exports: [SocialAccountsService],

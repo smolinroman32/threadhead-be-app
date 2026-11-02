@@ -12,4 +12,5 @@ export abstract class SocialAccountOauthPort {
     abstract getAuthorizationUrl(state: string): string;
     abstract exchangeCode(code: string): Promise<OAuthTokens>;
     abstract refreshToken(accessToken: string): Promise<OAuthTokens>;
+    abstract getGrantedScopes(accessToken: string): Promise<string[]>;
 }

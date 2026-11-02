@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import type { SocialProvider } from '../domain/entities/social-account.entity.js';
-import type { PostSearch } from '../domain/ports/social-account-api.port.js';
+import type { PostSearch, ReplyDraft } from '../domain/ports/social-account-api.port.js';
 import { AuthorizeSocialAccountUseCase } from './use-cases/authorize-social-account.use-case.js';
 import { CheckSearchAccessUseCase } from './use-cases/check-search-access.use-case.js';
 import { ConnectSocialAccountUseCase } from './use-cases/connect-social-account.use-case.js';
 import { DisconnectSocialAccountUseCase } from './use-cases/disconnect-social-account.use-case.js';
 import { GetAccessTokenUseCase } from './use-cases/get-access-token.use-case.js';
 import { ListSocialAccountsUseCase } from './use-cases/list-social-accounts.use-case.js';
+import { PublishReplyUseCase } from './use-cases/publish-reply.use-case.js';
+import { RefreshGrantedScopesUseCase } from './use-cases/refresh-granted-scopes.use-case.js';
 import { SearchPostsUseCase } from './use-cases/search-posts.use-case.js';
 
 @Injectable()
@@ -19,6 +21,8 @@ export class SocialAccountsService {
         private readonly getAccessTokenUseCase: GetAccessTokenUseCase,
         private readonly searchPostsUseCase: SearchPostsUseCase,
         private readonly checkSearchAccessUseCase: CheckSearchAccessUseCase,
+        private readonly publishReplyUseCase: PublishReplyUseCase,
+        private readonly refreshGrantedScopesUseCase: RefreshGrantedScopesUseCase,
     ) {}
 
     authorize(userId: string, provider: SocialProvider) {
@@ -47,5 +51,13 @@ export class SocialAccountsService {
 
     checkSearchAccess(accountId: string, userId?: string) {
         return this.checkSearchAccessUseCase.execute(accountId, userId);
+    }
+
+    publishReply(accountId: string, reply: ReplyDraft) {
+        return this.publishReplyUseCase.execute(accountId, reply);
+    }
+
+    refreshGrantedScopes(accountId: string) {
+        return this.refreshGrantedScopesUseCase.execute(accountId);
     }
 }

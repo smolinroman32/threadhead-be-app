@@ -6,13 +6,21 @@ import { readProviderBody } from '../providers/read-provider-body.js';
 
 const AUTHORIZE_URL = 'https://threads.net/oauth/authorize';
 const API_URL = 'https://graph.threads.net';
+const DEBUG_API_URL = 'https://graph.threads.com/v1.0';
 
 type TokenBody = { access_token: string; expires_in?: number };
+type DebugTokenBody = { data: { scopes?: string[] } };
 
 @Injectable()
 export class ThreadsAccountOAuth implements SocialAccountOauthPort {
     readonly provider = 'THREADS' as const;
-    readonly scopes = ['threads_basic', 'threads_keyword_search', 'threads_read_replies'] as const;
+    readonly scopes = [
+        'threads_basic',
+        'threads_keyword_search',
+        'threads_read_replies',
+        'threads_content_publish',
+        'threads_manage_replies',
+    ] as const;
 
     private readonly appId = getEnv('THREADS_APP_ID');
     private readonly appSecret = getEnv('THREADS_APP_SECRET');
@@ -56,6 +64,14 @@ export class ThreadsAccountOAuth implements SocialAccountOauthPort {
         });
 
         return this.toTokens(readProviderBody<TokenBody>(response));
+    }
+
+    async getGrantedScopes(accessToken: string) {
+        const response = await this.http.get(`${DEBUG_API_URL}/debug_token`, {
+            query: { input_token: accessToken, access_token: `TH|${this.appId}|${this.appSecret}` },
+        });
+
+        return readProviderBody<DebugTokenBody>(response).data.scopes ?? [];
     }
 
     private toTokens(body: TokenBody): OAuthTokens {

@@ -42,6 +42,7 @@ export class ConnectSocialAccountUseCase {
 
         const oauth = this.registry.oauth(provider);
         const tokens = await oauth.exchangeCode(code);
+        const scopes = await oauth.getGrantedScopes(tokens.accessToken);
         const profile = await this.registry.api(provider).getProfile(tokens.accessToken);
 
         this.logger.log(`Profile fetched: ${provider} @${profile.username} (${profile.id}), user ${userId}`);
@@ -56,7 +57,7 @@ export class ConnectSocialAccountUseCase {
             accessTokenEncrypted: this.encryption.encrypt(tokens.accessToken),
             refreshTokenEncrypted: tokens.refreshToken && this.encryption.encrypt(tokens.refreshToken),
             tokenExpiresAt: tokens.expiresAt,
-            scopes: [...oauth.scopes],
+            scopes,
         };
 
         const account = existing
